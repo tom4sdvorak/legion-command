@@ -83,7 +83,7 @@ export class Warrior {
 
     isBlocked() {
         // Check for an object right in front of the unit
-        let overlap = this.scene.physics.overlapRect((this.sprite.x + this.size*0.5* + 1)*this.direction, this.sprite.y, 5, this.sprite.height);
+        let overlap = this.scene.physics.overlapRect((this.sprite.x + this.size*0.5 + 1)*this.direction, this.sprite.y, 5, this.sprite.height);
         console.log(overlap);
         if(overlap.length > 0 && overlap[0].gameObject.getData('parent') instanceof PlayerBase){
             if(overlap[0].gameObject.getData('parent').faction === this.faction){
