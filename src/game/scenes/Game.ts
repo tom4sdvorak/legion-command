@@ -13,7 +13,8 @@ export class Game extends Scene
     redUnitsPhysics: Phaser.Physics.Arcade.Group;
     blueUnitsPhysics: Phaser.Physics.Arcade.Group;
     unitsPhysics: Phaser.Physics.Arcade.Group;
-    basePhysics: Phaser.Physics.Arcade.Group;
+    redBasePhysics: Phaser.Physics.Arcade.Group;
+    blueBasePhysics: Phaser.Physics.Arcade.Group;
     warriors: Warrior[] = [];
     resumeTimer: Phaser.Time.TimerEvent | null = null;
     unitCounter: number = 0;
@@ -49,11 +50,9 @@ export class Game extends Scene
         this.redBase = new PlayerBase(this, 'red', this.blueUnitsPhysics);
         this.blueBase = new PlayerBase(this, 'blue', this.redUnitsPhysics);
         
-        this.basePhysics.add(this.redBase.sprite);
-        this.basePhysics.add(this.blueBase.sprite);
-        /*this.physics.add.overlap(this.redBase.proximityZone, this.blueUnitsPhysics, (zone, unit) => { 
-            
-        }, () => {}, this);*/
+        this.redUnitsPhysics.add(this.redBase.sprite);
+        this.blueUnitsPhysics.add(this.blueBase.sprite);
+
     }
 
     create ()
@@ -65,10 +64,9 @@ export class Game extends Scene
         this.background.setOrigin(0,0);
         this.ground = this.add.image(0,650, 'ground');
         this.ground.setOrigin(0,0);
-        this.blueUnitsPhysics = this.physics.add.group();
-        this.redUnitsPhysics = this.physics.add.group();
+        this.blueUnitsPhysics = this.physics.add.group({allowGravity: false});
+        this.redUnitsPhysics = this.physics.add.group({allowGravity: false});
         this.unitsPhysics = this.physics.add.group();
-        this.basePhysics = this.physics.add.group();
         this.physics.world.setBounds(0, 0, 500, 500);
         this.createBases();
 
@@ -85,7 +83,7 @@ export class Game extends Scene
             parentUnit2.handleCollision(parentUnit1);
         });
 
-        this.physics.add.collider(this.basePhysics, this.unitsPhysics);
+        this.physics.add.collider(this.redUnitsPhysics, this.blueUnitsPhysics);
         eventsCenter.on('spawn-red-warrior', () => {
             this.spawnUnit("warrior", "red");
         });
@@ -97,7 +95,7 @@ export class Game extends Scene
     update(){
         this.warriors = this.warriors.filter((warrior) => {
             if (!warrior.isAlive()) {
-                warrior.sprite.destroy();
+                warrior.destroy();
                 return false;
             }
             return true;

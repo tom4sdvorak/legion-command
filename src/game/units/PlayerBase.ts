@@ -3,7 +3,7 @@ import { Warrior } from "./Warrior";
 export class PlayerBase {
     health: number;
     faction: 'red' | 'blue';
-    sprite: Phaser.Physics.Arcade.Sprite;
+    sprite: Phaser.Physics.Arcade.Sprite
     offset: number; // How far from edge of game to spawn
     groundLevel: number; // How low to spawn\
     proximityZone: Phaser.GameObjects.Shape;
@@ -26,7 +26,7 @@ export class PlayerBase {
         else{
             this.sprite = scene.physics.add.sprite(scene.scale.gameSize.width-this.offset, this.groundLevel, 'tower_blue');
         }
-
+        this.sprite.setData('parent', this);
         // Create circle around base to detect units
         this.proximityZone = scene.add.circle
             (
@@ -36,7 +36,7 @@ export class PlayerBase {
                 0xffffff, // fill color
                 0.5 // alpha
             );
-        scene.physics.add.existing(this.proximityZone);
+        scene.physics.add.existing(this.proximityZone, true);     
 
         // Check for overlap with units
         scene.physics.add.overlap(this.proximityZone, unitsPhysics, (zone, unit) => { 
@@ -51,7 +51,8 @@ export class PlayerBase {
         }, () => {}, this);
 
         if (this.sprite.body) {
-            this.sprite.body.pushable = false;
+            this.sprite.setImmovable(true);
+            this.sprite.setPushable(false);
         }
     }
 

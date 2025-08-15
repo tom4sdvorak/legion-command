@@ -1,3 +1,4 @@
+import { PlayerBase } from "./PlayerBase";
 
 const UnitStates = {
     WAITING: 'waiting',
@@ -18,27 +19,35 @@ export class Warrior {
     attackSpeed: number = 1000;
     attackingTimer: Phaser.Time.TimerEvent | null = null;
     unitID: number;
+    size: number = 100;
+    direction: number = 1;
 
     constructor(scene: Phaser.Scene,x: number, y: number, speed: number, attackDamage: number, health: number, faction: 'red' | 'blue', unitID: number) {
         this.scene = scene;
-        this.speed = speed;
         this.attackDamage = attackDamage;
         this.health = health;
         this.sprite = scene.physics.add.sprite(x, y, `warrior_${faction}`);
         this.unitID = unitID;
         this.faction = faction;
-        if(this.faction === 'blue') {
+        if(this.faction === 'blue') {    
             this.sprite.flipX = true;
-            this.speed = -this.speed;
+            this.direction = -1;
         }
+        this.speed = speed*this.direction;
         this.sprite.setData('parent', this);
         this.sprite.setOrigin(0.5);
         this.sprite.setCollideWorldBounds(true);
         //this.sprite.setBounce(1);
         if (this.sprite.body) {
-            this.sprite.body.setSize(100, 100);
+            this.sprite.body.setSize(this.size, this.size);
             this.sprite.body.pushable = false;
         }        
+    }
+
+    public destroy(): void {
+        this.sprite.destroy();
+        if(this.resumeTimer) this.resumeTimer.remove();
+        if(this.attackingTimer) this.attackingTimer.remove();
     }
 
     public takeDamage(damage: number): void {
@@ -71,9 +80,16 @@ export class Warrior {
 
     }
 
+
     isBlocked() {
         // Check for an object right in front of the unit
-        const overlap = this.scene.physics.overlapRect(this.sprite.x + this.speed, this.sprite.y, 5, this.sprite.height);
+        let overlap = this.scene.physics.overlapRect((this.sprite.x + this.size*0.5* + 1)*this.direction, this.sprite.y, 5, this.sprite.height);
+        console.log(overlap);
+        if(overlap.length > 0 && overlap[0].gameObject.getData('parent') instanceof PlayerBase){
+            if(overlap[0].gameObject.getData('parent').faction === this.faction){
+                return overlap.length-1 > 0;
+            }
+        }
         return overlap.length > 0;
     }
 
@@ -91,6 +107,10 @@ export class Warrior {
                     this.resumeTimer?.remove();
                     this.resumeTimer = null;
                     this.moveForward();
+                    console.log(this.unitID + "Resuming movement");
+                }
+                else{
+                    console.log(this.unitID + "Blocked");
                 }             
             },
             callbackScope: this,
@@ -100,6 +120,7 @@ export class Warrior {
     }
 
     public moveForward(): void {
+        if(this.state === UnitStates.DEAD) return;
         this.state = UnitStates.WALKING;
         this.sprite.setVelocityX(this.speed);
         this.sprite.play(`warrior_${this.faction}_walk`);
@@ -121,10 +142,11 @@ export class Warrior {
                        target.takeDamage(this.attackDamage);
                     }
                     else{
-                        this.state = UnitStates.IDLE;
+                        this.state = UnitStates.WALKING;
+                        this.moveForward(); 
                         this.attackingTimer?.remove();
                         this.attackingTimer = null;
-                        console.log("Stopped attacking");
+                        console.log(this.unitID + "Stopped attacking");
                     }
                 },
                 callbackScope: this,
