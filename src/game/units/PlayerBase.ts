@@ -1,30 +1,28 @@
-import { Warrior } from "./Warrior";
+import { Unit } from "./Unit";
 
 export class PlayerBase {
     health: number;
     faction: 'red' | 'blue';
     sprite: Phaser.Physics.Arcade.Sprite
-    offset: number; // How far from edge of game to spawn
-    groundLevel: number; // How low to spawn\
+    yOffset: number; // How high from groundLevel to spawn
     proximityZone: Phaser.GameObjects.Shape;
-    enemiesInRange: Warrior [] = [];
+    enemiesInRange: Unit [] = [];
     attackDamage: number = 50;
     isShooting: boolean = false;
     attackSpeed: number = 1000;
     shootingTimer: Phaser.Time.TimerEvent | null = null;
     scene: Phaser.Scene;
 
-    constructor(scene: Phaser.Scene, faction: 'red' | 'blue', unitsPhysics: Phaser.Physics.Arcade.Group) {
+    constructor(scene: Phaser.Scene, faction: 'red' | 'blue', spawnPosition: Phaser.Math.Vector2, unitsPhysics: Phaser.Physics.Arcade.Group) {
         this.scene = scene;
         this.health = 1000;
         this.faction = faction;
-        this.offset = 100;
-        this.groundLevel = 610;
+        this.yOffset = -80;
         if(faction == 'red'){
-            this.sprite = scene.physics.add.sprite(this.offset, this.groundLevel, 'tower_red');
+            this.sprite = scene.physics.add.sprite(spawnPosition.x, spawnPosition.y+this.yOffset, 'tower_red');
         }
         else{
-            this.sprite = scene.physics.add.sprite(scene.scale.gameSize.width-this.offset, this.groundLevel, 'tower_blue');
+            this.sprite = scene.physics.add.sprite(spawnPosition.x, spawnPosition.y+this.yOffset, 'tower_blue');
         }
         this.sprite.setData('parent', this);
         // Create circle around base to detect units
@@ -36,7 +34,12 @@ export class PlayerBase {
                 0xffffff, // fill color
                 0.5 // alpha
             );
-        scene.physics.add.existing(this.proximityZone, true);     
+        scene.physics.add.existing(this.proximityZone, true); 
+
+        //TEST: Add visible overlap checking rectangle
+        /*const myRect = this.scene.add.rectangle(this.sprite.x-this.sprite.width/2, this.sprite.y-this.sprite.height/2, this.sprite.width, this.sprite.height, 0xff0000, 0.5);
+        myRect.setOrigin(0,0);
+        console.log("Created overlap with x position from " + this.sprite.x + " to " + (this.sprite.x+this.sprite.width));*/
 
         // Check for overlap with units
         scene.physics.add.overlap(this.proximityZone, unitsPhysics, (zone, unit) => { 
@@ -91,5 +94,9 @@ export class PlayerBase {
         }
     }
 
-}
+    public isBlocked(): boolean{
+        let overlap = this.scene.physics.overlapRect(this.sprite.x-this.sprite.width/2, this.sprite.y-this.sprite.height/2, this.sprite.width, this.sprite.height, true, false);      
+        return overlap.length > 1;
+    }
 
+}

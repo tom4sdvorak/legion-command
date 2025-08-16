@@ -7,7 +7,7 @@ const UnitStates = {
     ATTACKING: 'attacking',
     DEAD: 'dead'
 };
-export class Warrior {
+export class Unit {
     speed: number;
     attackDamage: number;
     health: number;
@@ -29,25 +29,26 @@ export class Warrior {
         this.sprite = scene.physics.add.sprite(x, y, `warrior_${faction}`);
         this.unitID = unitID;
         this.faction = faction;
-        if(this.faction === 'blue') {    
+        if(this.faction === 'blue') { 
             this.sprite.flipX = true;
             this.direction = -1;
         }
         this.speed = speed*this.direction;
         this.sprite.setData('parent', this);
-        this.sprite.setOrigin(0.5);
         this.sprite.setCollideWorldBounds(true);
         //this.sprite.setBounce(1);
         if (this.sprite.body) {
             this.sprite.body.setSize(this.size, this.size);
             this.sprite.body.pushable = false;
-        }        
+        } 
+
+        
     }
 
     public destroy(): void {
-        this.sprite.destroy();
         if(this.resumeTimer) this.resumeTimer.remove();
         if(this.attackingTimer) this.attackingTimer.remove();
+        this.sprite.destroy();        
     }
 
     public takeDamage(damage: number): void {
@@ -58,10 +59,10 @@ export class Warrior {
         }
     }
 
-    public handleCollision(target: Warrior):void {  
+    public handleCollision(target: Unit):void { 
         //Do nothing if we collided with friendly unit behind us, otherwise stop walking
-        console.log(`${this.unitID} collided with ${target.unitID}`);
-        if(target instanceof Warrior && target.faction === this.faction){
+        //console.log(`${this.unitID} collided with ${target.unitID}`);``
+        if(target instanceof Unit && target.faction === this.faction){
             if(this.unitID < target.unitID){
                 return;
             }
@@ -71,7 +72,7 @@ export class Warrior {
         }
 
         // On collision with enemy, attack.
-        if(target instanceof Warrior && target.faction !== this.faction){
+        if(target instanceof Unit && target.faction !== this.faction){
             this.startAttackingTarget(target);
         }
     }
@@ -83,8 +84,12 @@ export class Warrior {
 
     isBlocked() {
         // Check for an object right in front of the unit
-        let overlap = this.scene.physics.overlapRect((this.sprite.x + this.size*0.5 + 1)*this.direction, this.sprite.y, 5, this.sprite.height);
-        console.log(overlap);
+        let overlap = this.scene.physics.overlapRect(this.sprite.x + (this.size*0.5 + 1)*this.direction, this.sprite.y-this.size*0.5, 5*this.direction, this.size);
+        
+        //TEST: Add visible overlap checking rectangle
+        /*let myRect = this.scene.add.rectangle(this.sprite.x + (this.size*0.5 + 1)*this.direction, this.sprite.y-this.size*0.5, 5*this.direction, this.size, 0xff0000, 0.5);
+        myRect.setOrigin(0,0);*/
+
         if(overlap.length > 0 && overlap[0].gameObject.getData('parent') instanceof PlayerBase){
             if(overlap[0].gameObject.getData('parent').faction === this.faction){
                 return overlap.length-1 > 0;
@@ -107,16 +112,12 @@ export class Warrior {
                     this.resumeTimer?.remove();
                     this.resumeTimer = null;
                     this.moveForward();
-                    console.log(this.unitID + "Resuming movement");
                 }
-                else{
-                    console.log(this.unitID + "Blocked");
-                }             
             },
             callbackScope: this,
             loop: true
-        });
-        }   
+            });
+        } 
     }
 
     public moveForward(): void {
@@ -131,7 +132,7 @@ export class Warrior {
         return true;
     }
 
-    public startAttackingTarget(target: Warrior): void {
+    public startAttackingTarget(target: Unit): void {
         if (this.state !== UnitStates.ATTACKING) {
             this.sprite.play(`warrior_${this.faction}_attack`);
             this.state = UnitStates.ATTACKING;

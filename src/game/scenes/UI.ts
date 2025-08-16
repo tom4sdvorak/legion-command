@@ -16,14 +16,14 @@ export class UI extends Scene
             .setStrokeStyle(2, 0x000000);
         this.button.setInteractive();
         this.button.on('pointerup', () => {
-            eventsCenter.emit('spawn-red-warrior');
+            eventsCenter.emit('spawn-red-unit');
         });
 
         this.button = this.add.circle(500, 500, 40, 0x000000)
             .setStrokeStyle(2, 0xffffff);
         this.button.setInteractive();
         this.button.on('pointerup', () => {
-            eventsCenter.emit('spawn-blue-warrior');
+            eventsCenter.emit('spawn-blue-unit');
         });
     }
 }
