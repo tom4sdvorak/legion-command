@@ -1,3 +1,5 @@
+import { Arrow } from "../projectiles/Arrow";
+import { Projectile } from "../projectiles/Projectile";
 import { Unit } from "./Unit";
 
 export class PlayerBase {
@@ -12,12 +14,14 @@ export class PlayerBase {
     attackSpeed: number = 1000;
     shootingTimer: Phaser.Time.TimerEvent | null = null;
     scene: Phaser.Scene;
+    projectiles: Phaser.Physics.Arcade.Group;
 
-    constructor(scene: Phaser.Scene, faction: 'red' | 'blue', spawnPosition: Phaser.Math.Vector2, unitsPhysics: Phaser.Physics.Arcade.Group) {
+    constructor(scene: Phaser.Scene, faction: 'red' | 'blue', spawnPosition: Phaser.Math.Vector2, unitsPhysics: Phaser.Physics.Arcade.Group, projectiles: Phaser.Physics.Arcade.Group) {
         this.scene = scene;
         this.health = 1000;
         this.faction = faction;
         this.yOffset = -80;
+        this.projectiles = projectiles;
         if(faction == 'red'){
             this.sprite = scene.physics.add.sprite(spawnPosition.x, spawnPosition.y+this.yOffset, 'tower_red');
         }
@@ -30,7 +34,7 @@ export class PlayerBase {
             (
                 this.sprite.x,
                 this.sprite.y,
-                200, // radius
+                400, // radius
                 0xffffff, // fill color
                 0.5 // alpha
             );
@@ -81,7 +85,12 @@ export class PlayerBase {
 
     public shoot(): void{
         if(this.enemiesInRange.length > 0){
-            this.enemiesInRange[0].takeDamage(this.attackDamage);
+            const projectile = this.projectiles.get(this.sprite.x, this.sprite.y) as Projectile; // Get first projectile from our pool
+            projectile.damage = this.attackDamage;
+            let projectileAngle = Phaser.Math.Angle.Between(this.sprite.x, this.sprite.y, this.enemiesInRange[0].x, this.enemiesInRange[0].y);
+            projectile.rotation = projectileAngle;
+            projectile.enableBody(true, this.sprite.x, this.sprite.y, true, true); // Reset it and set it to active and visible
+            this.scene.physics.moveTo(projectile, this.enemiesInRange[0].x, this.enemiesInRange[0].y, 100); // Release projectiles at the position of nearest target
             if(!this.enemiesInRange[0].isAlive()){
                 this.enemiesInRange.shift();
             }

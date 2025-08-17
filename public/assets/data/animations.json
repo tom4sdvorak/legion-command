@@ -1,5 +1,5 @@
 {
-    "warrior_red": {
+    "warrior": {
         "idle": {
             "frames": {
                 "start": 0,
@@ -25,7 +25,7 @@
             "repeat": -1
         }
     },
-    "warrior_blue": {
+    "archer": {
         "idle": {
             "frames": {
                 "start": 0,
@@ -36,19 +36,29 @@
         },
         "walk": {
             "frames": {
-                "start": 6,
-                "end": 11
+                "start": 8,
+                "end": 13
             },
             "frameRate": 10,
             "repeat": -1
         },
         "attack": {
             "frames": {
-                "start": 12,
-                "end": 23
+                "start": 32,
+                "end": 39
             },
             "frameRate": 10,
             "repeat": -1
+        }
+    },
+    "projectile": {
+        "arrow": {
+            "frames": {
+                "start": 0,
+                "end": 0
+            },
+            "frameRate": 0,
+            "repeat": 0
         }
     }
 }

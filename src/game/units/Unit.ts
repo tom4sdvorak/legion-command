@@ -1,78 +1,63 @@
-import { PlayerBase } from "./PlayerBase";
+import { UnitProps } from "../helpers/UnitProps";
+import { UnitStates } from "../helpers/UnitStates";
 
-const UnitStates = {
-    WAITING: 'waiting',
-    IDLE: 'idle',
-    WALKING: 'walking',
-    ATTACKING: 'attacking',
-    DEAD: 'dead'
-};
-export class Unit {
-    speed: number;
-    attackDamage: number;
-    health: number;
-    sprite: Phaser.Physics.Arcade.Sprite;
-    faction: 'red' | 'blue';
+export class Unit extends Phaser.Physics.Arcade.Sprite {
+    unitProps: UnitProps;
     resumeTimer: Phaser.Time.TimerEvent | null = null;
-    scene: Phaser.Scene;
     state: string = UnitStates.WAITING;
-    attackSpeed: number = 1000;
     attackingTimer: Phaser.Time.TimerEvent | null = null;
-    unitID: number;
-    size: number = 100;
     direction: number = 1;
+    unitType: string;
+    size: number = 100;
 
-    constructor(scene: Phaser.Scene,x: number, y: number, speed: number, attackDamage: number, health: number, faction: 'red' | 'blue', unitID: number) {
-        this.scene = scene;
-        this.attackDamage = attackDamage;
-        this.health = health;
-        this.sprite = scene.physics.add.sprite(x, y, `warrior_${faction}`);
-        this.unitID = unitID;
-        this.faction = faction;
-        if(this.faction === 'blue') { 
-            this.sprite.flipX = true;
-            this.direction = -1;
-        }
-        this.speed = speed*this.direction;
-        this.sprite.setData('parent', this);
-        this.sprite.setCollideWorldBounds(true);
-        //this.sprite.setBounce(1);
-        if (this.sprite.body) {
-            this.sprite.body.setSize(this.size, this.size);
-            this.sprite.body.pushable = false;
-        } 
+    constructor(scene: Phaser.Scene, unitProps: UnitProps, unitType: string) {
+        const initialDirection = (unitProps.faction === 'blue') ? -1 : 1;
+        const initialSpeed = Math.abs(unitProps.speed) * initialDirection;
 
+        super(scene, unitProps.x, unitProps.y, unitType);
+
+        // Set properties and add to scene
+        this.unitProps = unitProps;
+        this.unitType = unitType;
+        this.direction = initialDirection;
+        this.unitProps.speed = initialSpeed;
+
+        scene.add.existing(this);
+        scene.physics.add.existing(this);
         
-    }
+        if (this.body) {
+            (this.body as Phaser.Physics.Arcade.Body).setSize(this.size, this.size);
+            (this.body as Phaser.Physics.Arcade.Body).pushable = false;
+        }
 
+        this.setOrigin(0.5, 0.5);
+        this.setFlipX(this.direction === -1);
+    }
+    
     public destroy(): void {
         if(this.resumeTimer) this.resumeTimer.remove();
         if(this.attackingTimer) this.attackingTimer.remove();
-        this.sprite.destroy();        
+        super.destroy(); 
     }
 
     public takeDamage(damage: number): void {
-        this.health -= damage;
-        console.log(`Took ${damage} damage, remaining health is ${this.health}`);
-        if(this.health <= 0){
+        this.unitProps.health -= damage;
+        console.log(`Took ${damage} damage, remaining health is ${this.unitProps.health}`);
+        if(this.unitProps.health <= 0){
             this.state = UnitStates.DEAD;
         }
     }
 
     public handleCollision(target: Unit):void { 
-        //Do nothing if we collided with friendly unit behind us, otherwise stop walking
-        //console.log(`${this.unitID} collided with ${target.unitID}`);``
-        if(target instanceof Unit && target.faction === this.faction){
-            if(this.unitID < target.unitID){
+        if(target instanceof Unit && target.unitProps.faction === this.unitProps.faction){
+            if(this.unitProps.unitID < target.unitProps.unitID){
                 return;
             }
             else{
                 this.stopMoving();
             }
         }
-
-        // On collision with enemy, attack.
-        if(target instanceof Unit && target.faction !== this.faction){
+        if(target instanceof Unit && target.unitProps.faction !== this.unitProps.faction){
             this.startAttackingTarget(target);
         }
     }
@@ -81,41 +66,34 @@ export class Unit {
 
     }
 
-
     isBlocked() {
-        // Check for an object right in front of the unit
-        let overlap = this.scene.physics.overlapRect(this.sprite.x + (this.size*0.5 + 1)*this.direction, this.sprite.y-this.size*0.5, 5*this.direction, this.size);
-        
-        //TEST: Add visible overlap checking rectangle
-        /*let myRect = this.scene.add.rectangle(this.sprite.x + (this.size*0.5 + 1)*this.direction, this.sprite.y-this.size*0.5, 5*this.direction, this.size, 0xff0000, 0.5);
-        myRect.setOrigin(0,0);*/
+        const detectionRectWidth = 5;
+        const xOffset = (this.size * 0.5 + 1) * this.direction;
+        const yOffset = -this.size * 0.5;
 
-        if(overlap.length > 0 && overlap[0].gameObject.getData('parent') instanceof PlayerBase){
-            if(overlap[0].gameObject.getData('parent').faction === this.faction){
-                return overlap.length-1 > 0;
-            }
-        }
+        // Use a physics overlap check to find a blocking unit in front
+        let overlap = this.scene.physics.overlapRect(this.x + xOffset, this.y + yOffset, detectionRectWidth * this.direction, this.size);
+        
         return overlap.length > 0;
     }
 
     public stopMoving(): void {
         if(this.state === UnitStates.WALKING){
             this.state = UnitStates.IDLE;
-            this.sprite.setVelocityX(0);
-            this.sprite.play(`warrior_${this.faction}_idle`);
+            this.setVelocityX(0);
+            this.play(`${this.unitType}_idle`);
 
-            //Add timer to check every 50ms if unit is blocked and move if not
             this.resumeTimer = this.scene.time.addEvent({
-            delay: 50,
-            callback: () => {
-                if(!this.isBlocked()){
-                    this.resumeTimer?.remove();
-                    this.resumeTimer = null;
-                    this.moveForward();
-                }
-            },
-            callbackScope: this,
-            loop: true
+                delay: 50,
+                callback: () => {
+                    if(!this.isBlocked()){
+                        this.resumeTimer?.remove();
+                        this.resumeTimer = null;
+                        this.moveForward();
+                    }
+                },
+                callbackScope: this,
+                loop: true
             });
         } 
     }
@@ -123,31 +101,32 @@ export class Unit {
     public moveForward(): void {
         if(this.state === UnitStates.DEAD) return;
         this.state = UnitStates.WALKING;
-        this.sprite.setVelocityX(this.speed);
-        this.sprite.play(`warrior_${this.faction}_walk`);
+        this.setVelocityX(this.unitProps.speed);
+        this.play(`${this.unitType}_walk`);
     }
 
     public isAlive(): boolean {
-        if(this.state === UnitStates.DEAD) return false;
-        return true;
+        return this.state !== UnitStates.DEAD;
     }
 
     public startAttackingTarget(target: Unit): void {
         if (this.state !== UnitStates.ATTACKING) {
-            this.sprite.play(`warrior_${this.faction}_attack`);
             this.state = UnitStates.ATTACKING;
+            let timeScale = this.anims.duration / this.unitProps.attackSpeed;
+            this.anims.timeScale = timeScale;
+            this.play(`${this.unitType}_attack`);
+
             this.attackingTimer = this.scene.time.addEvent({
-                delay: this.attackSpeed,
+                delay: this.unitProps.attackSpeed,
                 callback: () => {
                     if(target.isAlive()){
-                       target.takeDamage(this.attackDamage);
+                       target.takeDamage(this.unitProps.attackDamage);
                     }
                     else{
                         this.state = UnitStates.WALKING;
                         this.moveForward(); 
                         this.attackingTimer?.remove();
                         this.attackingTimer = null;
-                        console.log(this.unitID + "Stopped attacking");
                     }
                 },
                 callbackScope: this,

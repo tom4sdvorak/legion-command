@@ -11,19 +11,49 @@ export class UI extends Scene
     }
 
     create ()
-    {
+    {      
         this.button = this.add.circle(400, 500, 40, 0xffffff)
-            .setStrokeStyle(2, 0x000000);
-        this.button.setInteractive();
-        this.button.on('pointerup', () => {
-            eventsCenter.emit('spawn-red-unit');
-        });
+            .setStrokeStyle(2, 0x000000)
+            .setInteractive()
+            .on('pointerup', () => {
+                eventsCenter.emit('spawn-red-unit', 'warrior');
+            });
+        const image1 = this.add.image(400, 500, 'warrior');
+        Phaser.Display.Align.In.Center(image1, this.button); // Center the image within the button.
+        this.button.setData('parent', image1);
+        image1.setData('parent', this.button);
+
+        this.button = this.add.circle(400, 400, 40, 0xffffff)
+            .setStrokeStyle(2, 0x000000)
+            .setInteractive()
+            .on('pointerup', () => {
+                eventsCenter.emit('spawn-red-unit', 'archer');
+            });
+        const image1b = this.add.image(400, 400, 'archer');
+        Phaser.Display.Align.In.Center(image1b, this.button); // Center the image within the button.
+        this.button.setData('parent', image1b);
+        image1b.setData('parent', this.button);
 
         this.button = this.add.circle(500, 500, 40, 0x000000)
-            .setStrokeStyle(2, 0xffffff);
-        this.button.setInteractive();
-        this.button.on('pointerup', () => {
-            eventsCenter.emit('spawn-blue-unit');
-        });
+            .setStrokeStyle(2, 0xffffff)
+            .setInteractive()
+            .on('pointerup', () => {
+                eventsCenter.emit('spawn-blue-unit', 'warrior');
+            });
+        const image2 = this.add.image(500, 500, 'warrior');
+        Phaser.Display.Align.In.Center(image2, this.button); // Center the image within the button.
+        this.button.setData('parent', image2);
+        image2.setData('parent', this.button);
+
+        this.button = this.add.circle(500, 400, 40, 0x000000)
+            .setStrokeStyle(2, 0xffffff)
+            .setInteractive()
+            .on('pointerup', () => {
+                eventsCenter.emit('spawn-blue-unit', 'archer');
+            });
+        const image2b = this.add.image(500, 400, 'archer');
+        Phaser.Display.Align.In.Center(image2b, this.button); // Center the image within the button.
+        this.button.setData('parent', image2b);
+        image2b.setData('parent', this.button);
     }
 }
