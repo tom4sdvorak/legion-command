@@ -4,6 +4,9 @@ import { Player } from '../units/Player';
 import { Unit } from '../units/Unit';
 import { Arrow } from '../projectiles/Arrow';
 import { Projectile } from '../projectiles/Projectile';
+import { Archer } from '../units/Archer';
+import { Warrior } from '../units/Warrior';
+import { UnitPools } from '../helpers/UnitPools';
 
 export class Game extends Scene
 {
@@ -22,6 +25,7 @@ export class Game extends Scene
     spawnDelay: number = 1000;
     framesSinceRedSpawn: number = 0;
     framesSinceBlueSpawn: number = 0;
+    unitPools: UnitPools;
 
 
     constructor ()
@@ -30,26 +34,32 @@ export class Game extends Scene
     }
 
     createPlayers(){  
-        this.blueUnitsPhysics = this.physics.add.group({allowGravity: false});
-        this.redUnitsPhysics = this.physics.add.group({allowGravity: false});
-        this.unitsPhysics = this.physics.add.group({allowGravity: false});
-        this.playerRed = new Player(this, 'red', this.redUnitsPhysics, this.blueUnitsPhysics, this.redArrows);
-        this.playerBlue = new Player(this, 'blue', this.blueUnitsPhysics, this.redUnitsPhysics, this.blueArrows);
+        this.blueUnitsPhysics = this.physics.add.group({
+            classType: Unit,
+            runChildUpdate: true,
+            allowGravity: false
+        });
+        this.redUnitsPhysics = this.physics.add.group({
+            classType: Unit,
+            runChildUpdate: true,
+            allowGravity: false
+        });
+
+        //this.unitsPhysics = this.physics.add.group({allowGravity: false});
+        this.playerRed = new Player(this, 'red', this.redUnitsPhysics, this.blueUnitsPhysics, this.redArrows, this.unitPools);
+        this.playerBlue = new Player(this, 'blue', this.blueUnitsPhysics, this.redUnitsPhysics, this.blueArrows, this.unitPools);
+        this.physics.add.collider(this.redUnitsPhysics, this.playerBlue.playerBase);
+        this.physics.add.collider(this.blueUnitsPhysics, this.playerRed.playerBase);
     }
 
-    handleUnitCollision(unit1: any, unit2: any){
-        let parentUnit1, parentUnit2;
-            if (unit1 instanceof Phaser.Physics.Arcade.Sprite){
-                parentUnit1 = unit1.getData('parent');    
-            }
-            if (unit2 instanceof Phaser.Physics.Arcade.Sprite){
-                parentUnit2 = unit2.getData('parent');
-            }
-            if(parentUnit1 instanceof Unit && parentUnit2 instanceof Unit){
-                parentUnit1.handleCollision(parentUnit2);
-                parentUnit2.handleCollision(parentUnit1);
-            }
-            
+    beforeUnitCollision(unit1: Unit, unit2: Unit) : boolean{
+        return true;
+    }
+
+    handleUnitCollision(unit1: Unit, unit2: Unit){
+        //console.log("Collision between " + unit1.unitProps.unitID + " and " + unit2.unitProps.unitID);
+        unit1.handleCollision(unit2);
+        unit2.handleCollision(unit1);            
     }
 
     beforeRedProjectileHit(projectile: Projectile, unit: Phaser.Physics.Arcade.Sprite) : boolean{
@@ -64,13 +74,36 @@ export class Game extends Scene
 
     onProjectileHit(projectile: Projectile, unit: Phaser.Physics.Arcade.Sprite) : void{
         projectile.disableBody(true, true);
-        let parentUnit;
-        if (unit instanceof Phaser.Physics.Arcade.Sprite){
-                parentUnit = unit.getData('parent');
-                if(parentUnit instanceof Unit){
-                    parentUnit.takeDamage(projectile.damage);                    
-                }
+        if (unit instanceof Unit){
+            unit.takeDamage(projectile.damage);
         }
+    }
+
+    setupUnitPools(){
+        // Unit pools
+        this.unitPools = {} as UnitPools;
+        this.unitPools.archers = this.physics.add.group({
+            classType: Archer,
+            maxSize: 50,
+            runChildUpdate: true
+        });
+        this.unitPools.warriors = this.physics.add.group({
+            classType: Warrior,
+            maxSize: 50,
+            runChildUpdate: true
+        });
+
+        // Projectile pools
+        this.redArrows = this.physics.add.group({
+            classType: Arrow,
+            maxSize: 50,
+            runChildUpdate: true
+        });
+        this.blueArrows = this.physics.add.group({
+            classType: Arrow,
+            maxSize: 50,
+            runChildUpdate: true
+        });
     }
 
     create ()
@@ -85,18 +118,8 @@ export class Game extends Scene
         this.ground.setOrigin(0,0);
         //this.physics.world.setBounds(0, 0, 500, 500);
 
-        // Create the Arrow pool for each side
-        this.redArrows = this.physics.add.group({
-            classType: Arrow,
-            maxSize: 50,
-            runChildUpdate: true
-        });
-        this.blueArrows = this.physics.add.group({
-            classType: Arrow,
-            maxSize: 50,
-            runChildUpdate: true
-        });
-
+        // Create unit and projectile pools
+        this.setupUnitPools();
         this.createPlayers();
 
         // Add collision between Arrows and opposing units
@@ -104,10 +127,10 @@ export class Game extends Scene
         this.physics.add.overlap(this.blueArrows, this.redUnitsPhysics, this.onProjectileHit as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, this.beforeBlueProjectileHit as unknown as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, this);
 
         // Add collision between friendly units
-        this.physics.add.collider(this.redUnitsPhysics, this.redUnitsPhysics, this.handleUnitCollision, undefined, this);
-        this.physics.add.collider(this.blueUnitsPhysics, this.blueUnitsPhysics, this.handleUnitCollision, undefined, this);
+        this.physics.add.collider(this.redUnitsPhysics, this.redUnitsPhysics, this.handleUnitCollision as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, this.beforeUnitCollision as unknown as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, this);
+        this.physics.add.collider(this.blueUnitsPhysics, this.blueUnitsPhysics, this.handleUnitCollision as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, this.beforeUnitCollision as unknown as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, this);
         // Add collision when hostile
-        this.physics.add.collider(this.redUnitsPhysics, this.blueUnitsPhysics, this.handleUnitCollision, undefined, this);
+        this.physics.add.collider(this.redUnitsPhysics, this.blueUnitsPhysics, this.handleUnitCollision as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, this.beforeUnitCollision as unknown as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, this);
 
         //Listen to events from UI scene
         eventsCenter.on('spawn-red-unit', (unitType : string) => {
@@ -146,14 +169,32 @@ export class Game extends Scene
 
         if(!this.playerRed.playerBase.isBlocked() && this.playerRed.unitQueue.length > 0 && this.redSpawnTime <= 0 && this.framesSinceRedSpawn >= 3){
             console.log("%cSpawning red unit", "color: red");
-            this.playerRed.spawnUnit(this.playerRed.unitQueue[0]);
+            const newUnit = this.playerRed.spawnUnit(this.playerRed.unitQueue[0]);
+            // In case of ranged unit add check for enemies in range
+            /*if(newUnit instanceof Archer){
+                this.physics.add.overlap(newUnit.proximityZone, this.blueUnitsPhysics, (zone, enemy) => {
+                const target = enemy as Unit;
+                if (!newUnit.enemiesInRange.includes(target)) {
+                    newUnit.enemiesInRange.push(target);
+                }
+                });
+            }*/
             this.playerRed.unitQueue.shift();
             this.redSpawnTime = this.spawnDelay;
             this.framesSinceRedSpawn = 0;
         }
         if(!this.playerBlue.playerBase.isBlocked() && this.playerBlue.unitQueue.length > 0 && this.blueSpawnTime <= 0 && this.framesSinceBlueSpawn >= 3){
             console.log("%cSpawning blue unit", "color: blue");
-            this.playerBlue.spawnUnit(this.playerBlue.unitQueue[0]);
+            const newUnit  = this.playerBlue.spawnUnit(this.playerBlue.unitQueue[0]);
+            // In case of ranged unit add check for enemies in range
+            /*if(newUnit instanceof Archer){
+                this.physics.add.overlap(newUnit.proximityZone, this.redUnitsPhysics, (zone, enemy) => {
+                const target = enemy as Unit;
+                if (!newUnit.enemiesInRange.includes(target)) {
+                    newUnit.enemiesInRange.push(target);
+                }
+                });
+            }*/
             this.playerBlue.unitQueue.shift();
             this.blueSpawnTime = this.spawnDelay;
             this.framesSinceBlueSpawn = 0;

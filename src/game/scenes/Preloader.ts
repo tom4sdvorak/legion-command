@@ -54,10 +54,11 @@ export class Preloader extends Scene
             for (const animKey in sheetAnims) {
                 const anim = sheetAnims[animKey];
                 this.anims.create({
-                    key: `${sheetKey}_${animKey}`,
+                    key: anim.key,
                     frames: this.anims.generateFrameNumbers(sheetKey, anim.frames),
                     frameRate: anim.frameRate,
-                    repeat: anim.repeat !== undefined ? anim.repeat : 0
+                    repeat: anim.repeat !== undefined ? anim.repeat : 0,
+                    yoyo: anim.yoyo !== undefined ? anim.yoyo : false
                 });
             }
         }
