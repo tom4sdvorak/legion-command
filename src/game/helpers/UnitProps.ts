@@ -3,6 +3,7 @@ export interface UnitProps {
     y: number;
     speed: number;
     health: number;
+    maxHealth: number;
     attackDamage: number;
     attackRange: number;
     attackSpeed: number;

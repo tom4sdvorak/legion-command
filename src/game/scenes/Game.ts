@@ -17,7 +17,7 @@ export class Game extends Scene
     playerBlue: Player;
     redUnitsPhysics: Phaser.Physics.Arcade.Group;
     blueUnitsPhysics: Phaser.Physics.Arcade.Group;
-    unitsPhysics: Phaser.Physics.Arcade.Group;
+    //unitsPhysics: Phaser.Physics.Arcade.Group;
     redArrows: Phaser.Physics.Arcade.Group;
     blueArrows: Phaser.Physics.Arcade.Group;
     redSpawnTime: number = 0;
@@ -26,6 +26,11 @@ export class Game extends Scene
     framesSinceRedSpawn: number = 0;
     framesSinceBlueSpawn: number = 0;
     unitPools: UnitPools;
+    blueCollider: Phaser.Physics.Arcade.Collider;
+    redCollider: Phaser.Physics.Arcade.Collider;
+    hostileCollider: Phaser.Physics.Arcade.Collider;
+    baseGroup: Phaser.GameObjects.Group;
+    
 
 
     constructor ()
@@ -37,12 +42,12 @@ export class Game extends Scene
         this.blueUnitsPhysics = this.physics.add.group({
             classType: Unit,
             runChildUpdate: true,
-            allowGravity: false
+            allowGravity: false,
         });
         this.redUnitsPhysics = this.physics.add.group({
             classType: Unit,
             runChildUpdate: true,
-            allowGravity: false
+            allowGravity: false,
         });
 
         //this.unitsPhysics = this.physics.add.group({allowGravity: false});
@@ -50,6 +55,15 @@ export class Game extends Scene
         this.playerBlue = new Player(this, 'blue', this.blueUnitsPhysics, this.redUnitsPhysics, this.blueArrows, this.unitPools);
         this.physics.add.collider(this.redUnitsPhysics, this.playerBlue.playerBase);
         this.physics.add.collider(this.blueUnitsPhysics, this.playerRed.playerBase);
+        this.baseGroup = this.add.group({
+            runChildUpdate: true
+        });
+        this.baseGroup.add(this.playerRed.playerBase);
+        this.baseGroup.add(this.playerBlue.playerBase);
+    }
+
+    onUnitRemoved(unit: Unit){
+        this.redCollider.update();
     }
 
     beforeUnitCollision(unit1: Unit, unit2: Unit) : boolean{
@@ -106,6 +120,19 @@ export class Game extends Scene
         });
     }
 
+    setupColliders(){
+        // Add collision between Arrows and opposing units
+        this.physics.add.overlap(this.redArrows, this.blueUnitsPhysics, this.onProjectileHit as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, this.beforeRedProjectileHit as unknown as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, this);
+        this.physics.add.overlap(this.blueArrows, this.redUnitsPhysics, this.onProjectileHit as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, this.beforeBlueProjectileHit as unknown as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, this);
+
+        // Add collision between friendly units
+        this.redCollider = this.physics.add.collider(this.redUnitsPhysics, this.redUnitsPhysics, this.handleUnitCollision as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, this.beforeUnitCollision as unknown as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, this);
+        this.blueCollider = this.physics.add.collider(this.blueUnitsPhysics, this.blueUnitsPhysics, this.handleUnitCollision as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, this.beforeUnitCollision as unknown as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, this);
+        // Add collision when hostile
+        this.hostileCollider = this.physics.add.collider(this.redUnitsPhysics, this.blueUnitsPhysics, this.handleUnitCollision as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, this.beforeUnitCollision as unknown as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, this);
+
+    }
+
     create ()
     {       
         // Setup the game screen
@@ -121,17 +148,8 @@ export class Game extends Scene
         // Create unit and projectile pools
         this.setupUnitPools();
         this.createPlayers();
-
-        // Add collision between Arrows and opposing units
-        this.physics.add.overlap(this.redArrows, this.blueUnitsPhysics, this.onProjectileHit as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, this.beforeRedProjectileHit as unknown as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, this);
-        this.physics.add.overlap(this.blueArrows, this.redUnitsPhysics, this.onProjectileHit as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, this.beforeBlueProjectileHit as unknown as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, this);
-
-        // Add collision between friendly units
-        this.physics.add.collider(this.redUnitsPhysics, this.redUnitsPhysics, this.handleUnitCollision as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, this.beforeUnitCollision as unknown as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, this);
-        this.physics.add.collider(this.blueUnitsPhysics, this.blueUnitsPhysics, this.handleUnitCollision as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, this.beforeUnitCollision as unknown as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, this);
-        // Add collision when hostile
-        this.physics.add.collider(this.redUnitsPhysics, this.blueUnitsPhysics, this.handleUnitCollision as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, this.beforeUnitCollision as unknown as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, this);
-
+        this.setupColliders();
+        
         //Listen to events from UI scene
         eventsCenter.on('spawn-red-unit', (unitType : string) => {
             console.log(`%cTrying to spawn red ${unitType}`, "color: red");
@@ -145,21 +163,6 @@ export class Game extends Scene
     }
 
     update(time: any, delta: number){
-        // Every update look thru all units in the game and remove dead ones
-        this.redUnitsPhysics.getChildren().forEach((child) => {
-            const unit = child as Unit;
-            if (!unit.isAlive()) {
-                unit.destroy();
-            }
-        });
-
-        // Clean up the blue units group
-        this.blueUnitsPhysics.getChildren().forEach((child) => {
-            const unit = child as Unit;
-            if (!unit.isAlive()) {
-                unit.destroy();
-            }
-        });
 
         // Release next unit from each player's queue if spawn points are free and minimum cooldown along with minimum amount of frames has passed
         this.redSpawnTime -= delta;
@@ -170,15 +173,6 @@ export class Game extends Scene
         if(!this.playerRed.playerBase.isBlocked() && this.playerRed.unitQueue.length > 0 && this.redSpawnTime <= 0 && this.framesSinceRedSpawn >= 3){
             console.log("%cSpawning red unit", "color: red");
             const newUnit = this.playerRed.spawnUnit(this.playerRed.unitQueue[0]);
-            // In case of ranged unit add check for enemies in range
-            /*if(newUnit instanceof Archer){
-                this.physics.add.overlap(newUnit.proximityZone, this.blueUnitsPhysics, (zone, enemy) => {
-                const target = enemy as Unit;
-                if (!newUnit.enemiesInRange.includes(target)) {
-                    newUnit.enemiesInRange.push(target);
-                }
-                });
-            }*/
             this.playerRed.unitQueue.shift();
             this.redSpawnTime = this.spawnDelay;
             this.framesSinceRedSpawn = 0;

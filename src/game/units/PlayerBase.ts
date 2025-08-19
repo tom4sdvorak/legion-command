@@ -6,45 +6,102 @@ export class PlayerBase extends Phaser.Physics.Arcade.Sprite {
     health: number;
     faction: 'red' | 'blue';
     yOffset: number; // How high from groundLevel to spawn
-    proximityZone: Phaser.GameObjects.Shape;
+    proximityZone: Phaser.GameObjects.Zone;
     enemiesInRange: Unit[] = [];
     attackDamage: number = 50;
     isShooting: boolean = false;
     attackSpeed: number = 1000;
     shootingTimer: Phaser.Time.TimerEvent | null = null;
     projectiles: Phaser.Physics.Arcade.Group;
+    enemyUnitsPhysics: Phaser.Physics.Arcade.Group;
+    range: number = 200;
 
-    constructor(scene: Scene, faction: 'red' | 'blue', spawnPosition: Phaser.Math.Vector2, unitsPhysics: Phaser.Physics.Arcade.Group, projectiles: Phaser.Physics.Arcade.Group) {
+    constructor(scene: Scene, faction: 'red' | 'blue', spawnPosition: Phaser.Math.Vector2, enemyUnitsPhysics: Phaser.Physics.Arcade.Group, projectiles: Phaser.Physics.Arcade.Group) {
         
         const texture = faction === 'red' ? 'tower_red' : 'tower_blue';
         const yOffset = -80;
         super(scene, spawnPosition.x, spawnPosition.y + yOffset, texture);
-        this.scene = scene;
+        this.enemyUnitsPhysics = enemyUnitsPhysics;
         this.health = 1000;
         this.faction = faction;
         this.yOffset = yOffset;
         this.projectiles = projectiles;
         scene.add.existing(this);
         scene.physics.add.existing(this, true);
-        this.setData('parent', this);
         
-        // Create circle around base to detect units
-        this.proximityZone = scene.add.circle(this.x, this.y, 200, 0xffffff, 0.5);
-        scene.physics.add.existing(this.proximityZone, true); 
+        // Create proximity zone around base to detect units
+        const zoneXOffset = (this.faction === 'blue') ? this.x-this.range : this.x;
+        this.proximityZone = this.scene.add.zone(zoneXOffset, this.y, this.range, this.height);
+        this.proximityZone.setOrigin(0, 0.5);
+        this.scene.physics.add.existing(this.proximityZone, true);
+        (this.proximityZone.body as Phaser.Physics.Arcade.Body).pushable = false;
+        (this.proximityZone.body as Phaser.Physics.Arcade.Body).allowGravity = false;
+
+        /*this.proximityZone = scene.add.circle(this.x, this.y, 200, 0xffffff, 0.5);
+        scene.physics.add.existing(this.proximityZone, true); */
 
         // Check for overlap with units
-        scene.physics.add.overlap(this.proximityZone, unitsPhysics, (zone, unit) => {
-            if (unit instanceof Unit) {
+        /*scene.physics.add.overlap(this.proximityZone, this.enemyUnitsPhysics, (zone, unit) => {
+            if (unit instanceof Unit && unit.active) {
                 if (!this.enemiesInRange.includes(unit)) {
                     this.enemiesInRange.push(unit);
                     if (!this.isShooting) this.startShooting();
                 }
             }
-        }, undefined, this);
+        }, undefined, this);*/
 
         // Configure the physics body
         this.setImmovable(true);
         this.setPushable(false);
+    }
+
+    update(time: any, delta: number): void {
+        if (!this.active) {
+            return;
+        }
+        super.update(time, delta);
+        this.checkForEnemies();
+
+        // Clear dead enemies from range list
+        for (let i = this.enemiesInRange.length - 1; i >= 0; i--) {
+            if (!this.enemiesInRange[i].isAlive()) {
+                this.enemiesInRange.splice(i, 1);
+            }
+        }
+
+        // Sort list of enemies in range by distance
+        if(this.faction  === 'red'){
+            this.enemiesInRange.sort((a, b) => {
+                return a.x - b.x;
+            }); 
+        }
+        else{
+            this.enemiesInRange.sort((a, b) => {
+                return b.x - a.x;
+            });
+        }
+
+        // Start attacking if there are enemies in range
+        if(this.enemiesInRange.length > 0 && this.isShooting === false){
+            this.startShooting();
+        }
+
+        // Stop attacking if there are no enemies in range
+        if(this.enemiesInRange.length === 0 && this.isShooting === true){
+            this.stopShooting();
+        }
+
+    }
+
+    public checkForEnemies(): void {
+        if(!this.enemyUnitsPhysics) return;
+        this.enemiesInRange = [];
+        this.scene.physics.overlap(this.proximityZone, this.enemyUnitsPhysics, (object1, object2) => {
+            if (object2 instanceof Unit && !this.enemiesInRange.includes(object2)) {
+                this.enemiesInRange.push(object2);
+                //console.log("Enemy in range: " + object2.unitProps.unitID);
+            }
+        }, undefined, this);
     }
 
     public takeDamage(damage: number): void {
@@ -61,37 +118,62 @@ export class PlayerBase extends Phaser.Physics.Arcade.Sprite {
         this.isShooting = true;
         this.shootingTimer = this.scene.time.addEvent({
             delay: this.attackSpeed,
-            callback: this.shoot,
+            callback: () => {
+                        while (true) {
+                            if (!this.active) {
+                                return;
+                            }
+                            if(this.enemiesInRange.length === 0){  // No targets stop attacking
+                                this.stopShooting();
+                                break;
+                            }
+                            else if (this.enemiesInRange[0].isAlive()) { // First target is alive fire on it
+                                this.fireProjectile(this.enemiesInRange[0]);
+                                break;
+                            }
+                            else { // First target is dead, remove it and run from beginning of loop
+                                this.enemiesInRange.shift();
+                                continue;
+                            }
+                        }    
+                    },
             callbackScope: this,
             loop: true
         });
     }
 
-    public shoot(): void {
-        if (this.enemiesInRange.length > 0) {
-            const projectile = this.projectiles.get(this.x, this.y) as Projectile; // Get first projectile from our pool
-            if (projectile) {
-                projectile.damage = this.attackDamage;
-                //console.log(this.enemiesInRange[0]);
-                let projectileAngle = Phaser.Math.Angle.Between(this.x, this.y, this.enemiesInRange[0].x, this.enemiesInRange[0].y);
-                projectile.rotation = projectileAngle;
-                projectile.enableBody(true, this.x, this.y, true, true); // Reset it and set it to active and visible
-                this.scene.physics.moveTo(projectile, this.enemiesInRange[0].x, this.enemiesInRange[0].y, 100); // Release projectiles at the position of nearest target
-                
-                if (!this.enemiesInRange[0].isAlive()) {
-                    this.enemiesInRange.shift();
-                }
-            }
-        } else {
-            this.isShooting = false;
-            this.shootingTimer?.remove();
-            this.shootingTimer = null;
-            console.log("Stopped shooting");
-        }
+    private fireProjectile(target: Unit): void {
+        if(!this.projectiles) return;
+        const projectile = this.projectiles.get(this.x, this.y) as Projectile; 
+        if (!projectile) return;
+
+        projectile.damage = this.attackDamage;
+
+        // Calculate projectile angle and launch it
+        const projectileAngle = Phaser.Math.Angle.Between(this.x, this.y, target.x, target.y);
+        projectile.rotation = projectileAngle;
+        projectile.enableBody(true, this.x, this.y, true, true);
+        this.scene.physics.moveTo(projectile, target.x, target.y, 300);
     }
     
     public isBlocked(): boolean {
         let overlap = this.scene.physics.overlapRect(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height, true, false);
-        return overlap.length > 0;
+        //if (overlap.length > 0) console.log(overlap);
+        return overlap.some(object => {
+            if (object.gameObject instanceof Unit && object.gameObject.active) {
+                //console.log(`Blocked by ${object.gameObject.unitProps.unitID}`);
+                return true;
+            }
+            //console.log("Not blocked by", object);
+            return false;
+        });
+    }
+
+    public stopShooting(): void {
+            if (this.shootingTimer) {
+                this.shootingTimer.remove();
+                this.shootingTimer = null;
+            }
+            this.isShooting = false;
     }
 }

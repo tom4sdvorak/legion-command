@@ -39,7 +39,8 @@ export class Player {
             x: this.spawnPosition.x,
             y: this.spawnPosition.y, 
             speed: 100, 
-            health: 100, 
+            health: 100,
+            maxHealth: 100,
             attackDamage: 34, 
             attackRange: 100,
             attackSpeed: 1000, //in ms
@@ -58,13 +59,15 @@ export class Player {
                 newUnitProps.type = 'ranged';
                 pool = this.unitPools.archers;
                 unit = pool.get();
+                
                 break;
             default:
                 throw new Error(`Unknown unit type: ${unitType}`);
         }
+
         if(unit){
-            unit.spawn(newUnitProps, this.ownUnitsPhysics, pool);
-            this.ownUnitsPhysics.add(unit);
+            unit.spawn(newUnitProps, this.ownUnitsPhysics, pool, this.enemyUnitsPhysics, this.projectiles);
+            //this.ownUnitsPhysics.add(unit);
             console.log("%cSpawning unit with  id: " + this.unitCounter, `color: ${this.faction}`);
             this.unitCounter++;
             unit.moveForward();
