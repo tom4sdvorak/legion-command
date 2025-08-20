@@ -163,23 +163,18 @@ export class Archer extends Unit {
 
 
     private fireProjectile(target: Unit | PlayerBase): void {
-        //console.log(this.projectiles, this.projectilePool, this.unitGroup);
         if(!this.projectiles || !this.projectilePool || !this.unitGroup) return;
         const projectile = this.projectilePool.get(this.x, this.y) as Arrow;
-        //console.group("Projectile: ", projectile);
         if (!projectile) return;
         if(projectile instanceof Projectile){
             projectile.damage = this.unitProps.attackDamage;
             projectile.spawn(this.projectiles, this.projectilePool);
         }        
-        console.log("Projectile: ", projectile);
         // Calculate projectile angle and launch it
         const projectileAngle = Phaser.Math.Angle.Between(this.x, this.y, target.x, this.y);
         projectile.rotation = projectileAngle;
         projectile.enableBody(true, this.x, this.y, true, true);
         this.scene.physics.moveTo(projectile, target.x, this.y, 300);
-        console.log("Projectile: ", projectile);
-        console.groupEnd();
     }
 
 }

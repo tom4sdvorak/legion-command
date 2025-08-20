@@ -3,6 +3,7 @@ import { Projectile } from "../projectiles/Projectile";
 import { Scene } from "phaser";
 import { ObjectPool } from "../helpers/ObjectPool";
 import { Arrow } from "../projectiles/Arrow";
+import eventsCenter from "../EventsCenter";
 
 export class PlayerBase extends Phaser.Physics.Arcade.Sprite {
     health: number = 500;
@@ -113,6 +114,7 @@ export class PlayerBase extends Phaser.Physics.Arcade.Sprite {
         this.updateHealthBar();
         this.active = false;
         this.isShooting = false;
+        eventsCenter.emit('base-destroyed', this.faction);
     }
 
     public checkForEnemies(): void {
@@ -194,16 +196,11 @@ export class PlayerBase extends Phaser.Physics.Arcade.Sprite {
             projectile.damage = this.attackDamage;
             projectile.spawn(this.projectiles, this.projectilePool);
         }
-        else{
-            console.log("Test: ", this.projectiles, projectile);
-        }
         // Calculate projectile angle and launch it
         const projectileAngle = Phaser.Math.Angle.Between(this.x, this.y, target.x, target.y);
         projectile.rotation = projectileAngle;
-        //this.projectiles.add(projectile);
         projectile.enableBody(true, this.x, this.y, true, true);
         this.scene.physics.moveTo(projectile, target.x, target.y, 300);
-        console.log("Shot projectile: ", projectile);
     }
     
     public isBlocked(): boolean {

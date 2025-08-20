@@ -1,6 +1,7 @@
 import { UnitProps } from "../helpers/UnitProps";
 import { UnitStates } from "../helpers/UnitStates";
 import { PlayerBase } from "./PlayerBase";
+import { HealthComponent } from "../components/HealthComponent";
 
 
 export class Unit extends Phaser.Physics.Arcade.Sprite {
@@ -14,13 +15,20 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
     unitGroup: Phaser.Physics.Arcade.Group | null = null;
     unitPool: Phaser.Physics.Arcade.Group | null = null;
     protected enemyGroup: Phaser.Physics.Arcade.Group | null = null;
-    healthBar: Phaser.GameObjects.Rectangle | null = null;
+    //healthBar: Phaser.GameObjects.Rectangle | null = null;
     baseGroup: Phaser.GameObjects.Group | null = null;
+    healthComponent: HealthComponent;
 
     constructor(scene: Phaser.Scene, unitType: string) {
         super(scene, 0, 0, unitType);
         this.unitType = unitType;
         this.setOrigin(0.5, 0.5);
+        
+        this.healthComponent = new HealthComponent(this, this.size/2, 5, this.size/3,100); // parent, width, height, yOffset, maxHealth
+
+        // Listen to call of unit's death
+        this.on('death', this.die, this);
+
         // Add to scene
         /*scene.add.existing(this);
         this.scene.physics.add.existing(this);
@@ -39,7 +47,8 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         this.setFlipX(this.direction === -1);
         this.unitProps = unitProps;
         this.unitProps.speed = Math.abs(unitProps.speed) * this.direction;
-        this.healthBar = this.scene.add.rectangle(this.unitProps.x, this.unitProps.y+this.size/3, this.size/2, 5, 0x00ff00).setDepth(1).setAlpha(0.5);
+        this.healthComponent.spawn(unitProps.health);
+        //this.healthBar = this.scene.add.rectangle(this.unitProps.x, this.unitProps.y+this.size/3, this.size/2, 5, 0x00ff00).setDepth(1).setAlpha(0.5);
 
         // Reinitialize the sprite's body
         this.setActive(true);
@@ -58,6 +67,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
     }
     
     die(): void {
+        this.state = UnitStates.DEAD;
         if(this.resumeTimer) this.resumeTimer.remove();
         this.resumeTimer = null;
         if(this.attackingTimer) this.attackingTimer.remove();
@@ -65,7 +75,8 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         this.setVelocityX(0);
         if(this.unitGroup) this.unitGroup.remove(this);
         if(this.unitPool) this.unitPool.killAndHide(this);
-        this.healthBar?.destroy();
+        this.healthComponent.deactivate();
+        //this.healthBar?.destroy();
         // Null the group references
         this.unitGroup = null;
         this.unitPool = null;
@@ -78,28 +89,23 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
             return;
         }
         super.update(time, delta);
+        this.healthComponent.update();
         //console.log("Health: " + this.unitProps.health);
-        if(this.unitProps.health <= 0){
+        /*if(this.unitProps.health <= 0){
             this.state = UnitStates.DEAD;
             //console.log("Unit is dead");
             this.die();
             return;
-        }
-        this.updateHealthBar();
+        }*/
+        //this.updateHealthBar();
         this.handleState();
     }
 
     public takeDamage(damage: number): void {
-        this.unitProps.health -= damage;
-        console.log(`Took ${damage} damage, remaining health is ${this.unitProps.health}`);
-        if(this.unitProps.health <= 0){
-            //console.log("Unit is supposed to be dead");
-            this.state = UnitStates.DEAD;
-            //this.die();
-        }
+        this.healthComponent.takeDamage(damage);
     }
 
-    public updateHealthBar():void {
+    /*public updateHealthBar():void {
         //console.log("Updating health bar to x: ", this.x);
         if (this.healthBar) {
             this.healthBar.x = this.x;
@@ -114,7 +120,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
                 this.healthBar.setFillStyle(0xff0000);
             }
         }
-    }
+    }*/
 
     public handleCollision(target: Unit | PlayerBase) : void { 
         // On collision with friendly unit stop the one behind
@@ -147,10 +153,6 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
                 break;
             case UnitStates.ATTACKING:
                 this.play(`${this.unitType}_attack`, true);
-                break;
-            case UnitStates.DEAD:
-                console.log("Unit is dead");
-                this.die();
                 break;
             default:
                 break;

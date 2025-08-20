@@ -157,6 +157,11 @@ export class Game extends Scene
         this.physics.add.collider(this.blueUnitsPhysics, this.playerRed.playerBase, this.handleBaseCollision as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, undefined, this);
     }
 
+    gameOver(faction: string){
+        this.scene.stop('UI');
+        this.scene.start('GameOver', {"faction" : faction});
+    }
+
     create ()
     {       
         // Setup the game screen
@@ -174,7 +179,7 @@ export class Game extends Scene
         this.createPlayers();
         this.setupColliders();
         
-        //Listen to events from UI scene
+        //Listen to events
         eventsCenter.on('spawn-red-unit', (unitType : string) => {
             console.log(`%cTrying to spawn red ${unitType}`, "color: red");
             this.playerRed.addUnitToQueue(unitType);
@@ -184,6 +189,9 @@ export class Game extends Scene
             console.log(`%cTrying to spawn blue ${unitType}`, "color: blue");
             this.playerBlue.addUnitToQueue(unitType);
         });
+        eventsCenter.on('base-destroyed', (faction : string) => {
+            this.gameOver(faction);
+        })
     }
 
     update(time: any, delta: number){
