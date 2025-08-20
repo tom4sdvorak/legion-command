@@ -1,5 +1,6 @@
 import { UnitProps } from "../helpers/UnitProps";
 import { UnitStates } from "../helpers/UnitStates";
+import { PlayerBase } from "./PlayerBase";
 
 
 export class Unit extends Phaser.Physics.Arcade.Sprite {
@@ -13,8 +14,8 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
     unitGroup: Phaser.Physics.Arcade.Group | null = null;
     unitPool: Phaser.Physics.Arcade.Group | null = null;
     protected enemyGroup: Phaser.Physics.Arcade.Group | null = null;
-    protected projectiles: Phaser.Physics.Arcade.Group | null = null;
     healthBar: Phaser.GameObjects.Rectangle | null = null;
+    baseGroup: Phaser.GameObjects.Group | null = null;
 
     constructor(scene: Phaser.Scene, unitType: string) {
         super(scene, 0, 0, unitType);
@@ -32,7 +33,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
     }
 
     // Reinitializes the unit like a constructor would
-    spawn(unitProps: UnitProps, unitGroup: Phaser.Physics.Arcade.Group, unitPool: Phaser.Physics.Arcade.Group, enemyGroup: Phaser.Physics.Arcade.Group, projectiles: Phaser.Physics.Arcade.Group): void{
+    spawn(unitProps: UnitProps, unitGroup: Phaser.Physics.Arcade.Group, unitPool: Phaser.Physics.Arcade.Group, enemyGroup: Phaser.Physics.Arcade.Group, baseGroup: Phaser.GameObjects.Group, projectiles: Phaser.Physics.Arcade.Group, projectilePool: Phaser.Physics.Arcade.Group): void{
         //console.log("Spawning " + unitProps.unitID);
         this.direction = (unitProps.faction === 'blue') ? -1 : 1;
         this.setFlipX(this.direction === -1);
@@ -52,8 +53,8 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         this.unitGroup = unitGroup;
         this.unitPool = unitPool;
         this.enemyGroup = enemyGroup;
-        this.projectiles = projectiles;
         this.unitGroup.add(this);
+        this.baseGroup = baseGroup;
     }
     
     die(): void {
@@ -69,7 +70,6 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         this.unitGroup = null;
         this.unitPool = null;
         this.enemyGroup = null;
-        this.projectiles = null;
         //console.log("Unit is killed off");
     }
 
@@ -116,7 +116,8 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         }
     }
 
-    public handleCollision(target: Unit):void { 
+    public handleCollision(target: Unit | PlayerBase) : void { 
+        // On collision with friendly unit stop the one behind
         if(target instanceof Unit && target.unitProps.faction === this.unitProps.faction){
             if(this.unitProps.unitID < target.unitProps.unitID){
                 return;
@@ -126,7 +127,12 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
                 this.stopMoving();
             }
         }
+        // On colision with enemy unit, melee unit should start attacking
         if(target instanceof Unit && target.unitProps.faction !== this.unitProps.faction && this.unitProps.type === 'melee'){
+            this.startAttackingTarget(target);
+        }
+        // On collision with enemy base, melee unit should start attacking
+        if(target instanceof PlayerBase && target.faction !== this.unitProps.faction && this.unitProps.type === 'melee'){
             this.startAttackingTarget(target);
         }
     }
@@ -200,28 +206,50 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         return this.state !== UnitStates.DEAD;
     }
 
-    public startAttackingTarget(target: Unit): void {
+    public startAttackingTarget(target: Unit | PlayerBase): void {
         if (this.state !== UnitStates.ATTACKING) {
             this.state = UnitStates.ATTACKING;
             let timeScale = this.anims.duration / this.unitProps.attackSpeed;
             this.anims.timeScale = timeScale;
-            let targetID = target.unitProps.unitID;
-            this.attackingTimer = this.scene.time.addEvent({
-                delay: this.unitProps.attackSpeed,
-                callback: () => {
-                    if (!this.active) {
-                        return;
-                    }
-                    if(target.unitProps.unitID === targetID && target.active && target.isAlive()){
-                       target.takeDamage(this.unitProps.attackDamage);
-                    }
-                    else{
-                        this.stopAttacking();
-                    }
-                },
-                callbackScope: this,
-                loop: true
-            });
+            if(target instanceof Unit){
+                let targetID = target.unitProps.unitID;
+                this.attackingTimer = this.scene.time.addEvent({
+                    delay: this.unitProps.attackSpeed,
+                    callback: () => {
+                        if (!this.active) {
+                            return;
+                        }
+                        if(target.unitProps.unitID === targetID && target.active && target.isAlive()){
+                        target.takeDamage(this.unitProps.attackDamage);
+                        }
+                        else{
+                            this.stopAttacking();
+                        }
+                    },
+                    callbackScope: this,
+                    loop: true
+                });
+            }
+            else if(target instanceof PlayerBase){
+                console.log("Found player base ", target);
+                this.attackingTimer = this.scene.time.addEvent({
+                    delay: this.unitProps.attackSpeed,
+                    callback: () => {
+                        if (!this.active) {
+                            return;
+                        }
+                        if (target.active){
+                            target.takeDamage(this.unitProps.attackDamage);
+                        }
+                        else{
+                            this.stopAttacking();
+                        }                        
+                    },
+                    callbackScope: this,
+                    loop: true
+                });
+            }
+            
         }
     }
 

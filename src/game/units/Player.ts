@@ -3,7 +3,7 @@ import { Unit } from "./Unit";
 import { Warrior } from "./Warrior";
 import { Archer } from "./Archer";
 import { UnitProps } from "../helpers/UnitProps";
-import { UnitPools } from "../helpers/UnitPools";
+import { ObjectPool } from "../helpers/ObjectPool";
 
 export class Player {
     public playerBase: PlayerBase;
@@ -15,9 +15,10 @@ export class Player {
     projectiles: Phaser.Physics.Arcade.Group;
     unitCounter: number = 0;
     unitQueue: String[] = [];
-    unitPools: UnitPools;
+    objectPool: ObjectPool;
+    baseGroup: Phaser.GameObjects.Group;
 
-    constructor(scene: Phaser.Scene, faction: 'red' | 'blue', ownUnitsPhysics: Phaser.Physics.Arcade.Group, enemyUnitsPhysics: Phaser.Physics.Arcade.Group, projectiles: Phaser.Physics.Arcade.Group, unitPools: UnitPools  ) {
+    constructor(scene: Phaser.Scene, faction: 'red' | 'blue', ownUnitsPhysics: Phaser.Physics.Arcade.Group, enemyUnitsPhysics: Phaser.Physics.Arcade.Group, projectiles: Phaser.Physics.Arcade.Group, objectPool: ObjectPool, baseGroup: Phaser.GameObjects.Group) {
         this.scene = scene;
         this.faction = faction;
         if(this.faction === 'blue') { this.spawnPosition = new Phaser.Math.Vector2(scene.scale.gameSize.width-100, 680);} 
@@ -25,8 +26,9 @@ export class Player {
         this.ownUnitsPhysics = ownUnitsPhysics;
         this.enemyUnitsPhysics = enemyUnitsPhysics;
         this.projectiles = projectiles;
-        this.playerBase = new PlayerBase(this.scene, this.faction, this.spawnPosition,this.enemyUnitsPhysics, this.projectiles);
-        this.unitPools = unitPools;
+        this.objectPool = objectPool;
+        this.baseGroup = baseGroup;
+        this.playerBase = new PlayerBase(this.scene, this.faction, this.spawnPosition,this.enemyUnitsPhysics, this.projectiles, this.objectPool.projectiles.arrows);
     }
 
     public addUnitToQueue(unitType: String) {
@@ -52,22 +54,19 @@ export class Player {
         let pool: Phaser.Physics.Arcade.Group;
         switch (unitType) {
             case 'warrior':
-                pool = this.unitPools.warriors;
+                pool = this.objectPool.units.warriors;
                 unit = pool.get();
                 break;
             case 'archer':
                 newUnitProps.type = 'ranged';
-                pool = this.unitPools.archers;
+                pool = this.objectPool.units.archers;
                 unit = pool.get();
-                
                 break;
             default:
                 throw new Error(`Unknown unit type: ${unitType}`);
         }
-
         if(unit){
-            unit.spawn(newUnitProps, this.ownUnitsPhysics, pool, this.enemyUnitsPhysics, this.projectiles);
-            //this.ownUnitsPhysics.add(unit);
+            unit.spawn(newUnitProps, this.ownUnitsPhysics, pool, this.enemyUnitsPhysics, this.baseGroup, this.projectiles,this.objectPool.projectiles.arrows);
             console.log("%cSpawning unit with  id: " + this.unitCounter, `color: ${this.faction}`);
             this.unitCounter++;
             unit.moveForward();
