@@ -1,9 +1,8 @@
 import { PlayerBase } from "./PlayerBase";
 import { Unit } from "./Unit";
-import { Warrior } from "./Warrior";
-import { Archer } from "./Archer";
 import { UnitProps } from "../helpers/UnitProps";
 import { ObjectPool } from "../helpers/ObjectPool";
+import { devConfig } from "../helpers/devConfig";
 
 export class Player {
     public playerBase: PlayerBase;
@@ -17,6 +16,9 @@ export class Player {
     unitQueue: String[] = [];
     objectPool: ObjectPool;
     baseGroup: Phaser.GameObjects.Group;
+    spawnTime: number = 0;
+    spawnDelay: number = 1000;
+    framesSinceSpawn: number = 0;
 
     constructor(scene: Phaser.Scene, faction: 'red' | 'blue', ownUnitsPhysics: Phaser.Physics.Arcade.Group, enemyUnitsPhysics: Phaser.Physics.Arcade.Group, projectiles: Phaser.Physics.Arcade.Group, objectPool: ObjectPool, baseGroup: Phaser.GameObjects.Group) {
         this.scene = scene;
@@ -34,6 +36,20 @@ export class Player {
     public addUnitToQueue(unitType: String) {
         this.unitQueue.push(unitType);
     }
+
+    public update(time: any, delta: number): void {
+        // Release next unit from player's queue if spawn points are free and minimum cooldown along with minimum amount of frames has passed
+        this.spawnTime -= delta;
+        if(this.framesSinceSpawn < 3) this.framesSinceSpawn++;
+
+        if(!this.playerBase.isBlocked() && this.unitQueue.length > 0 && this.spawnTime <= 0 && this.framesSinceSpawn >= 3){
+            if(devConfig.consoleLog) console.log(`%cSpawning ${this.faction} ${this.unitQueue[0]} unit`, "color: red");
+            this.spawnUnit(this.unitQueue[0]);
+            this.unitQueue.shift();
+            this.spawnTime = this.spawnDelay;
+            this.framesSinceSpawn = 0;
+        }
+    }
     
     public spawnUnit (unitType: String) : Unit
     {
@@ -48,7 +64,6 @@ export class Player {
             attackSpeed: 1000, //in ms
             faction: this.faction, 
             unitID: this.unitCounter,
-            type: 'melee'
         }
         let unit : Unit;
         let pool: Phaser.Physics.Arcade.Group;
@@ -58,7 +73,6 @@ export class Player {
                 unit = pool.get();
                 break;
             case 'archer':
-                newUnitProps.type = 'ranged';
                 pool = this.objectPool.units.archers;
                 unit = pool.get();
                 break;

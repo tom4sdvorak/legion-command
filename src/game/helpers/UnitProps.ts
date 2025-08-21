@@ -9,5 +9,4 @@ export interface UnitProps {
     attackSpeed: number;
     faction: 'red' | 'blue';
     unitID: number;
-    type: 'ranged' | 'melee';
 }

@@ -1,4 +1,3 @@
-import { ObjectPool } from "../helpers/ObjectPool";
 
 export class Projectile extends Phaser.Physics.Arcade.Sprite {
     damage: number = 0;
