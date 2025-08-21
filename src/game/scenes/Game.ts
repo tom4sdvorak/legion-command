@@ -8,6 +8,7 @@ import { ObjectPool } from '../helpers/ObjectPool';
 import { PlayerBase } from '../units/PlayerBase';
 import { Archer } from '../units/Archer';
 import { Warrior } from '../units/Warrior';
+import { Healer } from '../units/Healer';
 
 export class Game extends Scene
 {
@@ -114,7 +115,12 @@ export class Game extends Scene
                     classType: Warrior,
                     maxSize: 50,
                     runChildUpdate: true
-                })
+                }),
+                healers: this.physics.add.group({
+                    classType: Healer,
+                    maxSize: 50,
+                    runChildUpdate: true
+                }),
             },
             projectiles: {// Projectile pools
                 arrows: this.physics.add.group({

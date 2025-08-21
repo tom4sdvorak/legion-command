@@ -7,6 +7,9 @@ export interface UnitProps {
     attackDamage: number;
     attackRange: number;
     attackSpeed: number;
+    specialDamage: number;
+    specialRange: number;
+    specialSpeed: number;
     faction: 'red' | 'blue';
     unitID: number;
 }

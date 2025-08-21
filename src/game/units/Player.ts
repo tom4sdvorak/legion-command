@@ -62,6 +62,9 @@ export class Player {
             attackDamage: 34, 
             attackRange: 100,
             attackSpeed: 1000, //in ms
+            specialDamage: 10,
+            specialRange: 100,
+            specialSpeed: 1000, //in ms
             faction: this.faction, 
             unitID: this.unitCounter,
         }
@@ -74,6 +77,10 @@ export class Player {
                 break;
             case 'archer':
                 pool = this.objectPool.units.archers;
+                unit = pool.get();
+                break;
+            case 'healer':
+                pool = this.objectPool.units.healers;
                 unit = pool.get();
                 break;
             default:

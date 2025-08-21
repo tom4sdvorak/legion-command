@@ -71,6 +71,14 @@ export class HealthComponent {
         }
     }
 
+    heal(amount: number): void {
+        this.health += amount;
+        if(devConfig.consoleLog) console.log(`${this.parent.constructor.name} was healed by ${amount} hp, remaining health is ${this.health}`);
+        if (this.health > this.maxHealth) {
+            this.health = this.maxHealth;
+        }
+    }
+
     isAlive(): boolean {
         return this.health > 0;
     }

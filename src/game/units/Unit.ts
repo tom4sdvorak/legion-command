@@ -113,6 +113,9 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
             case UnitStates.ATTACKING:
                 this.play(`${this.unitType}_attack`, true);
                 break;
+            case UnitStates.SUPPORTING:
+                this.play(`${this.unitType}_support`, true);
+                break;
             default:
                 break;
         }
@@ -127,7 +130,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         let overlap = this.scene.physics.overlapRect(this.x + xOffset, this.y + yOffset, detectionRectWidth * this.direction, this.size);
         return overlap.some(object => {
             if (object.gameObject instanceof Unit && object.gameObject.active) {
-                if(devConfig.consoleLog) console.log(`Blocked by ${object.gameObject.unitProps.unitID}`);
+                //if(devConfig.consoleLog) console.log(`Blocked by ${object.gameObject.unitProps.unitID}`);
                 return true;
             }
             return false;
@@ -152,7 +155,11 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
             callbackScope: this,
             loop: true
         });
-    } 
+    }
+
+    heal(amount: number): void {
+        this.healthComponent.heal(amount);
+    }
     
 
     public moveForward(): void {

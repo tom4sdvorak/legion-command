@@ -37,6 +37,7 @@ export class Preloader extends Scene
         this.load.image('tower_blue', 'images/tower_blue.png');
         this.load.spritesheet('warrior', 'sprites/warrior/warrior.png',{frameWidth: 192, frameHeight: 192});
         this.load.spritesheet('archer', 'sprites/archer/archer.png',{frameWidth: 192, frameHeight: 192});
+        this.load.spritesheet('healer', 'sprites/healer/healer.png',{frameWidth: 192, frameHeight: 192});
         this.load.spritesheet('arrow', 'sprites/projectiles/arrow.png',{frameWidth: 64, frameHeight: 64});
         this.load.image('background', 'images/bg.png');
         this.load.image('ground', 'images/ground.png');
