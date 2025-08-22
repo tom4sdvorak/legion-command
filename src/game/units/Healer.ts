@@ -3,16 +3,10 @@ import { SupportUnit } from "./SupportUnit";
 import { Unit } from "./Unit";
 
 export class Healer extends SupportUnit {
-    supportTimer: Phaser.Time.TimerEvent | null = null;
+    
 
     constructor(scene: Phaser.Scene) {
         super(scene, "healer");
-    }
-
-    die(){
-        if(this.supportTimer) this.supportTimer.remove();
-        this.supportTimer = null;
-        super.die();
     }
 
     update(time: any, delta: number) {
@@ -27,27 +21,6 @@ export class Healer extends SupportUnit {
         );
 
         this.handleState();
-    }
-
-    handleState(): void {
-        switch (this.state) {
-            case UnitStates.WALKING:
-                this.moveForward();
-                if (this.alliesInRange.length > 0) {
-                    this.state = UnitStates.SUPPORTING;
-                    this.startSupporting();
-                }
-                break;
-            case UnitStates.SUPPORTING:
-                if (this.alliesInRange.length === 0) {
-                    this.state = UnitStates.WALKING;
-                    this.stopSupporting();
-                }
-                break;
-            default:
-                super.handleState();
-                break;
-        }
     }
     
     public startSupporting(): void {
@@ -74,10 +47,4 @@ export class Healer extends SupportUnit {
         target.heal(this.unitProps.specialDamage);
     }
 
-    stopSupporting() {
-        if (this.supportTimer) {
-            this.supportTimer.remove();
-            this.supportTimer = null;
-        }
-    }
 }

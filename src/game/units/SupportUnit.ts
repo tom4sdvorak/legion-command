@@ -7,6 +7,8 @@ export class SupportUnit extends Unit {
 
     proximityZone: Phaser.GameObjects.Zone;
     public alliesInRange: Unit[] = [];
+    supportTimer: Phaser.Time.TimerEvent | null = null;
+    meleeTarget: Unit | PlayerBase | null = null;
 
     constructor(scene: Phaser.Scene, texture: string) {
         super(scene, texture);
@@ -22,6 +24,7 @@ export class SupportUnit extends Unit {
     spawn(unitProps: UnitProps, unitGroup: Phaser.Physics.Arcade.Group, unitPool: Phaser.Physics.Arcade.Group, enemyGroup: Phaser.Physics.Arcade.Group, baseGroup: Phaser.GameObjects.Group, projectiles: Phaser.Physics.Arcade.Group, projectilePool: Phaser.Physics.Arcade.Group):void{
         super.spawn(unitProps, unitGroup, unitPool, enemyGroup, baseGroup, projectiles, projectilePool);
         this.alliesInRange = [];
+        this.meleeTarget = null;
         
         // Reinitialize proximity zone
         this.proximityZone.setPosition(this.x, this.y);
@@ -34,7 +37,7 @@ export class SupportUnit extends Unit {
 
     }
 
-    die() {
+    die() {        
         // Deactivate proximity zone
         this.proximityZone.setActive(false);
         this.proximityZone.setVisible(false);
@@ -42,6 +45,10 @@ export class SupportUnit extends Unit {
         (this.proximityZone.body as Phaser.Physics.Arcade.Body).reset(0, 0);
         
         // Null all temporary information
+        if(this.supportTimer) this.supportTimer.remove();
+        this.supportTimer = null;
+        this.unitGroup = null;
+        this.meleeTarget = null;
         this.alliesInRange = [];
         super.die();
     }
@@ -63,24 +70,49 @@ export class SupportUnit extends Unit {
         });
     }
 
+    /* Support unit state handling
+        WALKING: Plays a walking animation and checks if there are allies in range. If there are, it transitions to SUPPORTING state.
+        SUPPORTING: Plays a supporting animation and checks if there are no allies in range. If there aren't, it transitions back to WALKING state.
+        ATTACKING: Stops supporting, starts attacking a target, and plays an attack animation. If the target is invalid or inactive, it transitions back to WALKING state.
+    */
     handleState(): void {
         switch (this.state) {
             case UnitStates.WALKING:
-                this.moveForward();
+                this.play(`${this.unitType}_walk`, true);
                 if (this.alliesInRange.length > 0) {
                     this.state = UnitStates.SUPPORTING;
                     this.startSupporting();
                 }
                 break;
             case UnitStates.SUPPORTING:
+                this.play(`${this.unitType}_support`, true);
                 if (this.alliesInRange.length === 0) {
                     this.state = UnitStates.WALKING;
                     this.stopSupporting();
                 }
                 break;
+            case UnitStates.ATTACKING:
+                this.stopSupporting();
+                this.startAttackingTarget();
+                this.play(`${this.unitType}_attack`, true);
+                if(!this.meleeTarget || !this.meleeTarget.active){
+                    this.state = UnitStates.WALKING;
+                    this.stopAttacking();
+                }
+                break;
             default:
                 super.handleState();
                 break;
+        }
+    }
+
+    startSupporting() {
+    }
+
+    stopSupporting() {
+        if (this.supportTimer) {
+            this.supportTimer.remove();
+            this.supportTimer = null;
         }
     }
 
@@ -99,60 +131,56 @@ export class SupportUnit extends Unit {
     public handleCollision(target: Unit | PlayerBase) : void { 
         // On colision with enemy unit or base, unit should start attacking
         if(target instanceof Unit && target.unitProps.faction !== this.unitProps.faction){
-            this.startAttackingTarget(target);
+            this.state = UnitStates.ATTACKING;
+            this.meleeTarget = target;
         }
         else if(target instanceof PlayerBase && target.faction !== this.unitProps.faction){
-            this.startAttackingTarget(target);
+            this.state = UnitStates.ATTACKING;
+            this.meleeTarget = target;
         }
         else{
             super.handleCollision(target);
         }
     }
 
-    public startAttackingTarget(target: Unit | PlayerBase): void {
-        if (this.state !== UnitStates.ATTACKING) {
-            this.state = UnitStates.ATTACKING;
-            let timeScale = this.anims.duration / this.unitProps.attackSpeed;
-            this.anims.timeScale = timeScale;
-            if(target instanceof Unit){
-                let targetID = target.unitProps.unitID;
-                this.attackingTimer = this.scene.time.addEvent({
-                    delay: this.unitProps.attackSpeed,
-                    callback: () => {
-                        if (!this.active) {
-                            return;
-                        }
-                        if(target.unitProps.unitID === targetID && target.active && target.isAlive()){
-                        target.takeDamage(this.unitProps.attackDamage);
-                        }
-                        else{
-                            this.stopAttacking();
-                        }
-                    },
-                    callbackScope: this,
-                    loop: true
-                });
-            }
-            else if(target instanceof PlayerBase){
-                this.attackingTimer = this.scene.time.addEvent({
-                    delay: this.unitProps.attackSpeed,
-                    callback: () => {
-                        if (!this.active) {
-                            return;
-                        }
-                        if (target.active){
-                            target.takeDamage(this.unitProps.attackDamage);
-                        }
-                        else{
-                            this.stopAttacking();
-                        }                        
-                    },
-                    callbackScope: this,
-                    loop: true
-                });
-            }
-            
+    public startAttackingTarget(): void {
+        if (this.attackingTimer) return;
+        if (!this.meleeTarget) return;
+        
+        let timeScale = this.anims.duration / this.unitProps.attackSpeed;
+        this.anims.timeScale = timeScale;
+        let targetID = null;
+        if(this.meleeTarget instanceof Unit){
+            targetID = this.meleeTarget.unitProps.unitID;
         }
+        this.attackingTimer = this.scene.time.addEvent({
+            delay: this.unitProps.attackSpeed,
+            callback: () => {
+                if (!this.active) {
+                    return;
+                }
+                if(this.meleeTarget instanceof Unit && this.meleeTarget.unitProps.unitID === targetID && this.meleeTarget.active && this.meleeTarget.isAlive()){
+                    this.meleeTarget.takeDamage(this.unitProps.attackDamage);
+                }
+                else if(this.meleeTarget instanceof PlayerBase && this.meleeTarget.active){
+                    this.meleeTarget.takeDamage(this.unitProps.attackDamage);
+                }
+                else{
+                    this.stopAttacking();
+                    return;
+                }
+            },
+            callbackScope: this,
+            loop: true
+        });
     }
-    
+
+    public stopAttacking(): void {
+        if (this.attackingTimer) {
+            this.attackingTimer.remove();
+            this.attackingTimer = null;
+        }
+        this.meleeTarget = null;
+        this.state = UnitStates.WALKING;        
+    }
 }

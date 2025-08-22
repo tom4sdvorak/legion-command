@@ -161,7 +161,6 @@ export class Game extends Scene
     create ()
     {       
         // Setup the game screen
-        this.scene.launch('UI'); // Starts the UI scene on top of the game scene
         this.camera = this.cameras.main;
         this.camera.setBackgroundColor(0x00ff00);
         this.background = this.add.image(0,0, 'background');
@@ -174,6 +173,8 @@ export class Game extends Scene
         this.setupObjectPools();
         this.createPlayers();
         this.setupColliders();
+
+        this.scene.launch('UI', { player: this.playerRed }); // Starts the UI scene on top of the game scene
         
         //Listen to events
         eventsCenter.on('spawn-red-unit', (unitType : string) => {

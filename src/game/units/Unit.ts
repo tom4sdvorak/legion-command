@@ -15,8 +15,6 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
     size: number = 100;
     unitGroup: Phaser.Physics.Arcade.Group | null = null;
     unitPool: Phaser.Physics.Arcade.Group | null = null;
-    protected enemyGroup: Phaser.Physics.Arcade.Group | null = null;
-    baseGroup: Phaser.GameObjects.Group | null = null;
     healthComponent: HealthComponent;
 
     constructor(scene: Phaser.Scene, unitType: string) {
@@ -50,9 +48,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         this.state = UnitStates.WALKING;
         this.unitGroup = unitGroup;
         this.unitPool = unitPool;
-        this.enemyGroup = enemyGroup;
         this.unitGroup.add(this);
-        this.baseGroup = baseGroup;
     }
     
     die(): void {
@@ -69,7 +65,6 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         // Null the group references
         this.unitGroup = null;
         this.unitPool = null;
-        this.enemyGroup = null;
     }
 
     update(time: any, delta: number): void {
@@ -78,6 +73,13 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         }
         super.update(time, delta);
         this.healthComponent.update();
+
+        // Keep unit moving when not blocked
+        if (this.state !== UnitStates.DEAD) {
+            if (!this.isBlocked()) {
+                this.moveForward();
+            }
+        }
         this.handleState();
     }
 
@@ -90,34 +92,36 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         if(target instanceof Unit && target.unitProps.faction === this.unitProps.faction){
             if(this.unitProps.unitID > target.unitProps.unitID){
                 this.stopMoving();
+
+                // If unit was in walking state, change to idle
+                if(this.state === UnitStates.WALKING){
+                    this.state = UnitStates.IDLE;
+                }
             }
         }
-        /*// On colision with enemy unit, melee unit should start attacking
-        if(target instanceof Unit && target.unitProps.faction !== this.unitProps.faction && this.unitProps.type === 'melee'){
-            this.startAttackingTarget(target);
-        }
-        // On collision with enemy base, melee unit should start attacking
-        if(target instanceof PlayerBase && target.faction !== this.unitProps.faction && this.unitProps.type === 'melee'){
-            this.startAttackingTarget(target);
-        }*/
     }
 
+    /* General unit state handling
+        IDLE, it plays an idle animation and transitions to WALKING if it's not blocked.
+        WALKING, it plays a walking animation.
+        DEAD, it does nothing.
+        If the state is unknown, it throws an error.
+    */ 
     public handleState(): void {
         switch (this.state) {
             case UnitStates.IDLE:
                 this.play(`${this.unitType}_idle`, true);
+                if (!this.isBlocked()) {
+                    this.state = UnitStates.WALKING;
+                }
                 break;
             case UnitStates.WALKING:
                 this.play(`${this.unitType}_walk`, true);
                 break;
-            case UnitStates.ATTACKING:
-                this.play(`${this.unitType}_attack`, true);
-                break;
-            case UnitStates.SUPPORTING:
-                this.play(`${this.unitType}_support`, true);
+            case UnitStates.DEAD:
                 break;
             default:
-                break;
+                throw Error(`Unknown unit state: ${this.state}`);
         }
     }
 
@@ -125,12 +129,10 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         const detectionRectWidth = 5;
         const xOffset = (this.size * 0.5 + 1) * this.direction;
         const yOffset = -this.size * 0.5;
-
         // Use a physics overlap check to find a blocking unit in front
         let overlap = this.scene.physics.overlapRect(this.x + xOffset, this.y + yOffset, detectionRectWidth * this.direction, this.size);
         return overlap.some(object => {
             if (object.gameObject instanceof Unit && object.gameObject.active) {
-                //if(devConfig.consoleLog) console.log(`Blocked by ${object.gameObject.unitProps.unitID}`);
                 return true;
             }
             return false;
@@ -138,93 +140,18 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
     }
 
     public stopMoving(): void {
-        if(this.state === UnitStates.WALKING) this.state = UnitStates.IDLE;
         this.setVelocityX(0);
-        this.resumeTimer = this.scene.time.addEvent({
-            delay: 50,
-            callback: () => {
-                if (!this.active) {
-                    return;
-                }
-                if(!this.isBlocked()){
-                    this.resumeTimer?.remove();
-                    this.resumeTimer = null;
-                    this.moveForward();
-                }
-            },
-            callbackScope: this,
-            loop: true
-        });
     }
 
-    heal(amount: number): void {
+    public heal(amount: number): void {
         this.healthComponent.heal(amount);
     }
-    
 
     public moveForward(): void {
-        if(this.state === UnitStates.DEAD) return;
-        if(this.state === UnitStates.IDLE) this.state = UnitStates.WALKING;
         this.setVelocityX(this.unitProps.speed);
     }
 
     public isAlive(): boolean {
-        return this.state !== UnitStates.DEAD;
-    }
-
-    /*public startAttackingTarget(target: Unit | PlayerBase): void {
-        if (this.state !== UnitStates.ATTACKING) {
-            this.state = UnitStates.ATTACKING;
-            let timeScale = this.anims.duration / this.unitProps.attackSpeed;
-            this.anims.timeScale = timeScale;
-            if(target instanceof Unit){
-                let targetID = target.unitProps.unitID;
-                this.attackingTimer = this.scene.time.addEvent({
-                    delay: this.unitProps.attackSpeed,
-                    callback: () => {
-                        if (!this.active) {
-                            return;
-                        }
-                        if(target.unitProps.unitID === targetID && target.active && target.isAlive()){
-                        target.takeDamage(this.unitProps.attackDamage);
-                        }
-                        else{
-                            this.stopAttacking();
-                        }
-                    },
-                    callbackScope: this,
-                    loop: true
-                });
-            }
-            else if(target instanceof PlayerBase){
-                console.log("Found player base ", target);
-                this.attackingTimer = this.scene.time.addEvent({
-                    delay: this.unitProps.attackSpeed,
-                    callback: () => {
-                        if (!this.active) {
-                            return;
-                        }
-                        if (target.active){
-                            target.takeDamage(this.unitProps.attackDamage);
-                        }
-                        else{
-                            this.stopAttacking();
-                        }                        
-                    },
-                    callbackScope: this,
-                    loop: true
-                });
-            }
-            
-        }
-    }*/
-
-    public stopAttacking(): void {
-        if (this.attackingTimer) {
-            this.attackingTimer.remove();
-            this.attackingTimer = null;
-        }
-        this.state = UnitStates.WALKING;
-        this.moveForward();
+        return this.healthComponent.isAlive();
     }
 }

@@ -11,6 +11,8 @@ export class RangedUnit extends Unit {
     baseInRange: PlayerBase | null = null;
     projectiles: Phaser.Physics.Arcade.Group | null = null;
     projectilePool: Phaser.Physics.Arcade.Group | null = null;
+    protected enemyGroup: Phaser.Physics.Arcade.Group | null = null;
+    protected baseGroup: Phaser.GameObjects.Group | null = null;
 
     constructor(scene: Phaser.Scene, texture: string) {
         super(scene, texture);
@@ -29,6 +31,8 @@ export class RangedUnit extends Unit {
         this.baseInRange = null;
         this.projectiles = projectiles;
         this.projectilePool = projectilePool;
+        this.enemyGroup = enemyGroup;
+        this.baseGroup = baseGroup;
         
         // Reinitialize proximity zone
         const zoneXOffset = (this.direction === -1) ? this.x-this.unitProps.attackRange : this.x;
@@ -54,7 +58,8 @@ export class RangedUnit extends Unit {
         this.projectilePool = null;
         this.enemiesInRange = [];
         this.baseInRange = null;
-
+        this.enemyGroup = null;
+        this.baseGroup  = null;
         super.die();
     }
 
@@ -88,11 +93,14 @@ export class RangedUnit extends Unit {
         this.handleState();      
     }
 
+    /* Ranged unit state handling
+        WALKING: Plays a walking animation and checks if there are enemies in range. If there are, it transitions to ATTACKING state.
+        ATTACKING: Plays an attack animation. If there aren't targets, it transitions back to WALKING state.
+    */
     handleState(): void {
         switch (this.state) {
             case UnitStates.WALKING:
                 this.play(`${this.unitType}_walk`, true);
-                this.moveForward();
                 if (this.baseInRange || this.enemiesInRange.length > 0) {
                     this.state = UnitStates.ATTACKING;
                     this.startShooting();

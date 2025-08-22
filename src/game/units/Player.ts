@@ -13,7 +13,7 @@ export class Player {
     enemyUnitsPhysics: Phaser.Physics.Arcade.Group;
     projectiles: Phaser.Physics.Arcade.Group;
     unitCounter: number = 0;
-    unitQueue: String[] = [];
+    unitQueue: string[] = [];
     objectPool: ObjectPool;
     baseGroup: Phaser.GameObjects.Group;
     spawnTime: number = 0;
@@ -33,8 +33,12 @@ export class Player {
         this.playerBase = new PlayerBase(this.scene, this.faction, this.spawnPosition,this.enemyUnitsPhysics, this.projectiles, this.objectPool.projectiles.arrows);
     }
 
-    public addUnitToQueue(unitType: String) {
+    public addUnitToQueue(unitType: string) {
         this.unitQueue.push(unitType);
+    }
+
+    public getUnitQueue() {
+        return this.unitQueue;
     }
 
     public update(time: any, delta: number): void {
@@ -51,7 +55,7 @@ export class Player {
         }
     }
     
-    public spawnUnit (unitType: String) : Unit
+    public spawnUnit (unitType: string) : Unit
     {
         let newUnitProps: UnitProps = {
             x: this.spawnPosition.x,
@@ -60,7 +64,7 @@ export class Player {
             health: 100,
             maxHealth: 100,
             attackDamage: 34, 
-            attackRange: 100,
+            attackRange: 200,
             attackSpeed: 1000, //in ms
             specialDamage: 10,
             specialRange: 100,
@@ -88,6 +92,7 @@ export class Player {
         }
         if(unit){
             unit.spawn(newUnitProps, this.ownUnitsPhysics, pool, this.enemyUnitsPhysics, this.baseGroup, this.projectiles,this.objectPool.projectiles.arrows);
+            this.ownUnitsPhysics.add(unit);
             console.log("%cSpawning unit with  id: " + this.unitCounter, `color: ${this.faction}`);
             this.unitCounter++;
             unit.moveForward();

@@ -6,8 +6,8 @@ import { Arrow } from "../projectiles/Arrow";
 import eventsCenter from "../EventsCenter";
 
 export class PlayerBase extends Phaser.Physics.Arcade.Sprite {
-    health: number = 500;
-    maxHealth: number = 500;
+    health: number = 5000;
+    maxHealth: number = 5000;
     faction: 'red' | 'blue';
     yOffset: number; // How high from groundLevel to spawn
     proximityZone: Phaser.GameObjects.Zone;
