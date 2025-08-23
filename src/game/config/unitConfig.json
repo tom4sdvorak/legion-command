@@ -1,0 +1,59 @@
+{
+  "baseUnit": {
+    "speed": 100,
+    "health": 100,
+    "cost": 10,
+    "maxHealth": 100,
+    "attackDamage": 10,
+    "attackRange": 100,
+    "attackSpeed": 1000,
+    "specialDamage": 10,
+    "specialRange": 100,
+    "specialSpeed": 1000
+  },
+
+  "unitClasses": {
+    "meleeUnit": {
+      "extends": "baseUnit",
+      "cost": 10,
+      "health": 200,
+      "maxHealth": 200,
+      "attackDamage": 20,
+      "attackSpeed": 1000
+    },
+
+    "rangedUnit": {
+      "extends": "baseUnit",
+      "cost": 20,
+      "health": 80,
+      "maxHealth": 80,
+      "attackDamage": 50,
+      "attackRange": 200,
+      "attackSpeed": 1000
+    },
+
+    "supportUnit": {
+      "extends": "baseUnit",
+      "cost": 30,
+      "health": 100,
+      "maxHealth": 100,
+      "specialDamage": 10,
+      "specialRange": 100,
+      "specialSpeed": 500
+    }
+  },
+
+  "unitTypes": {
+    "warrior": {
+      "extends": "meleeUnit"
+    },
+
+    "archer": {
+      "extends": "rangedUnit"
+    },
+
+    "healer": {
+      "extends": "supportUnit"
+    }
+  }
+}

@@ -1,6 +1,7 @@
 import { UnitProps } from "../helpers/UnitProps";
 import { UnitStates } from "../helpers/UnitStates";
-import { PlayerBase } from "./PlayerBase";
+import { PlayerBase } from "../PlayerBase";
+import { Game } from "../scenes/Game";
 import { Unit } from "./Unit";
 
 export class SupportUnit extends Unit {
@@ -10,7 +11,7 @@ export class SupportUnit extends Unit {
     supportTimer: Phaser.Time.TimerEvent | null = null;
     meleeTarget: Unit | PlayerBase | null = null;
 
-    constructor(scene: Phaser.Scene, texture: string) {
+    constructor(scene: Game, texture: string) {
         super(scene, texture);
 
         // Create proximity zone for finding allies

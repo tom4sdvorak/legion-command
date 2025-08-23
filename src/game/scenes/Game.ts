@@ -1,14 +1,16 @@
 import { Scene } from 'phaser';
 import eventsCenter from '../EventsCenter';
-import { Player } from '../units/Player';
+import { Player } from '../Player';
 import { Unit } from '../units/Unit';
 import { Arrow } from '../projectiles/Arrow';
 import { Projectile } from '../projectiles/Projectile';
 import { ObjectPool } from '../helpers/ObjectPool';
-import { PlayerBase } from '../units/PlayerBase';
+import { PlayerBase } from '../PlayerBase';
 import { Archer } from '../units/Archer';
 import { Warrior } from '../units/Warrior';
 import { Healer } from '../units/Healer';
+import { UnitConfigLoader } from '../helpers/unitConfigLoader';
+import { AIController } from '../components/AIController';
 
 export class Game extends Scene
 {
@@ -26,6 +28,9 @@ export class Game extends Scene
     redCollider: Phaser.Physics.Arcade.Collider;
     hostileCollider: Phaser.Physics.Arcade.Collider;
     baseGroup: Phaser.GameObjects.Group;
+    redConfigLoader: UnitConfigLoader;
+    blueConfigLoader: UnitConfigLoader;
+    AIController: AIController;
     
 
 
@@ -58,9 +63,19 @@ export class Game extends Scene
             runChildUpdate: true
         });
 
-        //this.unitsPhysics = this.physics.add.group({allowGravity: false});
-        this.playerRed = new Player(this, 'red', this.redUnitsPhysics, this.blueUnitsPhysics, this.redProjectiles, this.objectPool, this.baseGroup);
-        this.playerBlue = new Player(this, 'blue', this.blueUnitsPhysics, this.redUnitsPhysics, this.blueProjectiles, this.objectPool, this.baseGroup);
+        const unitDataJson = this.cache.json.get('unitData');
+        this.redConfigLoader = new UnitConfigLoader(unitDataJson);
+        this.blueConfigLoader = new UnitConfigLoader(unitDataJson);
+
+        // Create and setup main player
+        this.playerRed = new Player(this, 'red', this.redUnitsPhysics, this.blueUnitsPhysics, this.redProjectiles, this.objectPool, this.baseGroup, this.redConfigLoader);
+        this.playerRed.changePassiveIncome(1, true);
+
+        // Create and setup AI player
+        this.playerBlue = new Player(this, 'blue', this.blueUnitsPhysics, this.redUnitsPhysics, this.blueProjectiles, this.objectPool, this.baseGroup, this.blueConfigLoader);
+        this.playerBlue.changePassiveIncome(1, true);
+        this.AIController = new AIController(this.playerBlue, this.playerRed);
+
         this.baseGroup.add(this.playerRed.playerBase);
         this.baseGroup.add(this.playerBlue.playerBase);
     }
@@ -158,6 +173,11 @@ export class Game extends Scene
         this.scene.start('GameOver', {"faction" : faction});
     }
 
+    rewardPlayer(faction: string, money: number = 0, xp: number = 0){
+        if(faction === 'red') this.playerRed.addMoney(money);
+        else this.playerBlue.addMoney(money);
+    }
+
     create ()
     {       
         // Setup the game screen
@@ -195,6 +215,8 @@ export class Game extends Scene
 
         // Run update methods of each player
         this.playerBlue.update(time, delta);
+        this.AIController.update(time, delta);
         this.playerRed.update(time, delta);
+        
     }
 }

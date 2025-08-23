@@ -1,4 +1,5 @@
-import { devConfig } from '../helpers/devConfig';
+
+import { devConfig } from '../helpers/DevConfig';
 import { Unit } from '../units/Unit';
 
 export class HealthComponent {
@@ -64,7 +65,7 @@ export class HealthComponent {
     }
     takeDamage(damage: number): void {
         this.health -= damage;
-        if(devConfig.consoleLog) console.log(`${this.parent.constructor.name} took ${damage} damage, remaining health is ${this.health}`);
+        //if(devConfig.consoleLog) console.log(`${this.parent.constructor.name} took ${damage} damage, remaining health is ${this.health}`);
         if(this.health <= 0){
             this.health = 0;
             this.parent.emit("death", this.parent);
@@ -73,7 +74,7 @@ export class HealthComponent {
 
     heal(amount: number): void {
         this.health += amount;
-        if(devConfig.consoleLog) console.log(`${this.parent.constructor.name} was healed by ${amount} hp, remaining health is ${this.health}`);
+        //if(devConfig.consoleLog) console.log(`${this.parent.constructor.name} was healed by ${amount} hp, remaining health is ${this.health}`);
         if (this.health > this.maxHealth) {
             this.health = this.maxHealth;
         }

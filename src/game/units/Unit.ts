@@ -1,8 +1,8 @@
 import { UnitProps } from "../helpers/UnitProps";
 import { UnitStates } from "../helpers/UnitStates";
-import { PlayerBase } from "./PlayerBase";
+import { PlayerBase } from "../PlayerBase";
 import { HealthComponent } from "../components/HealthComponent";
-import { devConfig } from "../helpers/devConfig";
+import { Game } from "../scenes/Game";
 
 
 export class Unit extends Phaser.Physics.Arcade.Sprite {
@@ -16,8 +16,9 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
     unitGroup: Phaser.Physics.Arcade.Group | null = null;
     unitPool: Phaser.Physics.Arcade.Group | null = null;
     healthComponent: HealthComponent;
+    declare scene: Game;
 
-    constructor(scene: Phaser.Scene, unitType: string) {
+    constructor(scene: Game, unitType: string) {
         super(scene, 0, 0, unitType);
         this.unitType = unitType;
         this.setOrigin(0.5, 0.5);
@@ -53,6 +54,9 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
     
     die(): void {
         this.state = UnitStates.DEAD;
+        if(this.unitProps.faction === 'red') this.scene.rewardPlayer('blue', this.unitProps.cost);
+        else this.scene.rewardPlayer('red', this.unitProps.cost);
+
         if(this.resumeTimer) this.resumeTimer.remove();
         this.resumeTimer = null;
         if(this.attackingTimer) this.attackingTimer.remove();
@@ -61,7 +65,6 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         if(this.unitGroup) this.unitGroup.remove(this);
         if(this.unitPool) this.unitPool.killAndHide(this);
         this.healthComponent.deactivate();
-
         // Null the group references
         this.unitGroup = null;
         this.unitPool = null;

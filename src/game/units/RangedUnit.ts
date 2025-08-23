@@ -2,7 +2,8 @@ import { UnitProps } from "../helpers/UnitProps";
 import { UnitStates } from "../helpers/UnitStates";
 import { Unit } from "./Unit";
 import { Projectile } from "../projectiles/Projectile";
-import { PlayerBase } from "./PlayerBase";
+import { PlayerBase } from "../PlayerBase";
+import { Game } from "../scenes/Game";
 
 export class RangedUnit extends Unit {
 
@@ -14,7 +15,7 @@ export class RangedUnit extends Unit {
     protected enemyGroup: Phaser.Physics.Arcade.Group | null = null;
     protected baseGroup: Phaser.GameObjects.Group | null = null;
 
-    constructor(scene: Phaser.Scene, texture: string) {
+    constructor(scene: Game, texture: string) {
         super(scene, texture);
 
         // Create proximity zone for finding enemies

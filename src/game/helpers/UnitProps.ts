@@ -1,6 +1,7 @@
 export interface UnitProps {
     x: number;
     y: number;
+    cost: number;
     speed: number;
     health: number;
     maxHealth: number;

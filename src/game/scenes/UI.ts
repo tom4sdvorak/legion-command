@@ -1,6 +1,6 @@
 import { Scene } from 'phaser';
 import eventsCenter from '../EventsCenter';
-import { Player } from '../units/Player';
+import { Player } from '../Player';
 
 export class UI extends Scene
 {
@@ -9,6 +9,8 @@ export class UI extends Scene
     unitQueueGraphics: Phaser.GameObjects.Group;
     unitQueue: string[] = [];
     unitLimit: number = 10;
+    moneyText: Phaser.GameObjects.Text;
+    moneyImage: Phaser.GameObjects.Image;
 
     constructor ()
     {
@@ -27,14 +29,17 @@ export class UI extends Scene
             visible: false,
             active: false
         });
-        
-        
+
+        this.moneyText = this.add.text(50, 50, 'Gold: ' + this.player.getMoney(), { fontSize: 24, color: '#000000' });
+        this.moneyImage = this.add.image(25, 50, 'gold');
+        this.moneyImage.setScale(0.8);
+        this.moneyImage.setOrigin(0.5, 0.5); 
         
         this.button = this.add.circle(400, 500, 40, 0xffffff)
             .setStrokeStyle(2, 0x000000)
             .setInteractive()
             .on('pointerup', () => {
-                if(this.unitQueue.length > this.unitLimit) return;
+                if(this.unitQueue.length >= this.unitLimit || !this.player.canAfford(this.player.getUnitCost('warrior'))) return;
                 eventsCenter.emit('spawn-red-unit', 'warrior');
             });
         const image1 = this.add.image(400, 500, 'warrior');
@@ -46,7 +51,7 @@ export class UI extends Scene
             .setStrokeStyle(2, 0x000000)
             .setInteractive()
             .on('pointerup', () => {
-                if(this.unitQueue.length > this.unitLimit) return;
+                if(this.unitQueue.length >= this.unitLimit || !this.player.canAfford(this.player.getUnitCost('archer'))) return;
                 eventsCenter.emit('spawn-red-unit', 'archer');
             });
         const image1b = this.add.image(400, 400, 'archer');
@@ -58,7 +63,7 @@ export class UI extends Scene
             .setStrokeStyle(2, 0x000000)
             .setInteractive()
             .on('pointerup', () => {
-                if(this.unitQueue.length > this.unitLimit) return;
+                if(this.unitQueue.length >= this.unitLimit || !this.player.canAfford(this.player.getUnitCost('healer'))) return;
                 eventsCenter.emit('spawn-red-unit', 'healer');
             });
         const image1c = this.add.image(400, 300, 'healer');
@@ -121,6 +126,7 @@ export class UI extends Scene
     update(time: any, delta: number) {
         this.unitQueue = this.player.getUnitQueue();
         this.renderUnitQueue();
+        this.moneyText.setText('Money: ' + Math.floor(this.player.getMoney()));
 
     }
 }

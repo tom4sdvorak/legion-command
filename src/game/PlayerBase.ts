@@ -1,9 +1,9 @@
-import { Unit } from "./Unit";
-import { Projectile } from "../projectiles/Projectile";
+import { Unit } from "./units/Unit";
+import { Projectile } from "./projectiles/Projectile";
 import { Scene } from "phaser";
-import { ObjectPool } from "../helpers/ObjectPool";
-import { Arrow } from "../projectiles/Arrow";
-import eventsCenter from "../EventsCenter";
+import { ObjectPool } from "./helpers/ObjectPool";
+import { Arrow } from "./projectiles/Arrow";
+import eventsCenter from "./EventsCenter";
 
 export class PlayerBase extends Phaser.Physics.Arcade.Sprite {
     health: number = 5000;
@@ -136,6 +136,7 @@ export class PlayerBase extends Phaser.Physics.Arcade.Sprite {
             this.die();
         }
     }
+    
 
     public updateHealthBar():void {
         //console.log("Updating health bar to x: ", this.x);

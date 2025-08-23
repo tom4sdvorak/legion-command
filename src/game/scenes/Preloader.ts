@@ -30,14 +30,19 @@ export class Preloader extends Scene
     preload ()
     {
         //  Load the assets for the game - Replace with your own assets
+        this.load.setPath('src');
+        this.load.json('unitData', '/game/config/unitConfig.json');
+
         this.load.setPath('assets');
         this.load.json('animationData', '/data/animations.json');
         this.load.image('logo', 'images/logo.png');
         this.load.image('tower_red', 'images/tower_red.png');
         this.load.image('tower_blue', 'images/tower_blue.png');
+        this.load.image('gold', 'sprites/resources/gold.png');
         this.load.spritesheet('warrior', 'sprites/warrior/warrior.png',{frameWidth: 192, frameHeight: 192});
         this.load.spritesheet('archer', 'sprites/archer/archer.png',{frameWidth: 192, frameHeight: 192});
         this.load.spritesheet('healer', 'sprites/healer/healer.png',{frameWidth: 192, frameHeight: 192});
+        this.load.spritesheet('arrow', 'sprites/projectiles/arrow.png',{frameWidth: 64, frameHeight: 64});
         this.load.spritesheet('arrow', 'sprites/projectiles/arrow.png',{frameWidth: 64, frameHeight: 64});
         this.load.image('background', 'images/bg.png');
         this.load.image('ground', 'images/ground.png');
