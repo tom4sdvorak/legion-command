@@ -1,7 +1,8 @@
+import { Game } from "../scenes/Game";
 import { RangedUnit } from "./RangedUnit";
 
 export class Archer extends RangedUnit {
-    constructor(scene: Phaser.Scene) {
+    constructor(scene: Game) {
         super(scene, "archer");
     }
 }

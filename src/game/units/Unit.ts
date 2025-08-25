@@ -12,7 +12,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
     attackingTimer: Phaser.Time.TimerEvent | null = null;
     direction: number = 1;
     unitType: string;
-    size: number = 100;
+    size: number = 64;
     unitGroup: Phaser.Physics.Arcade.Group | null = null;
     unitPool: Phaser.Physics.Arcade.Group | null = null;
     healthComponent: HealthComponent;
@@ -21,7 +21,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
     constructor(scene: Game, unitType: string) {
         super(scene, 0, 0, unitType);
         this.unitType = unitType;
-        this.setOrigin(0.5, 0.5);
+        this.setOrigin(0.5, 1);
         
         this.healthComponent = new HealthComponent(this, this.size/2, 5, this.size/3, 100); // parent, width, height, yOffset, maxHealth
 
@@ -36,22 +36,33 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         this.unitProps = unitProps;
         this.unitProps.speed = Math.abs(unitProps.speed) * this.direction;
         this.healthComponent.spawn(unitProps.health);
-
-        // Reinitialize the sprite's body
-        this.setActive(true);
-        this.setVisible(true);
-        this.setPosition(unitProps.x, unitProps.y);
-        (this.body as Phaser.Physics.Arcade.Body).enable = true;
-        (this.body as Phaser.Physics.Arcade.Body).reset(unitProps.x, unitProps.y);
-        (this.body as Phaser.Physics.Arcade.Body).setSize(this.size, this.size);
-        (this.body as Phaser.Physics.Arcade.Body).pushable = false;
-
-        this.state = UnitStates.WALKING;
         this.unitGroup = unitGroup;
         this.unitPool = unitPool;
+   
+        
+
+        // Reinitialize the sprite's body
+        this.setScale(unitProps.scale);
+        this.setActive(true);
+        this.setVisible(true);
+        // Calculate spawn position of unit based on desired position, moved by offset (how many empty pixels are under feet of the sprite) timed by scale of the unit (which scales the empty pixels too)
+        let newPositionY = unitProps.y + unitProps.offsetY*unitProps.scale;
+        this.setPosition(unitProps.x, newPositionY);
         this.unitGroup.add(this);
+
+        //this.setDisplaySize(this.sizeW, this.sizeH);
+        //this.setBodySize(this.size, this.size, true);
+
+        (this.body as Phaser.Physics.Arcade.Body).enable = true;
+        (this.body as Phaser.Physics.Arcade.Body).reset(unitProps.x, newPositionY);
+        (this.body as Phaser.Physics.Arcade.Body).pushable = false;
+        //this.setBodySize(this.size, this.size);
+
+        
+        this.state = UnitStates.WALKING;
     }
     
+
     die(): void {
         this.state = UnitStates.DEAD;
         if(this.unitProps.faction === 'red') this.scene.rewardPlayer('blue', this.unitProps.cost);
@@ -76,7 +87,6 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         }
         super.update(time, delta);
         this.healthComponent.update();
-
         // Keep unit moving when not blocked
         if (this.state !== UnitStates.DEAD) {
             if (!this.isBlocked()) {
@@ -119,7 +129,8 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
                 }
                 break;
             case UnitStates.WALKING:
-                this.play(`${this.unitType}_walk`, true);
+                // Check if the 'run' animation exists before playing
+                this.play(`${this.unitType}_run`, true);
                 break;
             case UnitStates.DEAD:
                 break;

@@ -1,11 +1,12 @@
 import { UnitStates } from "../helpers/UnitStates";
+import { Game } from "../scenes/Game";
 import { SupportUnit } from "./SupportUnit";
 import { Unit } from "./Unit";
 
 export class Healer extends SupportUnit {
     
 
-    constructor(scene: Phaser.Scene) {
+    constructor(scene: Game) {
         super(scene, "healer");
     }
 

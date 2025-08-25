@@ -8,6 +8,7 @@ export class MeleeUnit extends Unit {
     
     constructor(scene: Game, texture: string) {
         super(scene, texture);
+        this.setScale(0.8);
     }
 
     /*  Melee unit state handling
@@ -18,6 +19,8 @@ export class MeleeUnit extends Unit {
             case UnitStates.ATTACKING:
                 this.startAttackingTarget();
                 this.play(`${this.unitType}_attack`, true);
+                let timeScale = (this.anims?.currentAnim?.duration ?? 1) / this.unitProps.attackSpeed
+                this.anims.timeScale = timeScale;
                 if(!this.meleeTarget || !this.meleeTarget.active){
                     this.state = UnitStates.WALKING;
                     this.stopAttacking();
@@ -49,8 +52,6 @@ export class MeleeUnit extends Unit {
         if (this.attackingTimer) return;
         if (!this.meleeTarget) return;
         
-        let timeScale = this.anims.duration / this.unitProps.attackSpeed;
-        this.anims.timeScale = timeScale;
         let targetID = null;
         if(this.meleeTarget instanceof Unit){
             targetID = this.meleeTarget.unitProps.unitID;

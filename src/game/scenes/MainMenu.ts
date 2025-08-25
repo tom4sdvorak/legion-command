@@ -15,13 +15,13 @@ export class MainMenu extends Scene
     {
         this.background = this.add.image(512, 384, 'background');
 
-        this.logo = this.add.text(512, 300, 'Game', {
+        this.logo = this.add.text(200, 200, 'Game', {
             fontFamily: 'Arial Black', fontSize: 64, color: '#ffffff',
             stroke: '#000000', strokeThickness: 8,
             align: 'center'
         }).setOrigin(0.5);
 
-        this.title = this.add.text(512, 460, 'Start', {
+        this.title = this.add.text(300, 300, 'Start', {
             fontFamily: 'Arial Black', fontSize: 38, color: '#ffffff',
             stroke: '#000000', strokeThickness: 8,
             align: 'center'

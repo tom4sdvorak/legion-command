@@ -9,13 +9,15 @@ import { PlayerBase } from '../PlayerBase';
 import { Archer } from '../units/Archer';
 import { Warrior } from '../units/Warrior';
 import { Healer } from '../units/Healer';
-import { UnitConfigLoader } from '../helpers/unitConfigLoader';
+import { UnitConfigLoader } from '../helpers/UnitConfigLoader';
 import { AIController } from '../components/AIController';
+import { devConfig } from '../helpers/DevConfig';
 
 export class Game extends Scene
 {
     camera: Phaser.Cameras.Scene2D.Camera;
-    background: Phaser.GameObjects.Image;
+    worldWidth: number = 2200;
+    worldHeight: number = 800;
     ground: Phaser.GameObjects.Image;
     playerRed: Player;
     playerBlue: Player;
@@ -31,6 +33,7 @@ export class Game extends Scene
     redConfigLoader: UnitConfigLoader;
     blueConfigLoader: UnitConfigLoader;
     AIController: AIController;
+    controls: Phaser.Cameras.Controls.SmoothedKeyControl;
     
 
 
@@ -65,7 +68,8 @@ export class Game extends Scene
 
         const unitDataJson = this.cache.json.get('unitData');
         this.redConfigLoader = new UnitConfigLoader(unitDataJson);
-        this.blueConfigLoader = new UnitConfigLoader(unitDataJson);
+        const AIUnitDataJson = this.cache.json.get('AIUnitData');
+        this.blueConfigLoader = new UnitConfigLoader(AIUnitDataJson);
 
         // Create and setup main player
         this.playerRed = new Player(this, 'red', this.redUnitsPhysics, this.blueUnitsPhysics, this.redProjectiles, this.objectPool, this.baseGroup, this.redConfigLoader);
@@ -74,7 +78,7 @@ export class Game extends Scene
         // Create and setup AI player
         this.playerBlue = new Player(this, 'blue', this.blueUnitsPhysics, this.redUnitsPhysics, this.blueProjectiles, this.objectPool, this.baseGroup, this.blueConfigLoader);
         this.playerBlue.changePassiveIncome(1, true);
-        this.AIController = new AIController(this.playerBlue, this.playerRed);
+        if(devConfig.AI) this.AIController = new AIController(this.playerBlue, this.playerRed);
 
         this.baseGroup.add(this.playerRed.playerBase);
         this.baseGroup.add(this.playerBlue.playerBase);
@@ -182,12 +186,18 @@ export class Game extends Scene
     {       
         // Setup the game screen
         this.camera = this.cameras.main;
-        this.camera.setBackgroundColor(0x00ff00);
-        this.background = this.add.image(0,0, 'background');
-        this.background.setOrigin(0,0);
-        this.ground = this.add.image(0,650, 'ground');
-        this.ground.setOrigin(0,0);
-        //this.physics.world.setBounds(0, 0, 500, 500);
+        this.cameras.main.setBounds(0, 0, this.worldWidth, this.worldHeight);
+        this.physics.world.setBounds(0, 0, this.worldWidth, this.worldHeight);
+        this.camera.setBackgroundColor(0x76B9E3);
+
+        this.add.image(0, this.worldHeight, 'bglayer1').setScrollFactor(0).setOrigin(0,1).setDisplaySize(this.camera.width, this.worldHeight);
+        this.add.image(0, this.worldHeight, 'bglayer2').setScrollFactor(0.2).setOrigin(0,1).setDisplaySize(this.worldWidth-(1-0.2)*(this.worldWidth-(this.game.config.width as number)), this.worldHeight);
+        this.add.image(0, this.worldHeight, 'bglayer3').setScrollFactor(0.5).setOrigin(0,1).setDisplaySize(this.worldWidth-(1-0.5)*(this.worldWidth-(this.game.config.width as number)), this.worldHeight);
+        this.add.tileSprite(0, this.worldHeight-70, this.worldWidth, 0, 'bglayer4').setScrollFactor(0.8).setOrigin(0,1).setScale(1.4);
+        
+
+        this.add.image(0, this.worldHeight, 'ground').setScrollFactor(1).setOrigin(0,1).setDisplaySize(this.worldWidth, 100).setOrigin(0,1);
+        //
 
         // Create unit and projectile pools
         this.setupObjectPools();
@@ -195,6 +205,19 @@ export class Game extends Scene
         this.setupColliders();
 
         this.scene.launch('UI', { player: this.playerRed }); // Starts the UI scene on top of the game scene
+
+        const cursors = this.input.keyboard.createCursorKeys();
+        const controlConfig = {
+            camera: this.cameras.main,
+            left: cursors.left,
+            right: cursors.right,
+            up: cursors.up,
+            down: cursors.down,
+            acceleration: 0.04,
+            drag: 0.0005,
+            maxSpeed: 0.7
+        };
+        this.controls = new Phaser.Cameras.Controls.SmoothedKeyControl(controlConfig);
         
         //Listen to events
         eventsCenter.on('spawn-red-unit', (unitType : string) => {
@@ -208,14 +231,16 @@ export class Game extends Scene
         });
         eventsCenter.on('base-destroyed', (faction : string) => {
             this.gameOver(faction);
-        })
+        });
+
+
     }
 
     update(time: any, delta: number){
-
+        this.controls.update(delta);
         // Run update methods of each player
         this.playerBlue.update(time, delta);
-        this.AIController.update(time, delta);
+        if(devConfig.AI) this.AIController.update(time, delta);
         this.playerRed.update(time, delta);
         
     }

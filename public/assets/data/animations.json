@@ -1,112 +1,164 @@
 {
-    "warrior": {
-        "idle": {
-            "key": "warrior_idle",
-            "frames": {
-                "start": 0,
-                "end": 5
-            },
-            "frameRate": 10,
-            "repeat": -1,
-            "yoyo": true
-        },
-        "walk": {
-            "key": "warrior_walk",
-            "frames": {
-                "start": 6,
-                "end": 11
-            },
-            "frameRate": 10,
-            "repeat": -1
-        },
-        "attack": {
-            "key": "warrior_attack",
-            "frames": {
-                "start": 12,
-                "end": 23
-            },
-            "frameRate": 10,
-            "repeat": -1
-        }
+  "warrior": {
+    "idle": {
+      "key": "warrior_idle",
+      "frames": {
+        "start": 0,
+        "count": 6
+      },
+      "frameRate": 10,
+      "repeat": -1,
+      "yoyo": true
     },
-    "archer": {
-        "idle": {
-            "key": "archer_idle",
-            "frames": {
-                "start": 0,
-                "end": 5
-            },
-            "frameRate": 10,
-            "repeat": -1,
-            "yoyo": true
-        },
-        "walk": {
-            "key": "archer_walk",
-            "frames": {
-                "start": 8,
-                "end": 13
-            },
-            "frameRate": 10,
-            "repeat": -1
-        },
-        "attack": {
-            "key": "archer_attack",
-            "frames": {
-                "start": 32,
-                "end": 39
-            },
-            "frameRate": 10,
-            "repeat": -1
-        }
+    "run": {
+      "key": "warrior_run",
+      "frames": {
+        "start": 18,
+        "count": 8
+      },
+      "frameRate": 10,
+      "repeat": -1
     },
-    "healer": {
-        "idle": {
-            "key": "healer_idle",
-            "frames": {
-                "start": 0,
-                "end": 5
-            },
-            "frameRate": 10,
-            "repeat": -1,
-            "yoyo": true
-        },
-        "walk": {
-            "key": "healer_walk",
-            "frames": {
-                "start": 6,
-                "end": 11
-            },
-            "frameRate": 10,
-            "repeat": -1
-        },
-        "attack": {
-            "key": "healer_attack",
-            "frames": {
-                "start": 14,
-                "end": 19
-            },
-            "frameRate": 10,
-            "repeat": -1
-        },
-        "support": {
-            "key": "healer_support",
-            "frames": {
-                "start": 21,
-                "end": 26
-            },
-            "frameRate": 10,
-            "repeat": -1
-        }
+    "attack": {
+      "key": "warrior_attack",
+      "frames": {
+        "start": 27,
+        "count": 4
+      },
+      "frameRate": 10,
+      "repeat": -1
     },
-    "projectile": {
-        "arrow": {
-            "key": "arrow",
-            "frames": {
-                "start": 0,
-                "end": 0
-            },
-            "frameRate": 0,
-            "repeat": 0
-        }
+    "hit": {
+      "key": "warrior_hit",
+      "frames": {
+        "start": 50,
+        "count": 3
+      },
+      "frameRate": 10,
+      "repeat": -1
+    },
+    "death": {
+      "key": "warrior_death",
+      "frames": {
+        "start": 59,
+        "count": 9
+      },
+      "frameRate": 10,
+      "repeat": -1
     }
+  },
+  "archer": {
+    "idle": {
+      "key": "archer_idle",
+      "frames": {
+        "start": 0,
+        "count": 154
+      },
+      "frameRate": 10,
+      "repeat": -1,
+      "yoyo": true
+    },
+    "walk": {
+      "key": "archer_walk",
+      "frames": {
+        "start": 160,
+        "count": 36
+      },
+      "frameRate": 10,
+      "repeat": -1
+    },
+    "run": {
+      "key": "archer_run",
+      "frames": {
+        "start": 200,
+        "count": 26
+      },
+      "frameRate": 10,
+      "repeat": -1
+    },
+    "attack": {
+      "key": "archer_attack",
+      "frames": {
+        "start": 230,
+        "count": 43
+      },
+      "frameRate": 10,
+      "repeat": -1
+    },
+    "shoot": {  
+      "key": "archer_shoot",
+      "frames": {
+        "start": 280,
+        "count": 21
+      },
+      "frameRate": 10,
+      "repeat": -1
+      },
+    "death": {
+      "key": "archer_death",
+      "frames": {
+        "start": 310,
+        "count": 92
+      },
+      "frameRate": 10,
+      "repeat": -1
+    }
+  },
+  "healer": {
+    "idle": {
+      "key": "healer_idle",
+      "frames": {
+        "start": 0,
+        "count": 6
+      },
+      "frameRate": 10,
+      "repeat": -1,
+      "yoyo": true
+    },
+    "run": {
+      "key": "healer_run",
+      "frames": {
+        "start": 8,
+        "count": 8
+      },
+      "frameRate": 10,
+      "repeat": -1
+    },
+    "support": {
+      "key": "healer_support",
+      "frames": {
+        "start": 16,
+        "count": 8
+      },
+      "frameRate": 10,
+      "repeat": -1
+    },
+    "attack": {
+      "key": "healer_attack",
+      "frames": {
+        "start": 24,
+        "count": 8
+      },
+      "frameRate": 10,
+      "repeat": -1
+    },
+    "hit": {
+      "key": "healer_hit",
+      "frames": {
+        "start": 32,
+        "count": 4
+      },
+      "frameRate": 10,
+      "repeat": -1
+    },
+    "death": {
+      "key": "healer_death",
+      "frames": {
+        "start": 40,
+        "count": 8
+      },
+      "frameRate": 10,
+      "repeat": -1
+    }
+  }
 }

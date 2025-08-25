@@ -48,7 +48,6 @@ export class SupportUnit extends Unit {
         // Null all temporary information
         if(this.supportTimer) this.supportTimer.remove();
         this.supportTimer = null;
-        this.unitGroup = null;
         this.meleeTarget = null;
         this.alliesInRange = [];
         super.die();
@@ -79,7 +78,7 @@ export class SupportUnit extends Unit {
     handleState(): void {
         switch (this.state) {
             case UnitStates.WALKING:
-                this.play(`${this.unitType}_walk`, true);
+                this.play(`${this.unitType}_run`, true);
                 if (this.alliesInRange.length > 0) {
                     this.state = UnitStates.SUPPORTING;
                     this.startSupporting();

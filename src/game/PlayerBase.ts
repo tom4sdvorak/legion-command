@@ -12,7 +12,7 @@ export class PlayerBase extends Phaser.Physics.Arcade.Sprite {
     yOffset: number; // How high from groundLevel to spawn
     proximityZone: Phaser.GameObjects.Zone;
     enemiesInRange: Unit[] = [];
-    attackDamage: number = 49;
+    attackDamage: number = 70;
     isShooting: boolean = false;
     attackSpeed: number = 1000;
     shootingTimer: Phaser.Time.TimerEvent | null = null;
@@ -63,6 +63,7 @@ export class PlayerBase extends Phaser.Physics.Arcade.Sprite {
         // Configure the physics body
         this.setImmovable(true);
         this.setPushable(false);
+        console.log(this.scene.cameras.main.worldView.width, this.x);
     }
 
     update(time: any, delta: number): void {

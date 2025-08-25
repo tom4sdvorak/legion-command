@@ -13,4 +13,7 @@ export interface UnitProps {
     specialSpeed: number;
     faction: 'red' | 'blue';
     unitID: number;
+    spawnTime: number;
+    offsetY: number;
+    scale: number;
 }

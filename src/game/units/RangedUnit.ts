@@ -101,14 +101,14 @@ export class RangedUnit extends Unit {
     handleState(): void {
         switch (this.state) {
             case UnitStates.WALKING:
-                this.play(`${this.unitType}_walk`, true);
+                this.play(`${this.unitType}_run`, true);
                 if (this.baseInRange || this.enemiesInRange.length > 0) {
                     this.state = UnitStates.ATTACKING;
                     this.startShooting();
                 }
                 break;
             case UnitStates.ATTACKING:
-                this.play(`${this.unitType}_attack`, true);
+                this.play(`${this.unitType}_shoot`, true);
                 if (!this.baseInRange && this.enemiesInRange.length === 0) {
                     this.state = UnitStates.WALKING;
                     this.stopShooting();

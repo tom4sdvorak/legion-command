@@ -32,6 +32,7 @@ export class Preloader extends Scene
         //  Load the assets for the game - Replace with your own assets
         this.load.setPath('src');
         this.load.json('unitData', '/game/config/unitConfig.json');
+        this.load.json('AIUnitData', '/game/config/AIUnitConfig.json');
 
         this.load.setPath('assets');
         this.load.json('animationData', '/data/animations.json');
@@ -39,13 +40,27 @@ export class Preloader extends Scene
         this.load.image('tower_red', 'images/tower_red.png');
         this.load.image('tower_blue', 'images/tower_blue.png');
         this.load.image('gold', 'sprites/resources/gold.png');
-        this.load.spritesheet('warrior', 'sprites/warrior/warrior.png',{frameWidth: 192, frameHeight: 192});
-        this.load.spritesheet('archer', 'sprites/archer/archer.png',{frameWidth: 192, frameHeight: 192});
-        this.load.spritesheet('healer', 'sprites/healer/healer.png',{frameWidth: 192, frameHeight: 192});
-        this.load.spritesheet('arrow', 'sprites/projectiles/arrow.png',{frameWidth: 64, frameHeight: 64});
-        this.load.spritesheet('arrow', 'sprites/projectiles/arrow.png',{frameWidth: 64, frameHeight: 64});
         this.load.image('background', 'images/bg.png');
         this.load.image('ground', 'images/ground.png');
+
+        // Backgrounds
+        this.load.setPath('assets/images/backgrounds');
+        this.load.image('bglayer1', 'nature/1.png');
+        this.load.image('bglayer2', 'nature/2.png');
+        this.load.image('bglayer3', 'nature/3.png');
+        this.load.image('bglayer4', 'nature/4.png');
+
+
+        // Unit sprites
+        this.load.setPath('assets/sprites/units');
+        this.load.spritesheet('warrior', 'warrior/sprite_sheet.png',{frameWidth: 184, frameHeight: 126});
+        this.load.spritesheet('archer', 'archer/sprite_sheet.png',{frameWidth: 128, frameHeight: 128});
+        this.load.spritesheet('healer', 'healer/sprite_sheet.png',{frameWidth: 231, frameHeight: 190});
+
+        // Projectile sprites
+        this.load.setPath('assets/sprites/projectiles');
+        this.load.spritesheet('arrow', 'arrow/sprite.png',{frameWidth: 24, frameHeight: 5});
+        
         
     }
 
@@ -55,13 +70,21 @@ export class Preloader extends Scene
         //  For example, you can define global animations here, so we can use them in other scenes.
         // Creating animations from all sprites
         const animationData = this.cache.json.get('animationData');
-        for (const sheetKey in animationData) {
-            const sheetAnims = animationData[sheetKey];
-            for (const animKey in sheetAnims) {
-                const anim = sheetAnims[animKey];
+
+        for (const unitKey in animationData) {
+            const unitAnimations = animationData[unitKey];
+            for (const animKey in unitAnimations) {
+                const anim = unitAnimations[animKey];
+                
+                // Calculate the end frame based on start and count
+                const endFrame = anim.frames.start + anim.frames.count - 1;
+
                 this.anims.create({
                     key: anim.key,
-                    frames: this.anims.generateFrameNumbers(sheetKey, anim.frames),
+                    frames: this.anims.generateFrameNumbers(unitKey, {
+                        start: anim.frames.start,
+                        end: endFrame
+                    }),
                     frameRate: anim.frameRate,
                     repeat: anim.repeat !== undefined ? anim.repeat : 0,
                     yoyo: anim.yoyo !== undefined ? anim.yoyo : false

@@ -1,7 +1,7 @@
 import { Player } from "../Player";
 
 export class ResourceComponent {
-    private money: number = 0;
+    private money: number = 999;
     private parent: Player;
     private moneyPerSecond: number = 0;
 

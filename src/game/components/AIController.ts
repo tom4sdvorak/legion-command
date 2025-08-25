@@ -32,6 +32,7 @@ export class AIController {
     handleState() {
         switch (this.state) {
             case State.IDLE:
+                this.idle();
                 break;
             case State.ATTACKING:
                 this.attack()
@@ -47,6 +48,7 @@ export class AIController {
             default:
                 break;
         }
+        //console.log("I have this many units: " + this.player.ownUnitsPhysics.getChildren().length);
     }
 
     private decideStrategy() {
@@ -70,6 +72,12 @@ export class AIController {
         }
 
         console.log("Decided new strategy: " + this.state);
+    }
+
+    idle(){ // Idle strategy - just ocassionally send unit out
+        if (this.player.canAfford(10) &&  this.player.ownUnitsPhysics.getChildren().length < 1){
+            this.player.addUnitToQueue('warrior');
+        }
     }
 
     attack() { // Offensive strategy - prioritize spamming melee/ranged combo

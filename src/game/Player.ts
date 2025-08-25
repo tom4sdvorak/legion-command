@@ -3,7 +3,7 @@ import { Unit } from "./units/Unit";
 import { UnitProps } from "./helpers/UnitProps";
 import { ObjectPool } from "./helpers/ObjectPool";
 import { devConfig } from "./helpers/DevConfig";
-import { UnitConfigLoader } from "./helpers/unitConfigLoader";
+import { UnitConfigLoader } from "./helpers/UnitConfigLoader";
 import { ResourceComponent } from "./components/ResourceComponent";
 
 export class Player {
@@ -20,18 +20,20 @@ export class Player {
     objectPool: ObjectPool;
     baseGroup: Phaser.GameObjects.Group;
     spawnTime: number = 0;
-    spawnDelay: number = 1000;
+    spawnBarSize: number = 0;
     framesSinceSpawn: number = 0;
     configLoader: UnitConfigLoader;
+    isSpawning: boolean = false;
+    spawnTimerRectangle: Phaser.GameObjects.Rectangle;
 
     constructor(scene: Phaser.Scene, faction: 'red' | 'blue', ownUnitsPhysics: Phaser.Physics.Arcade.Group,
-            enemyUnitsPhysics: Phaser.Physics.Arcade.Group, projectiles: Phaser.Physics.Arcade.Group,
-            objectPool: ObjectPool, baseGroup: Phaser.GameObjects.Group, configLoader: UnitConfigLoader) {
+        enemyUnitsPhysics: Phaser.Physics.Arcade.Group, projectiles: Phaser.Physics.Arcade.Group,
+        objectPool: ObjectPool, baseGroup: Phaser.GameObjects.Group, configLoader: UnitConfigLoader) {
         this.configLoader = configLoader;
         this.scene = scene;
         this.faction = faction;
-        if(this.faction === 'blue') { this.spawnPosition = new Phaser.Math.Vector2(scene.scale.gameSize.width-100, 680);} 
-        else{this.spawnPosition = new Phaser.Math.Vector2(100, 680);}
+        if(this.faction === 'blue') { this.spawnPosition = new Phaser.Math.Vector2(this.scene.cameras.main.getBounds().width-100, this.scene.cameras.main.getBounds().height-100);}
+        else{this.spawnPosition = new Phaser.Math.Vector2(100, this.scene.cameras.main.getBounds().height-100);}
         this.ownUnitsPhysics = ownUnitsPhysics;
         this.enemyUnitsPhysics = enemyUnitsPhysics;
         this.projectiles = projectiles;
@@ -42,7 +44,6 @@ export class Player {
     }
 
     public addUnitToQueue(unitType: string) {
-        //this.unitQueue.push(unitType);
         this.unitQueue.push(unitType);
         let cost = this.configLoader.getUnitProps(unitType).cost;
         this.deduceMoney(cost);     
@@ -84,19 +85,37 @@ export class Player {
     }
 
     public update(time: any, delta: number): void {
-        // Release next unit from player's queue if spawn points are free and minimum cooldown along with minimum amount of frames has passed
-        this.spawnTime -= delta;
-        if(this.framesSinceSpawn < 3) this.framesSinceSpawn++;
-
         this.resourceComponent.update(time, delta);
 
-        if(!this.playerBase.isBlocked() && this.unitQueue.length > 0 && this.spawnTime <= 0 && this.framesSinceSpawn >= 3){
+        // If we are spawning, reduce spawn timer by delta and increase counter of frames since last spawn
+        if(this.isSpawning){
+            this.spawnTime -= delta;
+            if(this.spawnTime < 0) this.spawnTime = 0;
+            if(this.framesSinceSpawn < 3) this.framesSinceSpawn++;
+            this.spawnTimerRectangle.setScale(this.spawnTime/this.spawnBarSize, 1);
+        }
+
+        // If there is unit in queue and base is not busy spawning one, setup new spawn timer and start spawning
+        if(this.unitQueue.length > 0 && !this.isSpawning){
+            this.spawnTime = this.configLoader.getUnitProps(this.unitQueue[0]).spawnTime;
+            this.isSpawning = true;
+            this.spawnBarSize = this.spawnTime;
+            if(!this.spawnTimerRectangle) { // Add loading bar if it doesn't exist that shows the spawn timer
+                this.spawnTimerRectangle = this.scene.add.rectangle(this.playerBase.x, this.playerBase.y-50, this.playerBase.width/2, 10, 0xff0000).setDepth(1).setAlpha(1);
+            }
+        }
+        
+        // If spawntime has been reduced below zero and base is not blocked, release the unit
+        if(!this.playerBase.isBlocked() && this.isSpawning &&this.unitQueue.length > 0 && this.spawnTime <= 0 && this.framesSinceSpawn >= 3){
             if(devConfig.consoleLog) console.log(`Spawning ${this.faction} ${this.unitQueue[0]} unit`);
             this.spawnUnit(this.unitQueue[0]);
             this.unitQueue.shift();
-            this.spawnTime = this.spawnDelay;
+            this.spawnTime = 999999;
             this.framesSinceSpawn = 0;
+            this.isSpawning = false;
         }
+
+        
     }
     
     public spawnUnit (unitType: string) : Unit
@@ -115,6 +134,7 @@ export class Player {
             case 'healer':
                 pool = this.objectPool.units.healers;
                 unit = pool.get();
+                unit.setScale(1.4);
                 break;
             default:
                 throw new Error(`Unknown unit type: ${unitType}`);
@@ -123,14 +143,10 @@ export class Player {
             // Load base unit properties from JSON
             let newUnitProps = this.configLoader.getUnitProps(unitType);
             
-            /* Add current data to unitProps to spawn unit correctly:
-                x: this.spawnPosition.x,
-                y: this.spawnPosition.y, 
-                faction: this.faction, 
-                unitID: this.unitCounter,
-            */
+            // Add current data to unitProps to spawn unit correctly
+   
             newUnitProps.x = this.spawnPosition.x;
-            newUnitProps.y = this.spawnPosition.y;
+            newUnitProps.y = this.spawnPosition.y
             newUnitProps.faction = this.faction;
             newUnitProps.unitID = this.unitCounter;
 
