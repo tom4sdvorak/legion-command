@@ -6,7 +6,6 @@ export interface UnitProps {
     health: number;
     maxHealth: number;
     attackDamage: number;
-    attackRange: number;
     attackSpeed: number;
     specialDamage: number;
     specialRange: number;
@@ -16,4 +15,5 @@ export interface UnitProps {
     spawnTime: number;
     offsetY: number;
     scale: number;
+    projectileOffsetY: number;
 }

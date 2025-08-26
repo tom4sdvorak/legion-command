@@ -14,13 +14,14 @@ export class RangedUnit extends Unit {
     projectilePool: Phaser.Physics.Arcade.Group | null = null;
     protected enemyGroup: Phaser.Physics.Arcade.Group | null = null;
     protected baseGroup: Phaser.GameObjects.Group | null = null;
+    shootingTimer: Phaser.Time.TimerEvent | null = null;
 
     constructor(scene: Game, texture: string) {
         super(scene, texture);
 
         // Create proximity zone for finding enemies
         this.proximityZone = this.scene.add.zone(0, 0, 0, 0);
-        this.proximityZone.setOrigin(0, 0.5);
+        this.proximityZone.setOrigin(0, 1);
         this.scene.physics.add.existing(this.proximityZone);
         (this.proximityZone.body as Phaser.Physics.Arcade.Body).pushable = false;
         (this.proximityZone.body as Phaser.Physics.Arcade.Body).allowGravity = false;
@@ -36,10 +37,10 @@ export class RangedUnit extends Unit {
         this.baseGroup = baseGroup;
         
         // Reinitialize proximity zone
-        const zoneXOffset = (this.direction === -1) ? this.x-this.unitProps.attackRange : this.x;
+        const zoneXOffset = (this.direction === -1) ? this.x-this.unitProps.specialRange-this.width/2 : this.x+this.width/2;
         this.proximityZone.setPosition(zoneXOffset, this.y);
-        this.proximityZone.setSize(this.unitProps.attackRange, this.size);
-        (this.proximityZone.body as Phaser.Physics.Arcade.Body).setSize(this.unitProps.attackRange, this.size);
+        this.proximityZone.setSize(this.unitProps.specialRange, this.height);
+        (this.proximityZone.body as Phaser.Physics.Arcade.Body).setSize(this.unitProps.specialRange, this.height);
         this.proximityZone.setActive(true);
         this.proximityZone.setVisible(true);
         (this.proximityZone.body as Phaser.Physics.Arcade.Body).enable = true;
@@ -55,6 +56,8 @@ export class RangedUnit extends Unit {
         (this.proximityZone.body as Phaser.Physics.Arcade.Body).reset(0, 0);
         
         // Null all temporary information
+        if(this.shootingTimer) this.shootingTimer.remove();
+        this.shootingTimer = null;
         this.projectiles = null;
         this.projectilePool = null;
         this.enemiesInRange = [];
@@ -71,7 +74,7 @@ export class RangedUnit extends Unit {
         }
         
         // Move proximity zone in front of the unit
-        const zoneXOffset = (this.direction === -1) ? this.x-this.unitProps.attackRange : this.x;
+        const zoneXOffset = (this.direction === -1) ? this.x-this.unitProps.specialRange : this.x;
         this.proximityZone.setPosition(zoneXOffset, this.y);
 
         this.checkForEnemies();
@@ -102,16 +105,29 @@ export class RangedUnit extends Unit {
         switch (this.state) {
             case UnitStates.WALKING:
                 this.play(`${this.unitType}_run`, true);
+                this.anims.timeScale = 1;
                 if (this.baseInRange || this.enemiesInRange.length > 0) {
-                    this.state = UnitStates.ATTACKING;
+                    this.state = UnitStates.SHOOTING;
                     this.startShooting();
                 }
                 break;
-            case UnitStates.ATTACKING:
+            case UnitStates.SHOOTING:
                 this.play(`${this.unitType}_shoot`, true);
+                this.anims.timeScale = (this.anims?.currentAnim?.duration ?? 1) / this.unitProps.specialSpeed;
+                this.stopMoving();
                 if (!this.baseInRange && this.enemiesInRange.length === 0) {
                     this.state = UnitStates.WALKING;
                     this.stopShooting();
+                }
+                break;
+            case UnitStates.ATTACKING:
+                this.stopShooting();
+                this.startAttackingTarget();
+                this.play(`${this.unitType}_attack`, true);
+                this.anims.timeScale = (this.anims?.currentAnim?.duration ?? 1) / this.unitProps.attackSpeed;
+                if(!this.meleeTarget || !this.meleeTarget.active){
+                    this.state = UnitStates.WALKING;
+                    this.stopAttacking();
                 }
                 break;
             default:
@@ -142,11 +158,9 @@ export class RangedUnit extends Unit {
     }
 
     public startShooting(): void {
-        if (this.attackingTimer) return;
-        
-        this.anims.timeScale = this.anims.duration / this.unitProps.attackSpeed;        
-        this.attackingTimer = this.scene.time.addEvent({
-                delay: this.unitProps.attackSpeed,
+        if (this.shootingTimer) return;     
+        this.shootingTimer = this.scene.time.addEvent({
+                delay: this.unitProps.specialSpeed,
                 callback: () => {
                     if (!this.active) {
                         this.stopShooting();
@@ -176,24 +190,25 @@ export class RangedUnit extends Unit {
 
 
     private fireProjectile(target: Unit | PlayerBase): void {
+        let yPos = this.y+this.unitProps.projectileOffsetY;
         if(!this.projectiles || !this.projectilePool || !this.unitGroup) return;
-        const projectile = this.projectilePool.get(this.x, this.y) as Projectile;
+        const projectile = this.projectilePool.get(this.x, yPos) as Projectile;
         if (!projectile) return;
         if(projectile instanceof Projectile){
-            projectile.damage = this.unitProps.attackDamage;
+            projectile.damage = this.unitProps.specialDamage;
             projectile.spawn(this.projectiles, this.projectilePool);
         }        
         // Calculate projectile angle and launch it
-        const projectileAngle = Phaser.Math.Angle.Between(this.x, this.y, target.x, this.y);
+        const projectileAngle = Phaser.Math.Angle.Between(this.x, yPos, target.x, yPos);
         projectile.rotation = projectileAngle;
-        projectile.enableBody(true, this.x, this.y, true, true);
-        this.scene.physics.moveTo(projectile, target.x, this.y, 300);
+        projectile.enableBody(true, this.x, yPos, true, true);
+        this.scene.physics.moveTo(projectile, target.x, yPos, 300);
     }
 
     public stopShooting(): void {
-        if (this.attackingTimer) {
-            this.attackingTimer.remove();
-            this.attackingTimer = null;
+        if (this.shootingTimer) {
+            this.shootingTimer.remove();
+            this.shootingTimer = null;
         }
     }
 

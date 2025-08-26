@@ -89,7 +89,7 @@
       "key": "archer_shoot",
       "frames": {
         "start": 280,
-        "count": 21
+        "count": 133
       },
       "frameRate": 10,
       "repeat": -1
@@ -97,7 +97,7 @@
     "death": {
       "key": "archer_death",
       "frames": {
-        "start": 310,
+        "start": 420,
         "count": 92
       },
       "frameRate": 10,

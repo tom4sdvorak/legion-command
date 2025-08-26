@@ -26,20 +26,19 @@ export class Player {
     isSpawning: boolean = false;
     spawnTimerRectangle: Phaser.GameObjects.Rectangle;
 
-    constructor(scene: Phaser.Scene, faction: 'red' | 'blue', ownUnitsPhysics: Phaser.Physics.Arcade.Group,
+    constructor(scene: Phaser.Scene, faction: 'red' | 'blue', playerBase: PlayerBase, spawnPosition: Phaser.Math.Vector2, ownUnitsPhysics: Phaser.Physics.Arcade.Group,
         enemyUnitsPhysics: Phaser.Physics.Arcade.Group, projectiles: Phaser.Physics.Arcade.Group,
         objectPool: ObjectPool, baseGroup: Phaser.GameObjects.Group, configLoader: UnitConfigLoader) {
         this.configLoader = configLoader;
+        this.spawnPosition = spawnPosition;
         this.scene = scene;
         this.faction = faction;
-        if(this.faction === 'blue') { this.spawnPosition = new Phaser.Math.Vector2(this.scene.cameras.main.getBounds().width-100, this.scene.cameras.main.getBounds().height-100);}
-        else{this.spawnPosition = new Phaser.Math.Vector2(100, this.scene.cameras.main.getBounds().height-100);}
         this.ownUnitsPhysics = ownUnitsPhysics;
         this.enemyUnitsPhysics = enemyUnitsPhysics;
         this.projectiles = projectiles;
         this.objectPool = objectPool;
         this.baseGroup = baseGroup;
-        this.playerBase = new PlayerBase(this.scene, this.faction, this.spawnPosition,this.enemyUnitsPhysics, this.projectiles, this.objectPool.projectiles.arrows);
+        this.playerBase = playerBase;
         this.resourceComponent = new ResourceComponent(this);
     }
 
@@ -134,7 +133,6 @@ export class Player {
             case 'healer':
                 pool = this.objectPool.units.healers;
                 unit = pool.get();
-                unit.setScale(1.4);
                 break;
             default:
                 throw new Error(`Unknown unit type: ${unitType}`);
@@ -146,10 +144,11 @@ export class Player {
             // Add current data to unitProps to spawn unit correctly
    
             newUnitProps.x = this.spawnPosition.x;
-            newUnitProps.y = this.spawnPosition.y
+            newUnitProps.y = this.spawnPosition.y-35;
             newUnitProps.faction = this.faction;
             newUnitProps.unitID = this.unitCounter;
 
+            unit.setBodySize(96, 128, true);
             unit.spawn(newUnitProps, this.ownUnitsPhysics, pool, this.enemyUnitsPhysics, this.baseGroup, this.projectiles,this.objectPool.projectiles.arrows);
             this.ownUnitsPhysics.add(unit);
             console.log("%cSpawning unit with  id: " + this.unitCounter, `color: ${this.faction}`);

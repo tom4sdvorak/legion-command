@@ -36,19 +36,21 @@ export class Preloader extends Scene
 
         this.load.setPath('assets');
         this.load.json('animationData', '/data/animations.json');
-        this.load.image('logo', 'images/logo.png');
+        this.load.image('single_pixel', 'images/single_pixel.png');
         this.load.image('tower_red', 'images/tower_red.png');
-        this.load.image('tower_blue', 'images/tower_blue.png');
+        this.load.image('base_blue', 'images/buildings/mine.png');
         this.load.image('gold', 'sprites/resources/gold.png');
         this.load.image('background', 'images/bg.png');
-        this.load.image('ground', 'images/ground.png');
+        this.load.atlas('groundAtlas', 'images/grounds/texture.png', 'images/grounds/texture.json');
+        this.load.atlas('mineBase', 'images/buildings/mine/texture.png', 'images/buildings/mine/texture.json');
 
         // Backgrounds
         this.load.setPath('assets/images/backgrounds');
         this.load.image('bglayer1', 'nature/1.png');
         this.load.image('bglayer2', 'nature/2.png');
         this.load.image('bglayer3', 'nature/3.png');
-        this.load.image('bglayer4', 'nature/4.png');
+        this.load.image('bglayer4', 'nature/4b.png');
+        this.load.image('bglayer5', 'nature/5.png');
 
 
         // Unit sprites
@@ -59,7 +61,7 @@ export class Preloader extends Scene
 
         // Projectile sprites
         this.load.setPath('assets/sprites/projectiles');
-        this.load.spritesheet('arrow', 'arrow/sprite.png',{frameWidth: 24, frameHeight: 5});
+        this.load.spritesheet('arrow', 'arrow/sprite.png',{frameWidth: 30, frameHeight: 5});
         
         
     }

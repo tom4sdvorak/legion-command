@@ -5,7 +5,7 @@ import { ObjectPool } from "./helpers/ObjectPool";
 import { Arrow } from "./projectiles/Arrow";
 import eventsCenter from "./EventsCenter";
 
-export class PlayerBase extends Phaser.Physics.Arcade.Sprite {
+export class PlayerBase extends Phaser.Physics.Arcade.Sprite{
     health: number = 5000;
     maxHealth: number = 5000;
     faction: 'red' | 'blue';
@@ -18,52 +18,41 @@ export class PlayerBase extends Phaser.Physics.Arcade.Sprite {
     shootingTimer: Phaser.Time.TimerEvent | null = null;
     projectiles: Phaser.Physics.Arcade.Group;
     enemyUnitsPhysics: Phaser.Physics.Arcade.Group;
-    range: number = 200;
+    range: number = 400;
     healthBar: Phaser.GameObjects.Rectangle;
     projectilePool: Phaser.Physics.Arcade.Group | null = null;
+    scene: Scene;
+    physicsBody: Phaser.Physics.Arcade.Body;
+    sizeW: number = 150;
+    sizeH: number = 300;
 
     constructor(scene: Scene, faction: 'red' | 'blue', spawnPosition: Phaser.Math.Vector2, enemyUnitsPhysics: Phaser.Physics.Arcade.Group, projectiles: Phaser.Physics.Arcade.Group, projectilePool: Phaser.Physics.Arcade.Group) {
-        
-        const texture = faction === 'red' ? 'tower_red' : 'tower_blue';
-        const yOffset = -80;
-        super(scene, spawnPosition.x, spawnPosition.y + yOffset, texture);
+        super(scene, spawnPosition.x, spawnPosition.y, 'single_pixel');
+        const offsetX = (faction === 'blue') ? spawnPosition.x-this.sizeW : spawnPosition.x+100;
+        this.setPosition(offsetX, spawnPosition.y-this.sizeH/2);
+        this.setOrigin(0, 1);
         this.enemyUnitsPhysics = enemyUnitsPhysics;
         this.faction = faction;
-        this.yOffset = yOffset;
+        this.scene = scene;
         this.projectiles = projectiles;
         this.projectilePool = projectilePool;
-        scene.add.existing(this);
         scene.physics.add.existing(this, true);
-        (this.body as Phaser.Physics.Arcade.Body).setSize(this.width+10, this.height);
+        this.setPushable(false);
+        this.setImmovable(true);
+        this.setBodySize(this.sizeW, this.sizeH, true);
+        this.body?.setOffset(0,-this.sizeH/2);
         
         // Create proximity zone around base to detect units
-        const zoneXOffset = (this.faction === 'blue') ? this.x-this.range : this.x;
-        this.proximityZone = this.scene.add.zone(zoneXOffset, this.y, this.range, this.height);
-        this.proximityZone.setOrigin(0, 0.5);
+        
+        const zoneOffsetX = (faction === 'blue') ? this.x-this.range : this.x+this.sizeW;
+        this.proximityZone = this.scene.add.zone(zoneOffsetX, this.y+this.sizeH/2, this.range, this.sizeH);
+        this.proximityZone.setOrigin(0, 1);
         this.scene.physics.add.existing(this.proximityZone, true);
         (this.proximityZone.body as Phaser.Physics.Arcade.Body).pushable = false;
         (this.proximityZone.body as Phaser.Physics.Arcade.Body).allowGravity = false;
 
         // Add healthbar
-        this.healthBar = this.scene.add.rectangle(this.x, this.y-this.height/2, this.width, 20, 0x00ff00).setDepth(1).setAlpha(1);
-
-        /*this.proximityZone = scene.add.circle(this.x, this.y, 200, 0xffffff, 0.5);
-        scene.physics.add.existing(this.proximityZone, true); */
-
-        // Check for overlap with units
-        /*scene.physics.add.overlap(this.proximityZone, this.enemyUnitsPhysics, (zone, unit) => {
-            if (unit instanceof Unit && unit.active) {
-                if (!this.enemiesInRange.includes(unit)) {
-                    this.enemiesInRange.push(unit);
-                    if (!this.isShooting) this.startShooting();
-                }
-            }
-        }, undefined, this);*/
-
-        // Configure the physics body
-        this.setImmovable(true);
-        this.setPushable(false);
-        console.log(this.scene.cameras.main.worldView.width, this.x);
+        this.healthBar = this.scene.add.rectangle(this.x, this.y-this.height/2, this.width, 20, 0x00ff00).setDepth(1).setAlpha(1);       
     }
 
     update(time: any, delta: number): void {

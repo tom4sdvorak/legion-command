@@ -5,14 +5,14 @@
     "cost": 10,
     "maxHealth": 100,
     "attackDamage": 10,
-    "attackRange": 100,
     "attackSpeed": 1000,
     "specialDamage": 10,
     "specialRange": 100,
     "specialSpeed": 1000,
     "spawnTime": 1000,
     "offsetY": 0,
-    "scale": 1
+    "scale": 1,
+    "projectileOffsetY": 0
   },
 
   "unitClasses": {
@@ -28,9 +28,9 @@
       "extends": "baseUnit",
       "health": 80,
       "maxHealth": 80,
-      "attackDamage": 50,
-      "attackRange": 200,
-      "attackSpeed": 1000
+      "specialDamage": 50,
+      "specialRange": 200,
+      "specialSpeed": 1000
     },
 
     "supportUnit": {
@@ -50,7 +50,8 @@
     },
 
     "archer": {
-      "extends": "rangedUnit"
+      "extends": "rangedUnit",
+      "projectileOffsetY": -60
     },
 
     "healer": {

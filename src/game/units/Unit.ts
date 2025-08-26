@@ -17,6 +17,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
     unitPool: Phaser.Physics.Arcade.Group | null = null;
     healthComponent: HealthComponent;
     declare scene: Game;
+    meleeTarget: Unit | PlayerBase | null = null;
 
     constructor(scene: Game, unitType: string) {
         super(scene, 0, 0, unitType);
@@ -43,6 +44,9 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
 
         // Reinitialize the sprite's body
         this.setScale(unitProps.scale);
+        if(this.body){
+            this.setBodySize(this.body?.width/unitProps.scale, this.body?.height/unitProps.scale, true);
+        }
         this.setActive(true);
         this.setVisible(true);
         // Calculate spawn position of unit based on desired position, moved by offset (how many empty pixels are under feet of the sprite) timed by scale of the unit (which scales the empty pixels too)
@@ -56,9 +60,6 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         (this.body as Phaser.Physics.Arcade.Body).enable = true;
         (this.body as Phaser.Physics.Arcade.Body).reset(unitProps.x, newPositionY);
         (this.body as Phaser.Physics.Arcade.Body).pushable = false;
-        //this.setBodySize(this.size, this.size);
-
-        
         this.state = UnitStates.WALKING;
     }
     
@@ -97,6 +98,10 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
     }
 
     public takeDamage(damage: number): void {
+        this.scene.time.delayedCall(100, () => {
+            this.clearTint();
+        }, undefined, this);
+        this.setTintFill(0xffffff);
         this.healthComponent.takeDamage(damage);
     }
 
@@ -111,7 +116,44 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
                     this.state = UnitStates.IDLE;
                 }
             }
+        } // On colision with enemy unit or base, unit should start attacking
+        else if(target instanceof Unit && target.unitProps.faction !== this.unitProps.faction){
+            this.state = UnitStates.ATTACKING;
+            this.meleeTarget = target;
         }
+        else if(target instanceof PlayerBase && target.faction !== this.unitProps.faction){
+            this.state = UnitStates.ATTACKING;
+            this.meleeTarget = target;
+        }
+    }
+
+    public startAttackingTarget(): void {
+        if (this.attackingTimer) return;
+        if (!this.meleeTarget) return;
+        let targetID = null;
+        if(this.meleeTarget instanceof Unit){
+            targetID = this.meleeTarget.unitProps.unitID;
+        }
+        this.attackingTimer = this.scene.time.addEvent({
+            delay: this.unitProps.attackSpeed,
+            callback: () => {
+                if (!this.active) {
+                    return;
+                }
+                if(this.meleeTarget instanceof Unit && this.meleeTarget.unitProps.unitID === targetID && this.meleeTarget.active && this.meleeTarget.isAlive()){
+                    this.meleeTarget.takeDamage(this.unitProps.attackDamage);
+                }
+                else if(this.meleeTarget instanceof PlayerBase && this.meleeTarget.active){
+                    this.meleeTarget.takeDamage(this.unitProps.attackDamage);
+                }
+                else{
+                    this.stopAttacking();
+                    return;
+                }
+            },
+            callbackScope: this,
+            loop: true
+        });
     }
 
     /* General unit state handling
@@ -124,13 +166,14 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         switch (this.state) {
             case UnitStates.IDLE:
                 this.play(`${this.unitType}_idle`, true);
+                this.anims.timeScale = 1;
                 if (!this.isBlocked()) {
                     this.state = UnitStates.WALKING;
                 }
                 break;
             case UnitStates.WALKING:
-                // Check if the 'run' animation exists before playing
                 this.play(`${this.unitType}_run`, true);
+                this.anims.timeScale = 1;
                 break;
             case UnitStates.DEAD:
                 break;
@@ -141,16 +184,29 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
 
     isBlocked(): boolean {
         const detectionRectWidth = 5;
-        const xOffset = (this.size * 0.5 + 1) * this.direction;
-        const yOffset = -this.size * 0.5;
-        // Use a physics overlap check to find a blocking unit in front
-        let overlap = this.scene.physics.overlapRect(this.x + xOffset, this.y + yOffset, detectionRectWidth * this.direction, this.size);
-        return overlap.some(object => {
-            if (object.gameObject instanceof Unit && object.gameObject.active) {
-                return true;
-            }
-            return false;
-        });
+        if(this.body){
+            const xOffset = (this.body.width * 0.5 + 1) * this.direction;
+            const yOffset = -this.body.height * 0.5;
+            // Use a physics overlap check to find a blocking unit in front
+            let overlap = this.scene.physics.overlapRect(this.x + xOffset, this.y + yOffset, detectionRectWidth * this.direction, this.size);
+            return overlap.some(object => {
+                if (object.gameObject instanceof Unit && object.gameObject.active) {
+                    return true;
+                }
+                return false;
+            });
+        }
+        return false;
+        
+    }
+
+    public stopAttacking(): void {
+        if (this.attackingTimer) {
+            this.attackingTimer.remove();
+            this.attackingTimer = null;
+        }
+        this.meleeTarget = null;
+        this.state = UnitStates.WALKING;        
     }
 
     public stopMoving(): void {
