@@ -9,14 +9,14 @@ export class HealthComponent {
     private healthBar: Phaser.GameObjects.Rectangle | null;
     private barWidth: number;
     private barHeight: number;
-    private yOffset: number;
+    private posY: number;
 
-    constructor(parent: Unit, width: number, height: number, yOffset: number, maxHealth: number) {
+    constructor(parent: Unit, width: number, height: number, posY: number, maxHealth: number) {
         this.health = maxHealth;
         this.maxHealth = maxHealth;
         this.barWidth = width;
         this.barHeight = height;
-        this.yOffset = yOffset;
+        this.posY = posY;
         this.parent = parent;
         this.healthBar = null;
         this.createHealthBar();
@@ -29,7 +29,7 @@ export class HealthComponent {
         // Update Health Bar
         if (this.healthBar) {
             this.healthBar.x = this.parent.x;
-            this.healthBar.y = this.parent.y + this.yOffset;
+            //this.healthBar.y = this.parent.y + this.yOffset;
             this.healthBar.width = this.barWidth * (this.health / this.maxHealth);
             if (this.healthBar.width > (this.barWidth * 0.66)) {
                 this.healthBar.setFillStyle(0x00ff00);
@@ -48,7 +48,7 @@ export class HealthComponent {
         this.health = health;
         if (this.healthBar) {
             this.healthBar.setVisible(true);
-            this.healthBar.y = this.parent.y + this.yOffset;
+            //this.healthBar.y = this.parent.y + this.yOffset;
         }
         else{
             this.createHealthBar();
@@ -61,7 +61,7 @@ export class HealthComponent {
     }
 
     createHealthBar() {
-        this.healthBar = this.parent.scene.add.rectangle(this.parent.x, this.parent.y+this.yOffset, this.barWidth, this.barHeight, 0x00ff00).setDepth(100).setAlpha(0.5);
+        this.healthBar = this.parent.scene.add.rectangle(this.parent.x, this.posY, this.barWidth, this.barHeight, 0x00ff00).setDepth(100).setAlpha(0.5);
     }
     takeDamage(damage: number): void {
         this.health -= damage;

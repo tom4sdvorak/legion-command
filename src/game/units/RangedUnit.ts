@@ -97,44 +97,18 @@ export class RangedUnit extends Unit {
         this.handleState();      
     }
 
-    /* Ranged unit state handling
-        WALKING: Plays a walking animation and checks if there are enemies in range. If there are, it transitions to ATTACKING state.
-        ATTACKING: Plays an attack animation. If there aren't targets, it transitions back to WALKING state.
-    */
     handleState(): void {
-        switch (this.state) {
-            case UnitStates.WALKING:
-                this.play(`${this.unitType}_run`, true);
-                this.anims.timeScale = 1;
-                if (this.baseInRange || this.enemiesInRange.length > 0) {
-                    this.state = UnitStates.SHOOTING;
-                    this.startShooting();
-                }
-                break;
-            case UnitStates.SHOOTING:
-                this.play(`${this.unitType}_shoot`, true);
-                this.anims.timeScale = (this.anims?.currentAnim?.duration ?? 1) / this.unitProps.specialSpeed;
-                this.stopMoving();
-                if (!this.baseInRange && this.enemiesInRange.length === 0) {
-                    this.state = UnitStates.WALKING;
-                    this.stopShooting();
-                }
-                break;
-            case UnitStates.ATTACKING:
-                this.stopShooting();
-                this.startAttackingTarget();
-                this.play(`${this.unitType}_attack`, true);
-                this.anims.timeScale = (this.anims?.currentAnim?.duration ?? 1) / this.unitProps.attackSpeed;
-                if(!this.meleeTarget || !this.meleeTarget.active){
-                    this.state = UnitStates.WALKING;
-                    this.stopAttacking();
-                }
-                break;
-            default:
-                // Call the Unit class's handleState for other states
-                super.handleState();
-                break;
+        if(this.state === UnitStates.WALKING || this.state === UnitStates.IDLE){
+            if (this.baseInRange || this.enemiesInRange.length > 0) {
+                this.changeState(UnitStates.SHOOTING);
+            }
         }
+        else if(this.state === UnitStates.SHOOTING){
+            if (!this.baseInRange && this.enemiesInRange.length === 0) {
+                this.changeState(UnitStates.IDLE);
+            }
+        }
+        super.handleState();
     }
 
     public checkForEnemies(): void {

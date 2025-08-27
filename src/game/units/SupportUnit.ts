@@ -69,43 +69,18 @@ export class SupportUnit extends Unit {
         });
     }
 
-    /* Support unit state handling
-        WALKING: Plays a walking animation and checks if there are allies in range. If there are, it transitions to SUPPORTING state.
-        SUPPORTING: Plays a supporting animation and checks if there are no allies in range. If there aren't, it transitions back to WALKING state.
-        ATTACKING: Stops supporting, starts attacking a target, and plays an attack animation. If the target is invalid or inactive, it transitions back to WALKING state.
-    */
     handleState(): void {
-        switch (this.state) {
-            case UnitStates.WALKING:
-                this.play(`${this.unitType}_run`, true);
-                this.anims.timeScale = 1;
-                if (this.alliesInRange.length > 0) {
-                    this.state = UnitStates.SUPPORTING;
-                    this.startSupporting();
-                }
-                break;
-            case UnitStates.SUPPORTING:
-                this.play(`${this.unitType}_support`, true);
-                this.anims.timeScale = (this.anims?.currentAnim?.duration ?? 1) / this.unitProps.specialSpeed;
-                if (this.alliesInRange.length === 0) {
-                    this.state = UnitStates.WALKING;
-                    this.stopSupporting();
-                }
-                break;
-            case UnitStates.ATTACKING:
-                this.stopSupporting();
-                this.startAttackingTarget();
-                this.play(`${this.unitType}_attack`, true);
-                this.anims.timeScale = (this.anims?.currentAnim?.duration ?? 1) / this.unitProps.attackSpeed;
-                if(!this.meleeTarget || !this.meleeTarget.active){
-                    this.state = UnitStates.WALKING;
-                    this.stopAttacking();
-                }
-                break;
-            default:
-                super.handleState();
-                break;
+        if(this.state === UnitStates.WALKING || this.state === UnitStates.IDLE){
+            if (this.alliesInRange.length > 0) {
+                this.changeState(UnitStates.SUPPORTING);
+            }
         }
+        else if(this.state === UnitStates.SUPPORTING){
+            if (this.alliesInRange.length === 0) {
+                this.changeState(UnitStates.IDLE);
+            }
+        }
+        super.handleState();
     }
 
     startSupporting() {

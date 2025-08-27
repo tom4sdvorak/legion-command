@@ -188,10 +188,10 @@ export class PlayerBase extends Phaser.Physics.Arcade.Sprite{
             projectile.spawn(this.projectiles, this.projectilePool);
         }
         // Calculate projectile angle and launch it
-        const projectileAngle = Phaser.Math.Angle.Between(this.x, this.y, target.x, target.y);
+        const projectileAngle = Phaser.Math.Angle.Between(this.x, this.y, target.x, target.y-target.height/2);
         projectile.rotation = projectileAngle;
         projectile.enableBody(true, this.x, this.y, true, true);
-        this.scene.physics.moveTo(projectile, target.x, target.y, 300);
+        this.scene.physics.moveTo(projectile, target.x, target.y-target.body!.height/2, 300);
     }
     
     public isBlocked(): boolean {

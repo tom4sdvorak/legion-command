@@ -125,14 +125,17 @@ export class Player {
             case 'warrior':
                 pool = this.objectPool.units.warriors;
                 unit = pool.get();
+                unit.setBodySize(64, 128, true);
                 break;
             case 'archer':
                 pool = this.objectPool.units.archers;
                 unit = pool.get();
+                unit.setBodySize(64, 128, true);
                 break;
             case 'healer':
                 pool = this.objectPool.units.healers;
                 unit = pool.get();
+                
                 break;
             default:
                 throw new Error(`Unknown unit type: ${unitType}`);

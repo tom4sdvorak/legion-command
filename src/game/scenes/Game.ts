@@ -36,6 +36,8 @@ export class Game extends Scene
     blueConfigLoader: UnitConfigLoader;
     AIController: AIController;
     controls: Phaser.Cameras.Controls.SmoothedKeyControl;
+    isDragging: boolean = false;
+    lastPointerPosition : Phaser.Math.Vector2;
     
 
 
@@ -202,12 +204,13 @@ export class Game extends Scene
         this.cameras.main.setBounds(0, 0, this.worldWidth, this.worldHeight);
         this.physics.world.setBounds(0, 0, this.worldWidth, this.worldHeight);
         this.camera.setBackgroundColor(0x76B9E3);
+        this.lastPointerPosition = new Phaser.Math.Vector2();
 
         this.add.image(0, this.worldHeight, 'bglayer1').setScrollFactor(0).setOrigin(0,1).setDisplaySize(this.camera.width, this.worldHeight);
         this.add.image(0, this.worldHeight, 'bglayer2').setScrollFactor(0.2).setOrigin(0,1).setDisplaySize(this.worldWidth-(1-0.2)*(this.worldWidth-(this.game.config.width as number)), this.worldHeight);
         this.add.image(0, this.worldHeight, 'bglayer3').setScrollFactor(0.5).setOrigin(0,1).setDisplaySize(this.worldWidth-(1-0.5)*(this.worldWidth-(this.game.config.width as number)), this.worldHeight);
         this.add.tileSprite(0, this.worldHeight, this.worldWidth, 0, 'bglayer4').setScrollFactor(0.8).setOrigin(0,1).setScale(1.8);
-        const foreGround = this.add.tileSprite(0, this.worldHeight, this.worldWidth, 0, 'bglayer5').setOrigin(0,1).setDepth(2);
+        const foreGround = this.add.tileSprite(0, this.worldHeight, this.worldWidth, 0, 'bglayer5').setOrigin(0,1).setDepth(9);
         foreGround.setDisplaySize(foreGround.width, 65);
         
 
@@ -232,6 +235,16 @@ export class Game extends Scene
             };
         this.controls = new Phaser.Cameras.Controls.SmoothedKeyControl(controlConfig);
         }
+
+        this.input.on('pointerdown',  (pointer: any) => {
+            this.isDragging = true;
+            this.lastPointerPosition.x = pointer.x;
+            this.lastPointerPosition.y = pointer.y;
+        });
+
+        this.input.on('pointerup',  () => {
+            this.isDragging = false;
+        });
         
         
         //Listen to events
@@ -253,6 +266,16 @@ export class Game extends Scene
 
     update(time: any, delta: number){
         this.controls.update(delta);
+        if (this.isDragging) {
+            let deltaX = this.lastPointerPosition.x - this.input.activePointer.x;
+            let deltaY = this.lastPointerPosition.y - this.input.activePointer.y;
+            
+            this.cameras.main.scrollX += deltaX;
+            this.cameras.main.scrollY += deltaY;
+
+            this.lastPointerPosition.x = this.input.activePointer.x;
+            this.lastPointerPosition.y = this.input.activePointer.y;
+        }
         // Run update methods of each player
         this.playerBlue.update(time, delta);
         if(devConfig.AI) this.AIController.update(time, delta);

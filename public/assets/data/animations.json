@@ -31,7 +31,7 @@
     "hit": {
       "key": "warrior_hit",
       "frames": {
-        "start": 50,
+        "start": 54,
         "count": 3
       },
       "frameRate": 10,
@@ -40,11 +40,11 @@
     "death": {
       "key": "warrior_death",
       "frames": {
-        "start": 59,
+        "start": 63,
         "count": 9
       },
       "frameRate": 10,
-      "repeat": -1
+      "repeat": 0
     }
   },
   "archer": {
@@ -54,7 +54,7 @@
         "start": 0,
         "count": 154
       },
-      "frameRate": 10,
+      "frameRate": 48,
       "repeat": -1,
       "yoyo": true
     },
@@ -64,7 +64,7 @@
         "start": 160,
         "count": 36
       },
-      "frameRate": 10,
+      "frameRate": 48,
       "repeat": -1
     },
     "run": {
@@ -73,7 +73,7 @@
         "start": 200,
         "count": 26
       },
-      "frameRate": 10,
+      "frameRate": 48,
       "repeat": -1
     },
     "attack": {
@@ -100,8 +100,8 @@
         "start": 420,
         "count": 92
       },
-      "frameRate": 10,
-      "repeat": -1
+      "frameRate": 48,
+      "repeat": 0
     }
   },
   "healer": {
@@ -155,10 +155,10 @@
       "key": "healer_death",
       "frames": {
         "start": 40,
-        "count": 8
+        "count": 7
       },
       "frameRate": 10,
-      "repeat": -1
+      "repeat": 0
     }
   }
 }
