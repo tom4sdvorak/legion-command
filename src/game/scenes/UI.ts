@@ -1,6 +1,7 @@
 import { Scene } from 'phaser';
 import eventsCenter from '../EventsCenter';
 import { Player } from '../Player';
+import { UIComponent } from '../components/UIComponent';
 
 export class UI extends Scene
 {
@@ -11,6 +12,7 @@ export class UI extends Scene
     unitLimit: number = 10;
     moneyText: Phaser.GameObjects.Text;
     moneyImage: Phaser.GameObjects.Image;
+    unitQueueUI: UIComponent;
 
     constructor ()
     {
@@ -25,10 +27,14 @@ export class UI extends Scene
     {      
         
         this.unitQueueGraphics = this.add.group({
-            defaultKey: 'warrior', 
+            defaultKey: 'warrior_static', 
             visible: false,
             active: false
         });
+
+        this.unitQueueUI = new UIComponent(this, 50, (this.game.config.height as number)/2, 50, (this.game.config.height as number)*0.7, 1, 0xffffff);
+        this.add.existing(this.unitQueueUI);
+
 
         this.moneyText = this.add.text(50, 50, 'Gold: ' + this.player.getMoney(), { fontSize: 24, color: '#000000' });
         this.moneyImage = this.add.image(25, 50, 'gold');
@@ -71,6 +77,18 @@ export class UI extends Scene
         this.button.setData('parent', image1c);
         image1c.setData('parent', this.button);
 
+        this.button = this.add.circle(400, 200, 40, 0xffffff)
+            .setStrokeStyle(2, 0x000000)
+            .setInteractive()
+            .on('pointerup', () => {
+                if(this.unitQueue.length >= this.unitLimit || !this.player.canAfford(this.player.getUnitCost('fireWorm'))) return;
+                eventsCenter.emit('spawn-red-unit', 'fireWorm');
+            });
+        const image1d = this.add.image(400, 200, 'fireWorm');
+        Phaser.Display.Align.In.Center(image1d, this.button); // Center the image within the button.
+        this.button.setData('parent', image1d);
+        image1d.setData('parent', this.button);
+
         this.button = this.add.circle(500, 500, 40, 0x000000)
             .setStrokeStyle(2, 0xffffff)
             .setInteractive()
@@ -108,18 +126,35 @@ export class UI extends Scene
     private renderUnitQueue():void{       
         this.unitQueueGraphics.clear(true, true);
 
-        let offsetY = this.scale.height*0.8;
+        
+        const spriteMaxWidth = this.unitQueueUI.getWidth()/2;
+        const spriteMaxHeight = (this.unitQueueUI.getHeight()-12)/10
+        const maxRatio = spriteMaxWidth / spriteMaxHeight;
+        let yPos = (this.unitQueueUI.getHeight()/2) - spriteMaxHeight/2 - 6;
         for (const unit of this.unitQueue) {
-            const sprite = this.unitQueueGraphics.get(0, 0, unit);
-            
+            const sprite = this.unitQueueGraphics.get(0, 0, `${unit}_static`);
+            const originalRatio = sprite.texture.get().width / sprite.texture.get().height;
+            let newWidth, newHeight;
             // Update the sprite properties
+            this.unitQueueUI.add(sprite);
             sprite.setOrigin(0.5, 0.5);
-            sprite.setScale(0.5);
-            sprite.y = offsetY;
-            sprite.x = sprite.x+30;
+
+            if (originalRatio > maxRatio) {
+                // The original image is wider than the max container
+                // Use the max width as the limiting factor
+                newWidth = spriteMaxWidth;
+                newHeight = newWidth / originalRatio;
+            } else {
+                // The original image is taller than the max container
+                // Use the max height as the limiting factor
+                newHeight = spriteMaxHeight;
+                newWidth = newHeight * originalRatio;
+            }
+            sprite.setDisplaySize(newWidth,newHeight);
+            sprite.y = yPos;
             sprite.setVisible(true);
             sprite.setActive(true);
-            offsetY -= sprite.displayHeight/2;
+            yPos -= spriteMaxHeight;
         }
     }
 

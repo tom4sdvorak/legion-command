@@ -1,6 +1,5 @@
 import { PlayerBase } from "./PlayerBase";
 import { Unit } from "./units/Unit";
-import { UnitProps } from "./helpers/UnitProps";
 import { ObjectPool } from "./helpers/ObjectPool";
 import { devConfig } from "./helpers/DevConfig";
 import { UnitConfigLoader } from "./helpers/UnitConfigLoader";
@@ -135,7 +134,10 @@ export class Player {
             case 'healer':
                 pool = this.objectPool.units.healers;
                 unit = pool.get();
-                
+                break;
+            case 'fireWorm':
+                pool = this.objectPool.units.fireWorms;
+                unit = pool.get();
                 break;
             default:
                 throw new Error(`Unknown unit type: ${unitType}`);
@@ -147,11 +149,11 @@ export class Player {
             // Add current data to unitProps to spawn unit correctly
    
             newUnitProps.x = this.spawnPosition.x;
-            newUnitProps.y = this.spawnPosition.y-35;
+            newUnitProps.y = this.spawnPosition.y;
             newUnitProps.faction = this.faction;
             newUnitProps.unitID = this.unitCounter;
 
-            unit.setBodySize(96, 128, true);
+            // Spawn unit
             unit.spawn(newUnitProps, this.ownUnitsPhysics, pool, this.enemyUnitsPhysics, this.baseGroup, this.projectiles,this.objectPool.projectiles.arrows);
             this.ownUnitsPhysics.add(unit);
             console.log("%cSpawning unit with  id: " + this.unitCounter, `color: ${this.faction}`);

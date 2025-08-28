@@ -12,6 +12,7 @@ import { Healer } from '../units/Healer';
 import { UnitConfigLoader } from '../helpers/UnitConfigLoader';
 import { AIController } from '../components/AIController';
 import { devConfig } from '../helpers/DevConfig';
+import { FireWorm } from '../units/FireWorm';
 
 export class Game extends Scene
 {
@@ -38,6 +39,7 @@ export class Game extends Scene
     controls: Phaser.Cameras.Controls.SmoothedKeyControl;
     isDragging: boolean = false;
     lastPointerPosition : Phaser.Math.Vector2;
+    globalOffsetY: number = -40;
     
 
 
@@ -76,7 +78,7 @@ export class Game extends Scene
         this.blueConfigLoader = new UnitConfigLoader(AIUnitDataJson);
 
         // Create and setup main player
-        const redPos = new Phaser.Math.Vector2(0, this.worldHeight);
+        const redPos = new Phaser.Math.Vector2(0, this.worldHeight+this.globalOffsetY);
         const redSprites = [
             this.add.sprite(100, this.worldHeight, 'tower_red').setOrigin(0,1)
         ];
@@ -85,7 +87,7 @@ export class Game extends Scene
         this.playerRed.changePassiveIncome(1, true);
 
         // Create and setup AI player
-        const bluePos = new Phaser.Math.Vector2(this.worldWidth, this.worldHeight);
+        const bluePos = new Phaser.Math.Vector2(this.worldWidth, this.worldHeight+this.globalOffsetY);
         const blueSprites = [
             this.add.sprite(this.worldWidth-10, this.worldHeight, 'mineBase', 'hill').setOrigin(1,1).setScale(1.1),
             this.add.sprite(this.worldWidth-10, this.worldHeight, 'mineBase', 'dark_hill').setOrigin(1,1).setScale(1.1),
@@ -155,6 +157,11 @@ export class Game extends Scene
                     maxSize: 50,
                     runChildUpdate: true
                 }),
+                fireWorms: this.physics.add.group({
+                    classType: FireWorm,
+                    maxSize: 50,
+                    runChildUpdate: true
+                }),
             },
             projectiles: {// Projectile pools
                 arrows: this.physics.add.group({
@@ -195,6 +202,10 @@ export class Game extends Scene
     rewardPlayer(faction: string, money: number = 0, xp: number = 0){
         if(faction === 'red') this.playerRed.addMoney(money);
         else this.playerBlue.addMoney(money);
+    }
+
+    getGlobalOffset(): Phaser.Math.Vector2{
+         return new Phaser.Math.Vector2(0, this.globalOffsetY);
     }
 
     create ()

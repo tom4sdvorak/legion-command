@@ -164,7 +164,7 @@ export class RangedUnit extends Unit {
 
 
     private fireProjectile(target: Unit | PlayerBase): void {
-        let yPos = this.y+this.unitProps.projectileOffsetY;
+        let yPos = this.y+this.unitProps.projectileOffsetY+this.unitProps.offsetY;
         if(!this.projectiles || !this.projectilePool || !this.unitGroup) return;
         const projectile = this.projectilePool.get(this.x, yPos) as Projectile;
         if (!projectile) return;

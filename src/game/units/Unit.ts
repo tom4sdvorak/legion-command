@@ -47,18 +47,26 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         this.setActive(true);
         this.setVisible(true);
         // Calculate spawn position of unit based on desired position, moved by offset (how many empty pixels are under feet of the sprite) timed by scale of the unit (which scales the empty pixels too)
-        let newPositionY = unitProps.y + unitProps.offsetY*unitProps.scale;
+        let newPositionY = unitProps.y - unitProps.offsetY*unitProps.scale;
         this.setPosition(unitProps.x, newPositionY);
         this.unitGroup.add(this);
 
         //this.setDisplaySize(this.sizeW, this.sizeH);
         //this.setBodySize(this.size, this.size, true);
-
+        
         (this.body as Phaser.Physics.Arcade.Body).enable = true;
         (this.body as Phaser.Physics.Arcade.Body).reset(unitProps.x, newPositionY);
         (this.body as Phaser.Physics.Arcade.Body).pushable = false;
         if(this.body){
-            this.setBodySize(this.body?.width/unitProps.scale, this.body?.height/unitProps.scale, true);
+            this.setBodySize(unitProps.bodyWidth/unitProps.scale, unitProps.bodyHeight/unitProps.scale, true);
+            //this.body.setOffset(this.body.offset.x, this.body.offset.y+(35+this.unitProps.offsetY)*unitProps.scale);
+
+            /* Calculate offset of units body on Y axis by taking the bottom cooridinate of game screen 
+            and minus current body location, height of the body, (negative) globatOffsetY defined in game scene
+            and all adjusted for scale          
+            */
+            let bodyOffsetY = ((this.scene.camera.height-this.body.y-this.body.height+this.scene.getGlobalOffset().y)/this.unitProps.scale);
+            this.body.setOffset(this.body.offset.x, bodyOffsetY);
         }
         this.changeState(UnitStates.WALKING);
     }

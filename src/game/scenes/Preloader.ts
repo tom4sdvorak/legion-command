@@ -44,6 +44,12 @@ export class Preloader extends Scene
         this.load.atlas('groundAtlas', 'images/grounds/texture.png', 'images/grounds/texture.json');
         this.load.atlas('mineBase', 'images/buildings/mine/texture.png', 'images/buildings/mine/texture.json');
 
+        // UI
+        this.load.setPath('assets/images/UI');
+        this.load.image('UI_border', 'UI_border.png');
+        this.load.image('UI_bg_lighter', 'UI_bg_lighter.png');
+        this.load.image('UI_bg_darker', 'UI_bg_darker.png');
+
         // Backgrounds
         this.load.setPath('assets/images/backgrounds');
         this.load.image('bglayer1', 'nature/1.png');
@@ -56,8 +62,13 @@ export class Preloader extends Scene
         // Unit sprites
         this.load.setPath('assets/sprites/units');
         this.load.spritesheet('warrior', 'warrior/sprite_sheet.png',{frameWidth: 184, frameHeight: 126});
+        this.load.image('warrior_static', 'warrior/static.png');
         this.load.spritesheet('archer', 'archer/sprite_sheet.png',{frameWidth: 128, frameHeight: 128});
+        this.load.image('archer_static', 'archer/static.png');
         this.load.spritesheet('healer', 'healer/sprite_sheet.png',{frameWidth: 231, frameHeight: 190});
+        this.load.image('healer_static', 'healer/static.png');
+        this.load.spritesheet('fireWorm', 'fireWorm/sprite_sheet.png',{frameWidth: 90, frameHeight: 90});
+        this.load.image('fireWorm_static', 'fireWorm/static.png');
 
         // Projectile sprites
         this.load.setPath('assets/sprites/projectiles');
