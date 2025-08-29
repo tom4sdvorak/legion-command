@@ -43,6 +43,7 @@ export class Preloader extends Scene
         this.load.image('background', 'images/bg.png');
         this.load.atlas('groundAtlas', 'images/grounds/texture.png', 'images/grounds/texture.json');
         this.load.atlas('mineBase', 'images/buildings/mine/texture.png', 'images/buildings/mine/texture.json');
+        this.load.image('signpost', 'images/items/signpost.png');
 
         // UI
         this.load.setPath('assets/images/UI');
@@ -56,7 +57,8 @@ export class Preloader extends Scene
         this.load.image('bglayer2', 'nature/2.png');
         this.load.image('bglayer3', 'nature/3.png');
         this.load.image('bglayer4', 'nature/4b.png');
-        this.load.image('bglayer5', 'nature/5.png');
+        this.load.image('bglayer5', 'nature/5b.png');
+        //this.load.image('bglayer6', 'nature/6.png');
 
 
         // Unit sprites
@@ -73,6 +75,7 @@ export class Preloader extends Scene
         // Projectile sprites
         this.load.setPath('assets/sprites/projectiles');
         this.load.spritesheet('arrow', 'arrow/sprite.png',{frameWidth: 30, frameHeight: 5});
+        this.load.spritesheet('fireball', 'fireball/sprite_sheet.png',{frameWidth: 46, frameHeight: 46});
         
         
     }

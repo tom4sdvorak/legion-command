@@ -14,7 +14,8 @@
     "scale": 1,
     "projectileOffsetY": 0,
     "bodyWidth": 64,
-    "bodyHeight": 96
+    "bodyHeight": 96,
+    "projectileVelocity": 500
   },
 
   "unitClasses": {
@@ -65,9 +66,12 @@
 
     "fireWorm": {
       "extends": "rangedUnit",
+      "attackDamage": 200,
       "offsetY": -32,
       "scale": 1.4,
-      "bodyHeight": 96
+      "bodyHeight": 96,
+      "projectileOffsetY": -51,
+      "projectileVelocity": 300
     }
   }
 }

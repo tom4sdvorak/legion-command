@@ -18,4 +18,5 @@ export interface UnitProps {
     projectileOffsetY: number;
     bodyWidth: number;
     bodyHeight: number;
+    projectileVelocity: number;
 }

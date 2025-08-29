@@ -199,11 +199,40 @@
       "frameRate": 10,
       "repeat": -1
     },
+    "attack": {
+      "key": "fireWorm_attack",
+      "frames": {
+        "start": 64,
+        "count": 8
+      },
+      "frameRate": 10,
+      "repeat": 0
+    },
     "death": {
       "key": "fireWorm_death",
       "frames": {
         "start": 64,
         "count": 8
+      },
+      "frameRate": 10,
+      "repeat": 0
+    }
+  },
+  "fireball": {
+    "move": {
+      "key": "fireball_move",
+      "frames": {
+        "start": 0,
+        "count": 6
+      },
+      "frameRate": 10,
+      "repeat": -1
+    },
+    "explode": {
+      "key": "fireball_explode",
+      "frames": {
+        "start": 7,
+        "count": 7
       },
       "frameRate": 10,
       "repeat": 0

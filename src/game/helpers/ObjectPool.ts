@@ -9,5 +9,6 @@ export type ObjectPool = {
     },
     projectiles: {
         arrows: Phaser.Physics.Arcade.Group;
+        fireballs: Phaser.Physics.Arcade.Group;
     }
 }

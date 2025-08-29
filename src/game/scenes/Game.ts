@@ -13,6 +13,7 @@ import { UnitConfigLoader } from '../helpers/UnitConfigLoader';
 import { AIController } from '../components/AIController';
 import { devConfig } from '../helpers/DevConfig';
 import { FireWorm } from '../units/FireWorm';
+import { Fireball } from '../projectiles/Fireball';
 
 export class Game extends Scene
 {
@@ -39,7 +40,9 @@ export class Game extends Scene
     controls: Phaser.Cameras.Controls.SmoothedKeyControl;
     isDragging: boolean = false;
     lastPointerPosition : Phaser.Math.Vector2;
-    globalOffsetY: number = -40;
+    globalOffsetY: number = -200;
+    nextUnitContainer: Phaser.GameObjects.Container;
+    nextUnit: Phaser.GameObjects.Image;
     
 
 
@@ -80,7 +83,7 @@ export class Game extends Scene
         // Create and setup main player
         const redPos = new Phaser.Math.Vector2(0, this.worldHeight+this.globalOffsetY);
         const redSprites = [
-            this.add.sprite(100, this.worldHeight, 'tower_red').setOrigin(0,1)
+            this.add.sprite(100, this.worldHeight+this.globalOffsetY+35, 'tower_red').setOrigin(0,1)
         ];
         this.baseRed = new PlayerBase(this, 'red', redPos, this.blueUnitsPhysics, this.redProjectiles, this.objectPool.projectiles.arrows);
         this.playerRed = new Player(this, 'red', this.baseRed, redPos, this.redUnitsPhysics, this.blueUnitsPhysics, this.redProjectiles, this.objectPool, this.baseGroup, this.redConfigLoader);
@@ -89,10 +92,10 @@ export class Game extends Scene
         // Create and setup AI player
         const bluePos = new Phaser.Math.Vector2(this.worldWidth, this.worldHeight+this.globalOffsetY);
         const blueSprites = [
-            this.add.sprite(this.worldWidth-10, this.worldHeight, 'mineBase', 'hill').setOrigin(1,1).setScale(1.1),
-            this.add.sprite(this.worldWidth-10, this.worldHeight, 'mineBase', 'dark_hill').setOrigin(1,1).setScale(1.1),
-            this.add.sprite(this.worldWidth-10, this.worldHeight, 'mineBase', 'mine_bg').setOrigin(1,1).setScale(1.1),
-            this.add.sprite(this.worldWidth-10, this.worldHeight, 'mineBase', 'mine_fg').setOrigin(1,1).setDepth(10).setScale(1.1),
+            this.add.sprite(this.worldWidth-10, this.worldHeight+this.globalOffsetY+35, 'mineBase', 'hill').setOrigin(1,1).setScale(1.1),
+            this.add.sprite(this.worldWidth-10, this.worldHeight+this.globalOffsetY+35, 'mineBase', 'dark_hill').setOrigin(1,1).setScale(1.1),
+            this.add.sprite(this.worldWidth-10, this.worldHeight+this.globalOffsetY+35, 'mineBase', 'mine_bg').setOrigin(1,1).setScale(1.1),
+            this.add.sprite(this.worldWidth-10, this.worldHeight+this.globalOffsetY+35, 'mineBase', 'mine_fg').setOrigin(1,1).setDepth(10).setScale(1.1),
         ];
         this.baseBlue = new PlayerBase(this, 'blue', bluePos, this.redUnitsPhysics, this.blueProjectiles, this.objectPool.projectiles.arrows);
         this.playerBlue = new Player(this, 'blue', this.baseBlue, bluePos, this.blueUnitsPhysics, this.redUnitsPhysics, this.blueProjectiles, this.objectPool, this.baseGroup, this.blueConfigLoader);
@@ -132,11 +135,7 @@ export class Game extends Scene
     }
 
     onProjectileHit(target: Unit | PlayerBase, projectile: Projectile) : void{
-        projectile.disableBody(true, true);
-        projectile.body?.reset(0, 0);
-        this.redProjectiles.remove(projectile);
-        this.blueProjectiles.remove(projectile);
-        target.takeDamage(projectile.damage);
+        projectile.onHit(target);
     }
 
     setupObjectPools(){
@@ -166,6 +165,11 @@ export class Game extends Scene
             projectiles: {// Projectile pools
                 arrows: this.physics.add.group({
                     classType: Arrow,
+                    maxSize: 50,
+                    runChildUpdate: true
+                }),
+                fireballs: this.physics.add.group({
+                    classType: Fireball,
                     maxSize: 50,
                     runChildUpdate: true
                 }),
@@ -218,12 +222,20 @@ export class Game extends Scene
         this.lastPointerPosition = new Phaser.Math.Vector2();
 
         this.add.image(0, this.worldHeight, 'bglayer1').setScrollFactor(0).setOrigin(0,1).setDisplaySize(this.camera.width, this.worldHeight);
-        this.add.image(0, this.worldHeight, 'bglayer2').setScrollFactor(0.2).setOrigin(0,1).setDisplaySize(this.worldWidth-(1-0.2)*(this.worldWidth-(this.game.config.width as number)), this.worldHeight);
-        this.add.image(0, this.worldHeight, 'bglayer3').setScrollFactor(0.5).setOrigin(0,1).setDisplaySize(this.worldWidth-(1-0.5)*(this.worldWidth-(this.game.config.width as number)), this.worldHeight);
-        this.add.tileSprite(0, this.worldHeight, this.worldWidth, 0, 'bglayer4').setScrollFactor(0.8).setOrigin(0,1).setScale(1.8);
+        this.add.image(0, this.worldHeight+this.globalOffsetY+35, 'bglayer2').setScrollFactor(0.2).setOrigin(0,1).setDisplaySize(this.worldWidth-(1-0.2)*(this.worldWidth-(this.game.config.width as number)), (this.worldHeight+this.globalOffsetY+35));
+        this.add.image(0, this.worldHeight+this.globalOffsetY+35, 'bglayer3').setScrollFactor(0.5).setOrigin(0,1).setDisplaySize(this.worldWidth-(1-0.5)*(this.worldWidth-(this.game.config.width as number)), (this.worldHeight+this.globalOffsetY+35));
+        this.add.tileSprite(0, this.worldHeight+this.globalOffsetY+35, this.worldWidth, 0, 'bglayer4').setScrollFactor(0.8).setOrigin(0,1).setScale(1.8);
         const foreGround = this.add.tileSprite(0, this.worldHeight, this.worldWidth, 0, 'bglayer5').setOrigin(0,1).setDepth(9);
-        foreGround.setDisplaySize(foreGround.width, 65);
-        
+        foreGround.setDisplaySize(foreGround.width, 220);
+        //this.add.tileSprite(0, this.worldHeight, this.worldWidth, 0, 'bglayer6').setOrigin(0,1);
+        /*this.nextUnitContainer = this.add.container(0, this.worldHeight-100).setDepth(11).setSize(100,100);
+        this.nextUnitContainer.add(this.add.image(this.nextUnitContainer.width/2, 30, 'signpost').setOrigin(0.5,0.5).setScale(1.5));
+        this.nextUnit = this.add.image(0, 0, 'warrior_static').setScale(0.5).setOrigin(0.5,0);
+        this.nextUnitContainer.add(this.nextUnit);
+        console.log(this.nextUnitContainer.width);
+        //this.nextUnit.setPosition(this.nextUnitContainer.width/2, -this.nextUnitContainer.height/2);
+        //Phaser.Display.Align.In.TopCenter(this.nextUnit, this.nextUnitContainer.list[0]);
+        Phaser.Display.Align.In.TopCenter(this.nextUnit, this.nextUnitContainer.list[0]);*/
 
         // Create unit and projectile pools
         this.setupObjectPools();
@@ -288,6 +300,10 @@ export class Game extends Scene
             this.lastPointerPosition.y = this.input.activePointer.y;
         }
         // Run update methods of each player
+        /*if(this.playerRed.unitQueue.length > 0){
+            this.nextUnit.setTexture(`${this.playerRed.unitQueue[0]}_static`);
+            console.log(this.nextUnit);   
+        } */
         this.playerBlue.update(time, delta);
         if(devConfig.AI) this.AIController.update(time, delta);
         this.playerRed.update(time, delta);

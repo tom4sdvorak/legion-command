@@ -119,24 +119,29 @@ export class Player {
     public spawnUnit (unitType: string) : Unit
     {
         let unit : Unit;
-        let pool: Phaser.Physics.Arcade.Group;        
+        let pool: Phaser.Physics.Arcade.Group;
+        let projectilePool: Phaser.Physics.Arcade.Group | null;           
         switch (unitType) {
             case 'warrior':
                 pool = this.objectPool.units.warriors;
+                projectilePool = null;
                 unit = pool.get();
                 unit.setBodySize(64, 128, true);
                 break;
             case 'archer':
                 pool = this.objectPool.units.archers;
+                projectilePool = this.objectPool.projectiles.arrows;
                 unit = pool.get();
                 unit.setBodySize(64, 128, true);
                 break;
             case 'healer':
                 pool = this.objectPool.units.healers;
+                projectilePool = null;
                 unit = pool.get();
                 break;
             case 'fireWorm':
                 pool = this.objectPool.units.fireWorms;
+                projectilePool = this.objectPool.projectiles.fireballs;
                 unit = pool.get();
                 break;
             default:
@@ -154,7 +159,7 @@ export class Player {
             newUnitProps.unitID = this.unitCounter;
 
             // Spawn unit
-            unit.spawn(newUnitProps, this.ownUnitsPhysics, pool, this.enemyUnitsPhysics, this.baseGroup, this.projectiles,this.objectPool.projectiles.arrows);
+            unit.spawn(newUnitProps, this.ownUnitsPhysics, pool, this.enemyUnitsPhysics, this.baseGroup, this.projectiles, projectilePool);
             this.ownUnitsPhysics.add(unit);
             console.log("%cSpawning unit with  id: " + this.unitCounter, `color: ${this.faction}`);
             this.unitCounter++;

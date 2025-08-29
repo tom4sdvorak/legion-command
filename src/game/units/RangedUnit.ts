@@ -38,13 +38,13 @@ export class RangedUnit extends Unit {
         
         // Reinitialize proximity zone
         const zoneXOffset = (this.direction === -1) ? this.x-this.unitProps.specialRange-this.width/2 : this.x+this.width/2;
-        this.proximityZone.setPosition(zoneXOffset, this.y);
-        this.proximityZone.setSize(this.unitProps.specialRange, this.height);
-        (this.proximityZone.body as Phaser.Physics.Arcade.Body).setSize(this.unitProps.specialRange, this.height);
+        this.proximityZone.setPosition(zoneXOffset, 0);
+        this.proximityZone.setSize(this.unitProps.specialRange, this.unitProps.bodyHeight);
+        (this.proximityZone.body as Phaser.Physics.Arcade.Body).setSize(this.unitProps.specialRange, this.unitProps.bodyHeight);
         this.proximityZone.setActive(true);
         this.proximityZone.setVisible(true);
         (this.proximityZone.body as Phaser.Physics.Arcade.Body).enable = true;
-        (this.proximityZone.body as Phaser.Physics.Arcade.Body).reset(zoneXOffset, this.y);
+        (this.proximityZone.body as Phaser.Physics.Arcade.Body).reset(zoneXOffset, 0);
 
     }
 
@@ -75,7 +75,7 @@ export class RangedUnit extends Unit {
         
         // Move proximity zone in front of the unit
         const zoneXOffset = (this.direction === -1) ? this.x-this.unitProps.specialRange : this.x;
-        this.proximityZone.setPosition(zoneXOffset, this.y);
+        this.proximityZone.setPosition(zoneXOffset, this.y+this.unitProps.offsetY*this.scale);
 
         this.checkForEnemies();
         
@@ -164,7 +164,8 @@ export class RangedUnit extends Unit {
 
 
     private fireProjectile(target: Unit | PlayerBase): void {
-        let yPos = this.y+this.unitProps.projectileOffsetY+this.unitProps.offsetY;
+        // Calculate Y position of sprite from which projectile should originate
+        let yPos = this.y+this.unitProps.projectileOffsetY+this.unitProps.offsetY/this.scale;
         if(!this.projectiles || !this.projectilePool || !this.unitGroup) return;
         const projectile = this.projectilePool.get(this.x, yPos) as Projectile;
         if (!projectile) return;
@@ -173,10 +174,12 @@ export class RangedUnit extends Unit {
             projectile.spawn(this.projectiles, this.projectilePool);
         }        
         // Calculate projectile angle and launch it
-        const projectileAngle = Phaser.Math.Angle.Between(this.x, yPos, target.x, yPos);
-        projectile.rotation = projectileAngle;
+        //const projectileAngle = Phaser.Math.Angle.Between(this.x, yPos, target.x, yPos);
+        //projectile.rotation = projectileAngle;
         projectile.enableBody(true, this.x, yPos, true, true);
-        this.scene.physics.moveTo(projectile, target.x, yPos, 300);
+        projectile.setVelocityX(this.unitProps.projectileVelocity * this.direction);
+        projectile.setVelocityY(10);
+        //this.scene.physics.moveTo(projectile, target.x, yPos, 300);
     }
 
     public stopShooting(): void {

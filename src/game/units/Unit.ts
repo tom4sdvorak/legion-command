@@ -22,14 +22,14 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         this.unitType = unitType;
         this.setOrigin(0.5, 1);
         
-        this.healthComponent = new HealthComponent(this, 32, 5, scene.cameras.main.height-30, 100); // parent, width, height, yOffset, maxHealth
+        this.healthComponent = new HealthComponent(this, 32, 5, scene.cameras.main.height+this.scene.getGlobalOffset().y+10, 100); // parent, width, height, yOffset, maxHealth
 
         // Listen to call of unit's death
         this.on('death', this.die, this);
     }
 
     // Reinitializes the unit like a constructor would
-    spawn(unitProps: UnitProps, unitGroup: Phaser.Physics.Arcade.Group, unitPool: Phaser.Physics.Arcade.Group, enemyGroup: Phaser.Physics.Arcade.Group, baseGroup: Phaser.GameObjects.Group, projectiles: Phaser.Physics.Arcade.Group, projectilePool: Phaser.Physics.Arcade.Group): void{
+    spawn(unitProps: UnitProps, unitGroup: Phaser.Physics.Arcade.Group, unitPool: Phaser.Physics.Arcade.Group, enemyGroup: Phaser.Physics.Arcade.Group, baseGroup: Phaser.GameObjects.Group, projectiles: Phaser.Physics.Arcade.Group, projectilePool: Phaser.Physics.Arcade.Group | null): void{
         this.direction = (unitProps.faction === 'blue') ? -1 : 1;
         this.setFlipX(this.direction === -1);
         this.unitProps = unitProps;
@@ -38,7 +38,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         this.unitGroup = unitGroup;
         this.unitPool = unitPool;
         this.setDepth(5);
-        
+        this.state = UnitStates.WAITING;
 
         // Reinitialize the sprite's body
         this.setScale(unitProps.scale);
@@ -73,7 +73,9 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
     
 
     die(): void {
+        
         this.stopMoving();
+        console.log(this.unitType + "died");
         this.changeState(UnitStates.DEAD);
         this.setDepth(1);
         if(this.unitProps.faction === 'red') this.scene.rewardPlayer('blue', this.unitProps.cost);
@@ -103,14 +105,15 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
             return;
         }
         super.update(time, delta);
-        this.healthComponent.update();
         // Keep unit moving when not blocked
-        if (this.state !== UnitStates.DEAD && this.state !== UnitStates.SHOOTING) {
-            if (!this.isBlocked()) {
+        if (this.state !== UnitStates.DEAD) {
+            if (this.state !== UnitStates.SHOOTING && !this.isBlocked()) {
                 this.moveForward();
             }
         }
+        this.healthComponent.update();
         this.handleState();
+        
         
     }
 
@@ -163,6 +166,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
                     this.meleeTarget.takeDamage(this.unitProps.attackDamage);
                 }
                 else{
+                    this.meleeTarget = null;
                     this.stopAttacking();
                     return;
                 }
@@ -198,6 +202,8 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
 
     public changeState(newState: string): void {
         if(newState === this.state) return;
+        if(this.state === UnitStates.DEAD) return;
+        console.log(`Changing state from ${this.state} to ${newState} as ${this.unitType}`);
         this.state = newState;
 
         switch (newState) {
@@ -274,7 +280,6 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
             this.attackingTimer.remove();
             this.attackingTimer = null;
         }
-        this.meleeTarget = null;
         this.changeState(UnitStates.IDLE);
     }
 

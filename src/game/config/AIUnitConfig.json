@@ -12,7 +12,10 @@
     "spawnTime": 1000,
     "offsetY": 0,
     "scale": 1,
-    "projectileOffsetY": 0
+    "projectileOffsetY": 0,
+    "bodyWidth": 64,
+    "bodyHeight": 96,
+    "projectileVelocity": 500
   },
 
   "unitClasses": {
@@ -46,7 +49,8 @@
   "unitTypes": {
     "warrior": {
       "extends": "meleeUnit",
-      "offsetY": 1
+      "offsetY": -1,
+      "scale": 0.9
     },
 
     "archer": {
@@ -56,8 +60,18 @@
 
     "healer": {
       "extends": "supportUnit",
-      "offsetY": 49,
+      "offsetY": -49,
       "scale": 0.8
+    },
+
+    "fireWorm": {
+      "extends": "rangedUnit",
+      "attackDamage": 200,
+      "offsetY": -32,
+      "scale": 1.4,
+      "bodyHeight": 96,
+      "projectileOffsetY": -51,
+      "projectileVelocity": 300
     }
   }
 }
