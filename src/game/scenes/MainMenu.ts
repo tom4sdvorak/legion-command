@@ -38,7 +38,7 @@ export class MainMenu extends Scene
 
         this.input.once('pointerup', () => {
 
-            this.scene.start('Game');
+            this.scene.start('PreGame');
 
         });
     }

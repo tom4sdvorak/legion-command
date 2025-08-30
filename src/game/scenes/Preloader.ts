@@ -53,12 +53,16 @@ export class Preloader extends Scene
 
         // Backgrounds
         this.load.setPath('assets/images/backgrounds');
+        this.load.image('pregamelayer1', 'nature/pregame/1.png');
+        this.load.image('pregamelayer2', 'nature/pregame/2.png');
+        this.load.image('pregamelayer3', 'nature/pregame/3.png');
+        this.load.image('pregamelayer4', 'nature/pregame/4.png');
+        this.load.image('pregamelayer5', 'nature/pregame/5.png');
         this.load.image('bglayer1', 'nature/1.png');
         this.load.image('bglayer2', 'nature/2.png');
         this.load.image('bglayer3', 'nature/3.png');
         this.load.image('bglayer4', 'nature/4b.png');
         this.load.image('bglayer5', 'nature/5b.png');
-        //this.load.image('bglayer6', 'nature/6.png');
 
 
         // Unit sprites
