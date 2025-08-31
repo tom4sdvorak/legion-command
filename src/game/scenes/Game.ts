@@ -43,12 +43,17 @@ export class Game extends Scene
     globalOffsetY: number = -200;
     nextUnitContainer: Phaser.GameObjects.Container;
     nextUnit: Phaser.GameObjects.Image;
+    playedUnits: string[];
     
 
 
     constructor ()
     {
         super('Game');
+    }
+
+    init(data: {units: string[]}){
+        this.playedUnits = data.units;
     }
 
     createPlayers(){  
@@ -242,7 +247,7 @@ export class Game extends Scene
         this.createPlayers();
         this.setupColliders();
 
-        this.scene.launch('UI', { player: this.playerRed }); // Starts the UI scene on top of the game scene
+        this.scene.launch('UI', { player: this.playerRed, playedUnits: this.playedUnits }); // Starts the UI scene on top of the game scene
 
         if(this.input.keyboard){
             const cursors = this.input.keyboard.createCursorKeys();

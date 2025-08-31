@@ -30,6 +30,7 @@
     "rangedUnit": {
       "extends": "baseUnit",
       "health": 80,
+      "cost": 20,
       "maxHealth": 80,
       "specialDamage": 50,
       "specialRange": 200,
@@ -40,6 +41,7 @@
       "extends": "baseUnit",
       "health": 100,
       "maxHealth": 100,
+      "cost": 30,
       "specialDamage": 10,
       "specialRange": 100,
       "specialSpeed": 500

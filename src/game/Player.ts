@@ -4,6 +4,7 @@ import { ObjectPool } from "./helpers/ObjectPool";
 import { devConfig } from "./helpers/DevConfig";
 import { UnitConfigLoader } from "./helpers/UnitConfigLoader";
 import { ResourceComponent } from "./components/ResourceComponent";
+import eventsCenter from './EventsCenter';
 
 export class Player {
     public playerBase: PlayerBase;
@@ -83,7 +84,6 @@ export class Player {
     }
 
     public update(time: any, delta: number): void {
-        this.resourceComponent.update(time, delta);
 
         // If we are spawning, reduce spawn timer by delta and increase counter of frames since last spawn
         if(this.isSpawning){

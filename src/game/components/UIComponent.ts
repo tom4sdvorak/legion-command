@@ -14,6 +14,7 @@ export class UIComponent extends Phaser.GameObjects.Container {
     private background: Phaser.GameObjects.Image;
     private sizeW: number;
     private sizeH: number;
+    private tint: number | undefined;
 
     constructor(scene: Phaser.Scene, x: number, y: number, width: number, height: number, background: number, tint: number | undefined) {
         super(scene, x, y);
@@ -48,5 +49,18 @@ export class UIComponent extends Phaser.GameObjects.Container {
 
     public getHeight(): number {
         return this.sizeH;
+    }
+
+    public changeBorderTint(tint: number | undefined): void {
+        if(tint === undefined){
+            if(this.tint === undefined){
+                this.border.clearTint();
+                return;
+            }
+            this.border.setTint(this.tint);
+        }
+        else{
+            this.border.setTint(tint);
+        }
     }
 }

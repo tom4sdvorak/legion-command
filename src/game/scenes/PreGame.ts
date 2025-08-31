@@ -8,6 +8,7 @@ export class PreGame extends Scene
     readyCheck: Phaser.GameObjects.Container;
     gameWidth : number;
     gameHeight : number;
+    readyButton: Phaser.GameObjects.Text;
 
     constructor ()
     {
@@ -28,6 +29,21 @@ export class PreGame extends Scene
         this.add.image(0, 0, 'pregamelayer4').setDisplaySize(this.gameWidth, this.gameHeight).setOrigin(0, 0);
         this.add.image(0, 0, 'pregamelayer5').setDisplaySize(this.gameWidth, this.gameHeight).setOrigin(0, 0);
 
+        this.readyButton = this.add.text(this.gameWidth-100, this.gameHeight-100, 'Selected 0/3', {color: '#000', fontSize: '48px', fontFamily: 'Arial Black'}).setOrigin(1, 1).setInteractive()
+            .on('pointerover', () => {
+                if(this.unitsToTake.length < 3) return;
+                this.readyButton.preFX?.addGlow(0xFFFF00, 1, 0, false);
+            })
+            .on('pointerout', () => {
+                if(this.unitsToTake.length < 3) return;
+                this.readyButton.preFX?.clear();
+            })
+            .on('pointerup', () => {
+                if(this.unitsToTake.length < 3) return;
+                this.readyCheck.setVisible(true);
+            });
+    
+
         const UI = new UIComponent(this, 0, 0, this.gameWidth/2, this.gameHeight/2, 1, undefined);
         this.readyCheck = this.add.container(this.gameWidth/2, this.gameHeight/2);
         this.readyCheck.add(UI).setVisible(false).setDepth(999);
@@ -47,6 +63,7 @@ export class PreGame extends Scene
             const mySprite = this.add.sprite(200, 400, unit, 0).setScale(1.3).setRandomPosition(100, this.gameHeight/3, this.gameWidth*0.6, this.gameHeight/3).setOrigin(0.5).setInteractive().on('pointerup', () => {
                 let destX, destY, direction;
                 if(mySprite.x < (this.gameWidth*0.7)){
+                    if(this.unitsToTake.length >= 3) return;
                     destX = Phaser.Math.Between(this.gameWidth*0.8, this.gameWidth*0.9);
                     destY = Phaser.Math.Between(this.gameHeight/3, this.gameHeight*0.7);
                     direction = 1;
@@ -72,6 +89,7 @@ export class PreGame extends Scene
                     }
                 });
             }).play(`${unit}_idle`);
+            mySprite.preFX?.addGlow(0x000000, 1, 0, false);
         });
 
         /*this.input.once('pointerup', () => {
@@ -82,8 +100,12 @@ export class PreGame extends Scene
     }
 
     update(){
+        
         if (this.unitsToTake.length === 3) {
-            this.readyCheck.setVisible(true);
+            this.readyButton.setText(`READY`);
+        }
+        else{
+            this.readyButton.setText(`Selected ${this.unitsToTake.length}/3`);
         }
     }
 }
