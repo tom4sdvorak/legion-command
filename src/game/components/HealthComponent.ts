@@ -11,7 +11,7 @@ export class HealthComponent {
     private barHeight: number;
     private posY: number;
 
-    constructor(parent: Unit, width: number, height: number, posY: number, maxHealth: number) {
+    constructor(parent: any, width: number, height: number, posY: number, maxHealth: number) {
         this.health = maxHealth;
         this.maxHealth = maxHealth;
         this.barWidth = width;

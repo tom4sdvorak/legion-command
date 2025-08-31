@@ -4,10 +4,12 @@ import { Scene } from "phaser";
 import { ObjectPool } from "./helpers/ObjectPool";
 import { Arrow } from "./projectiles/Arrow";
 import eventsCenter from "./EventsCenter";
+import { Game } from "./scenes/Game";
+import { HealthComponent } from "./components/HealthComponent";
 
 export class PlayerBase extends Phaser.Physics.Arcade.Sprite{
-    health: number = 5000;
-    maxHealth: number = 5000;
+    //health: number = 5000;
+    //maxHealth: number = 5000;
     faction: 'red' | 'blue';
     yOffset: number; // How high from groundLevel to spawn
     proximityZone: Phaser.GameObjects.Zone;
@@ -19,14 +21,14 @@ export class PlayerBase extends Phaser.Physics.Arcade.Sprite{
     projectiles: Phaser.Physics.Arcade.Group;
     enemyUnitsPhysics: Phaser.Physics.Arcade.Group;
     range: number = 400;
-    healthBar: Phaser.GameObjects.Rectangle;
     projectilePool: Phaser.Physics.Arcade.Group | null = null;
-    scene: Scene;
+    scene: Game;
     physicsBody: Phaser.Physics.Arcade.Body;
     sizeW: number = 150;
     sizeH: number = 300;
+    healthComponent : HealthComponent;
 
-    constructor(scene: Scene, faction: 'red' | 'blue', spawnPosition: Phaser.Math.Vector2, enemyUnitsPhysics: Phaser.Physics.Arcade.Group, projectiles: Phaser.Physics.Arcade.Group, projectilePool: Phaser.Physics.Arcade.Group) {
+    constructor(scene: Game, faction: 'red' | 'blue', spawnPosition: Phaser.Math.Vector2, enemyUnitsPhysics: Phaser.Physics.Arcade.Group, projectiles: Phaser.Physics.Arcade.Group, projectilePool: Phaser.Physics.Arcade.Group) {
         super(scene, spawnPosition.x, spawnPosition.y, 'single_pixel');
         const offsetX = (faction === 'blue') ? spawnPosition.x-this.sizeW : spawnPosition.x+100;
         this.setPosition(offsetX, spawnPosition.y-this.sizeH/2);
@@ -52,7 +54,9 @@ export class PlayerBase extends Phaser.Physics.Arcade.Sprite{
         (this.proximityZone.body as Phaser.Physics.Arcade.Body).allowGravity = false;
 
         // Add healthbar
-        this.healthBar = this.scene.add.rectangle(this.x, this.y-this.height/2, this.width, 20, 0x00ff00).setDepth(1).setAlpha(1);       
+        this.healthComponent = new HealthComponent(this, this.sizeW, 20, spawnPosition.y-this.sizeH/2, 5000);
+        this.on('death', this.die, this);
+        //this.healthBar = this.scene.add.rectangle(this.x, this.y-this.height/2, this.width, 20, 0x00ff00).setDepth(1).setAlpha(1);       
     }
 
     update(time: any, delta: number): void {
@@ -60,11 +64,7 @@ export class PlayerBase extends Phaser.Physics.Arcade.Sprite{
             return;
         }
         super.update(time, delta);
-        if (this.health <= 0) {
-            this.health = 0;
-            this.die();
-        }
-        this.updateHealthBar();
+        this.healthComponent.update();
         this.checkForEnemies();
 
         // Clear dead enemies from range list
@@ -101,7 +101,6 @@ export class PlayerBase extends Phaser.Physics.Arcade.Sprite{
     die(): void {
         this.shootingTimer?.remove();
         this.shootingTimer = null;
-        this.updateHealthBar();
         this.active = false;
         this.isShooting = false;
         eventsCenter.emit('base-destroyed', this.faction);
@@ -119,30 +118,15 @@ export class PlayerBase extends Phaser.Physics.Arcade.Sprite{
     }
 
     public takeDamage(damage: number): void {
-        this.health -= damage
-        console.log(`Base took ${damage} damage, remaining health is ${this.health}`);
-        if (this.health <= 0) {
-            this.health = 0;
-            this.die();
-        }
+        this.healthComponent.takeDamage(damage);
     }
-    
 
-    public updateHealthBar():void {
-        //console.log("Updating health bar to x: ", this.x);
-        if (this.healthBar) {
-            this.healthBar.x = this.x;
-            this.healthBar.width = this.width * (this.health / this.maxHealth);
-            if (this.healthBar.width > (this.width * 0.66)) {
-                this.healthBar.setFillStyle(0x00ff00);
-            }
-            else if (this.healthBar.width > (this.width * 0.33)) {
-                this.healthBar.setFillStyle(0xffa500);
-            }
-            else {
-                this.healthBar.setFillStyle(0xff0000);
-            }
-        }
+    public getCurrentHealth(): number {
+        return this.healthComponent.getHealth();
+    }
+
+    public getMaxHealth(): number {
+        return this.healthComponent.getMaxHealth();
     }
 
     public getPosition(): number[] {
@@ -195,7 +179,15 @@ export class PlayerBase extends Phaser.Physics.Arcade.Sprite{
     }
     
     public isBlocked(): boolean {
-        let overlap = this.scene.physics.overlapRect(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height, true, false);
+        //Check if there are units 100px off screen
+        let overlap;
+        if(this.faction === 'red'){
+            overlap = this.scene.physics.overlapRect(-100, 0, 100, this.scene.getWorldSize().y, true, false);
+        }
+        else{
+            overlap = this.scene.physics.overlapRect(this.scene.getWorldSize().x, 0, 100, this.scene.getWorldSize().y, true, false);
+        }
+        
         //if (overlap.length > 0) console.log(overlap);
         return overlap.some(object => {
             if (object.gameObject instanceof Unit && object.gameObject.active) {

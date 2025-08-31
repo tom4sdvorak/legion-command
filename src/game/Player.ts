@@ -73,8 +73,8 @@ export class Player {
     }
 
     public getHealth(absolute: boolean = true) {
-        if(absolute) return this.playerBase.health;
-        else return this.playerBase.health / this.playerBase.maxHealth;
+        if(absolute) return this.playerBase.getCurrentHealth();
+        else return this.playerBase.getCurrentHealth() / this.playerBase.getMaxHealth();
     }
 
     // Sets passive (per second) income to amount (if override is true) or by default it increases income by the amount (if override is false)
@@ -167,7 +167,7 @@ export class Player {
             return unit;
         }
         else{
-            throw new Error(`No units left`);
+            throw new Error(`Out of units`);
         }     
     }
 }

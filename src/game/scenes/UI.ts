@@ -174,6 +174,5 @@ export class UI extends Scene
     update(time: any, delta: number) {
         this.unitQueue = this.player.getUnitQueue();
         this.renderUnitQueue();
-        this.moneyText.setText('Money: ' + Math.floor(this.player.getMoney()));
     }
 }

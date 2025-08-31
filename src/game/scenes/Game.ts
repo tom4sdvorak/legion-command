@@ -217,6 +217,10 @@ export class Game extends Scene
          return new Phaser.Math.Vector2(0, this.globalOffsetY);
     }
 
+    getWorldSize(): Phaser.Math.Vector2{
+        return new Phaser.Math.Vector2(this.worldWidth, this.worldHeight);
+    }
+
     create ()
     {       
         // Setup the game screen

@@ -57,6 +57,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         (this.body as Phaser.Physics.Arcade.Body).enable = true;
         (this.body as Phaser.Physics.Arcade.Body).reset(unitProps.x, newPositionY);
         (this.body as Phaser.Physics.Arcade.Body).pushable = false;
+        console.log("Unit spawned at: " + this.x + " " + this.y);
         if(this.body){
             this.setBodySize(unitProps.bodyWidth/unitProps.scale, unitProps.bodyHeight/unitProps.scale, true);
             //this.body.setOffset(this.body.offset.x, this.body.offset.y+(35+this.unitProps.offsetY)*unitProps.scale);

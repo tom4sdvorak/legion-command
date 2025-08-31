@@ -90,6 +90,7 @@ export class PreGame extends Scene
                 });
             }).play(`${unit}_idle`);
             mySprite.preFX?.addGlow(0x000000, 1, 0, false);
+            mySprite.setDepth(mySprite.y);
         });
 
         /*this.input.once('pointerup', () => {
