@@ -24,7 +24,6 @@ export class Player {
     framesSinceSpawn: number = 0;
     configLoader: UnitConfigLoader;
     isSpawning: boolean = false;
-    spawnTimerRectangle: Phaser.GameObjects.Rectangle;
 
     constructor(scene: Phaser.Scene, faction: 'red' | 'blue', playerBase: PlayerBase, spawnPosition: Phaser.Math.Vector2, ownUnitsPhysics: Phaser.Physics.Arcade.Group,
         enemyUnitsPhysics: Phaser.Physics.Arcade.Group, projectiles: Phaser.Physics.Arcade.Group,
@@ -72,6 +71,10 @@ export class Player {
         return this.configLoader.getUnitProps(unitType).cost;
     }
 
+    public getUnitSpawnTime(unitType: string) {
+        return this.configLoader.getUnitProps(unitType).spawnTime;
+    }
+
     public getHealth(absolute: boolean = true) {
         if(absolute) return this.playerBase.getCurrentHealth();
         else return this.playerBase.getCurrentHealth() / this.playerBase.getMaxHealth();
@@ -90,7 +93,6 @@ export class Player {
             this.spawnTime -= delta;
             if(this.spawnTime < 0) this.spawnTime = 0;
             if(this.framesSinceSpawn < 3) this.framesSinceSpawn++;
-            this.spawnTimerRectangle.setScale(this.spawnTime/this.spawnBarSize, 1);
         }
 
         // If there is unit in queue and base is not busy spawning one, setup new spawn timer and start spawning
@@ -98,14 +100,12 @@ export class Player {
             this.spawnTime = this.configLoader.getUnitProps(this.unitQueue[0]).spawnTime;
             this.isSpawning = true;
             this.spawnBarSize = this.spawnTime;
-            if(!this.spawnTimerRectangle) { // Add loading bar if it doesn't exist that shows the spawn timer
-                this.spawnTimerRectangle = this.scene.add.rectangle(this.playerBase.x, this.playerBase.y-50, this.playerBase.width/2, 10, 0xff0000).setDepth(1).setAlpha(1);
-            }
         }
         
         // If spawntime has been reduced below zero and base is not blocked, release the unit
         if(!this.playerBase.isBlocked() && this.isSpawning &&this.unitQueue.length > 0 && this.spawnTime <= 0 && this.framesSinceSpawn >= 3){
             if(devConfig.consoleLog) console.log(`Spawning ${this.faction} ${this.unitQueue[0]} unit`);
+            eventsCenter.emit('unit-spawned', this.faction, this.unitQueue[0]);
             this.spawnUnit(this.unitQueue[0]);
             this.unitQueue.shift();
             this.spawnTime = 999999;

@@ -32,7 +32,7 @@ export class PreGame extends Scene
         this.readyButton = this.add.text(this.gameWidth-100, this.gameHeight-100, 'Selected 0/3', {color: '#000', fontSize: '48px', fontFamily: 'Arial Black'}).setOrigin(1, 1).setInteractive()
             .on('pointerover', () => {
                 if(this.unitsToTake.length < 3) return;
-                this.readyButton.preFX?.addGlow(0xFFFF00, 1, 0, false);
+                this.readyButton.postFX?.addGlow(0xFFFF00, 1, 0, false);
             })
             .on('pointerout', () => {
                 if(this.unitsToTake.length < 3) return;
@@ -44,7 +44,7 @@ export class PreGame extends Scene
             });
     
 
-        const UI = new UIComponent(this, 0, 0, this.gameWidth/2, this.gameHeight/2, 1, undefined);
+        const UI = new UIComponent(this, 0, 0, this.gameWidth/2, this.gameHeight/2, 1);
         this.readyCheck = this.add.container(this.gameWidth/2, this.gameHeight/2);
         this.readyCheck.add(UI).setVisible(false).setDepth(999);
         const readyText = this.add.text(0, -this.gameHeight/6, 'Ready?', {color: '#000', fontSize: '64px', fontFamily: 'Arial Black'}).setOrigin(0.5, 0);
@@ -89,7 +89,7 @@ export class PreGame extends Scene
                     }
                 });
             }).play(`${unit}_idle`);
-            mySprite.preFX?.addGlow(0x000000, 1, 0, false);
+            mySprite.postFX?.addGlow(0x000000, 1, 0, false);
             mySprite.setDepth(mySprite.y);
         });
 

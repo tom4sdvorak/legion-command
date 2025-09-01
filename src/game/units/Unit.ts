@@ -21,7 +21,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         super(scene, -500, -500, unitType);
         this.unitType = unitType;
         this.setOrigin(0.5, 1);
-        this.preFX?.addGlow(0x000000, 1, 0, false);
+        this.postFX?.addGlow(0x000000, 1, 0, false);
         this.healthComponent = new HealthComponent(this, 32, 5, scene.cameras.main.height+this.scene.getGlobalOffset().y+10, 100); // parent, width, height, yOffset, maxHealth
 
         // Listen to call of unit's death

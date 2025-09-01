@@ -10,7 +10,7 @@ export class UI extends Scene
     player: Player;
     unitQueueGraphics: Phaser.GameObjects.Group;
     unitQueue: string[] = [];
-    unitLimit: number = 10;
+    unitLimit: number = 1;
     moneyText: Phaser.GameObjects.BitmapText
     moneyImage: Phaser.GameObjects.Image;
     unitQueueUI: UIComponent;
@@ -19,6 +19,10 @@ export class UI extends Scene
     playedUnits: string[];
     hpBarWidth: number = 0;
     hpBarHeight: number = 0;
+    isSpawning: boolean = false;
+    unit1LoadingBar: Phaser.GameObjects.Rectangle;
+    unit2LoadingBar: Phaser.GameObjects.Rectangle;
+    unit3LoadingBar: Phaser.GameObjects.Rectangle;
 
     constructor ()
     {
@@ -103,62 +107,103 @@ export class UI extends Scene
 
         // Create unit spawning buttons based on selected units
         for(let i = -1; i < 2; i++) {
-            const buttonHeight = 96;
-            const buttonWidth = 96;
-            const x = this.cameras.main.width/2 + i*(buttonWidth+48);
+            const spawnButtonUI = new UIComponent(this, 0, 0, 96, 96, 1);
+            const innerButtonHeight = 96 - spawnButtonUI.getBorderThickness()[2]*2;
+            const innerButtonWidth = 96 - spawnButtonUI.getBorderThickness()[0]*2;
+            const x = this.cameras.main.width/2 + i*(96+48);
             const y = this.cameras.main.height - 96;
-            const spawnButtonUI = new UIComponent(this, 0, 0, buttonWidth, buttonHeight, 1, undefined);
             const unitSprite = this.add.image(0, 0, this.playedUnits[i+1] + '_static');
-
+            
             // Determine how to resize the unit sprite so it fits UI element
-            const maxRatio = buttonWidth / buttonHeight;
+            const maxRatio = innerButtonWidth / innerButtonHeight;
             const originalRatio = unitSprite.texture.get().width / unitSprite.texture.get().height;
             let newWidth, newHeight;
             if (originalRatio > maxRatio) {
                 // The original image is wider than the max container
                 // Use the max width as the limiting factor
-                newWidth = buttonWidth*0.7;
+                newWidth = innerButtonWidth-8;
                 newHeight = newWidth / originalRatio;
             } else {
                 // The original image is taller than the max container
                 // Use the max height as the limiting factor
-                newHeight = buttonHeight*0.7;
+                newHeight = innerButtonHeight-8;
                 newWidth = newHeight * originalRatio;
             }
             unitSprite.setDisplaySize(newWidth,newHeight);
-            let currentGlow = unitSprite.preFX?.addGlow(0x000000, 1, 0, false);
-
-            
+            let currentGlow : any;
+            unitSprite.postFX.addGlow(0x000000, 1, 0, false);
+            const unitLoadingBar = this.add.rectangle(0, innerButtonHeight/2, innerButtonWidth, innerButtonHeight, 0xffffff).setAlpha(0.5).setOrigin(0.5,1);
+            unitLoadingBar.scaleY = 0;
             const spawnButtonContainer = this.add.container(x, y);
-            spawnButtonContainer.setSize(buttonWidth, buttonHeight);
+            spawnButtonContainer.setSize(96, 96);
             spawnButtonContainer.add(spawnButtonUI);
+            spawnButtonContainer.add(unitLoadingBar);
             spawnButtonContainer.add(unitSprite);
             spawnButtonContainer.setInteractive()
                 .on('pointerover', () => {
-                    if(currentGlow) unitSprite.preFX?.remove(currentGlow);
-                    currentGlow = unitSprite.preFX?.addGlow(0xffffff, 1, 0, false);
+                    let buttonBorder : Phaser.GameObjects.NineSlice = spawnButtonUI.list[2] as Phaser.GameObjects.NineSlice;
+                    if(currentGlow) buttonBorder.postFX.remove(currentGlow);
+                    currentGlow = buttonBorder.postFX.addGlow(0xffffff, 1, 0, false);
                 })
                 .on('pointerout', () => {
-                    if(currentGlow) unitSprite.preFX?.remove(currentGlow);
-                    currentGlow =unitSprite.preFX?.addGlow(0x000000, 1, 0, false);
+                    let buttonBorder : Phaser.GameObjects.NineSlice = spawnButtonUI.list[2] as Phaser.GameObjects.NineSlice;
+                    if(currentGlow) buttonBorder.postFX.remove(currentGlow);
                 })
                 .on('pointerup', () => {
-                    if(this.player.getUnitQueue().length >= this.unitLimit || !this.player.canAfford(this.player.getUnitCost(this.playedUnits[i+1]))) return;
+                    if(this.isSpawning || this.player.getUnitQueue().length >= this.unitLimit || !this.player.canAfford(this.player.getUnitCost(this.playedUnits[i+1]))) return;
                     eventsCenter.emit('spawn-red-unit', this.playedUnits[i+1]);
+                    this.isSpawning = true;
+                    this.unitSpawnButtons.forEach((button, i) => {
+                        let buttonUI : UIComponent= button.list[0] as UIComponent;
+                        if(button.getData('canAfford') === true) buttonUI.changeTint(0x808080, 0xbfbfbf);
+                    });
+                    unitLoadingBar.scaleY = 1;
+                    this.tweens.add({
+                        targets: unitLoadingBar,
+                        ease: 'Power1',
+                        scaleY: 0,
+                        duration: this.player.getUnitSpawnTime(this.playedUnits[i+1])
+                    });
                 });
 
             this.unitSpawnButtons.push(spawnButtonContainer);
             Phaser.Display.Align.In.Center(unitSprite, spawnButtonUI);
         }
 
+        /** Event listener for player's money changes
+         * updates money value in UIrenders UI buttons red if player cannot afford
+         * or removes tint if they can afford it (and )
+         */
         eventsCenter.on('money-changed', (faction: string, amount: number) => {
             if(faction != this.player.faction) return;
             this.moneyText.setText(`${amount}`);
             this.unitSpawnButtons.forEach((button, i) => {
                 let buttonUI : UIComponent= button.list[0] as UIComponent;
-                buttonUI.changeBorderTint(this.player.canAfford(this.player.getUnitCost(this.playedUnits[i])) ? undefined : 0xff0000);
+                if(this.player.canAfford(this.player.getUnitCost(this.playedUnits[i])) === false){
+                    button.setData('canAfford', false);
+                    buttonUI.changeTint(0xff0000, 0xfa756b);
+                }
+                else{
+                    button.setData('canAfford', true);
+                    if(this.isSpawning){
+                        buttonUI.changeTint(0x808080, 0xbfbfbf);
+                    }
+                    else{
+                        buttonUI.changeTint(-1,-1);
+                    }
+                }
             });
         });
+
+        eventsCenter.on('unit-spawned', (faction: string, unitType: string) => {
+            if(faction != this.player.faction) return;
+            this.isSpawning = false;
+            this.unitSpawnButtons.forEach((button, i) => {
+                let buttonUI : UIComponent= button.list[0] as UIComponent;
+                if(button.getData('canAfford') === true) buttonUI.changeTint(-1,-1);
+            });
+        });
+
 
         eventsCenter.on('base-take-damage', (faction: string) => {
             if(faction != this.player.faction) return;
