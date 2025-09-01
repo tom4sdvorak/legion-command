@@ -35,7 +35,17 @@ export class Preloader extends Scene
         this.load.json('AIUnitData', '/game/config/AIUnitConfig.json');
 
         this.load.setPath('assets');
-        this.load.json('animationData', '/data/animations.json');
+        this.load.bitmapFont('pixelFont', 'fonts/BoldPixels.png', 'fonts/BoldPixels.xml');
+        
+        // Load font
+        //this.load.xml('pixelFont-xml', 'fonts/BoldPixels.xml');
+        //this.load.image('pixelFont-img', 'fonts/BoldPixels.png');
+        /*this.load.on('complete', () => {
+            // Manually add the font after both files have loaded
+            this.cache.bitmapFont.add('pixelFont', this.textures.get('pixelFont-img'), this.cache.xml.get('pixelFont-xml'));
+        });*/
+
+        this.load.json('animationData', 'data/animations.json');
         this.load.image('single_pixel', 'images/single_pixel.png');
         this.load.image('tower_red', 'images/tower_red.png');
         this.load.image('base_blue', 'images/buildings/mine.png');
@@ -44,6 +54,7 @@ export class Preloader extends Scene
         this.load.atlas('groundAtlas', 'images/grounds/texture.png', 'images/grounds/texture.json');
         this.load.atlas('mineBase', 'images/buildings/mine/texture.png', 'images/buildings/mine/texture.json');
         this.load.image('signpost', 'images/items/signpost.png');
+        this.load.image('coin', 'images/items/coin.png');
 
         // UI
         this.load.setPath('assets/images/UI');

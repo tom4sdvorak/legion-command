@@ -61,7 +61,7 @@ export class HealthComponent {
     }
 
     createHealthBar() {
-        this.healthBar = this.parent.scene.add.rectangle(this.parent.x, this.posY, this.barWidth, this.barHeight, 0x00ff00).setDepth(100).setAlpha(0.5);
+        this.healthBar = this.parent.scene.add.rectangle(-500, this.posY, this.barWidth, this.barHeight, 0x00ff00).setDepth(100).setAlpha(0.5);
     }
     takeDamage(damage: number): void {
         this.health -= damage;

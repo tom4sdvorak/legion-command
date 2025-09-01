@@ -2,7 +2,7 @@ import eventsCenter from "../EventsCenter";
 import { Player } from "../Player";
 
 export class ResourceComponent {
-    private money: number = 9;
+    private money: number = 0;
     private parent: Player;
     private moneyPerSecond: number = 0;
 

@@ -93,6 +93,7 @@ export class Game extends Scene
         this.baseRed = new PlayerBase(this, 'red', redPos, this.blueUnitsPhysics, this.redProjectiles, this.objectPool.projectiles.arrows);
         this.playerRed = new Player(this, 'red', this.baseRed, redPos, this.redUnitsPhysics, this.blueUnitsPhysics, this.redProjectiles, this.objectPool, this.baseGroup, this.redConfigLoader);
         this.playerRed.changePassiveIncome(1, true);
+        this.playerRed.addMoney(9);
 
         // Create and setup AI player
         const bluePos = new Phaser.Math.Vector2(this.worldWidth, this.worldHeight+this.globalOffsetY);
@@ -105,6 +106,7 @@ export class Game extends Scene
         this.baseBlue = new PlayerBase(this, 'blue', bluePos, this.redUnitsPhysics, this.blueProjectiles, this.objectPool.projectiles.arrows);
         this.playerBlue = new Player(this, 'blue', this.baseBlue, bluePos, this.blueUnitsPhysics, this.redUnitsPhysics, this.blueProjectiles, this.objectPool, this.baseGroup, this.blueConfigLoader);
         this.playerBlue.changePassiveIncome(1, true);
+        this.playerBlue.addMoney(100);
         if(devConfig.AI) this.AIController = new AIController(this.playerBlue, this.playerRed);
 
         this.baseGroup.add(this.baseRed);

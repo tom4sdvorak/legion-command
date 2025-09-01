@@ -119,6 +119,7 @@ export class PlayerBase extends Phaser.Physics.Arcade.Sprite{
 
     public takeDamage(damage: number): void {
         this.healthComponent.takeDamage(damage);
+        eventsCenter.emit('base-take-damage', this.faction);
     }
 
     public getCurrentHealth(): number {

@@ -15,6 +15,7 @@ export class UIComponent extends Phaser.GameObjects.Container {
     private sizeW: number;
     private sizeH: number;
     private tint: number | undefined;
+    private borderStroke: Phaser.GameObjects.Graphics;
 
     constructor(scene: Phaser.Scene, x: number, y: number, width: number, height: number, background: number, tint: number | undefined) {
         super(scene, x, y);
@@ -37,6 +38,11 @@ export class UIComponent extends Phaser.GameObjects.Container {
         this.background.setDisplaySize(width, height);
         this.add(this.background);
 
+        this.borderStroke = this.scene.add.graphics();
+        this.borderStroke.lineStyle(2, 0x000000);
+        this.borderStroke.strokeRect(-width/2, -height/2, width, height);
+        this.add(this.borderStroke);
+
         this.border = this.scene.add.nineslice(-width/2, -height/2, 'UI_border', undefined, width, height, 8, 8, 6, 6);
         this.border.setOrigin(0, 0);
         if(tint !== undefined) this.border.setTint(tint);
@@ -49,6 +55,14 @@ export class UIComponent extends Phaser.GameObjects.Container {
 
     public getHeight(): number {
         return this.sizeH;
+    }
+
+    /**
+     * Returns the thickness of the border of this UI component in pixels.
+     * @returns A number array with size of border in pixels: [left, right, top, bottom]
+     */
+    public getBorderThickness(): number[] {
+        return [8,8,6,6]
     }
 
     public changeBorderTint(tint: number | undefined): void {

@@ -18,7 +18,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
     meleeTarget: Unit | PlayerBase | null = null;
 
     constructor(scene: Game, unitType: string) {
-        super(scene, 0, 0, unitType);
+        super(scene, -500, -500, unitType);
         this.unitType = unitType;
         this.setOrigin(0.5, 1);
         this.preFX?.addGlow(0x000000, 1, 0, false);
@@ -76,7 +76,6 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
     die(): void {
         
         this.stopMoving();
-        console.log(this.unitType + "died");
         this.changeState(UnitStates.DEAD);
         this.setDepth(1);
         if(this.unitProps.faction === 'red') this.scene.rewardPlayer('blue', this.unitProps.cost);
@@ -93,7 +92,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
        // (this.body as Phaser.Physics.Arcade.Body).setEnable(false);
         this.scene.time.delayedCall(5000, () => {
             this.healthComponent.deactivate();
-            (this.body as Phaser.Physics.Arcade.Body).reset(0, 0);
+            (this.body as Phaser.Physics.Arcade.Body).reset(-500, -500);
             if(this.unitPool) this.unitPool.killAndHide(this);
             this.unitGroup = null;
             this.unitPool = null;
