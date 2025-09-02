@@ -1,3 +1,4 @@
+import eventsCenter from '../EventsCenter';
 import { Player } from '../Player';
 
 const State = {
@@ -25,7 +26,6 @@ export class AIController {
             this.lastDecision = time;
             this.decideStrategy();
         }
-
 
         this.handleState();
     }
@@ -81,23 +81,36 @@ export class AIController {
     }
 
     attack() { // Offensive strategy - prioritize spamming melee/ranged combo
-        if (this.player.canAfford(20) && this.player.getUnitQueue().length < 9){
-            this.player.addUnitToQueue('warrior');
-            this.player.addUnitToQueue('archer');
+        if (this.player.canAfford(20)){
+            if(this.player.ownUnitsPhysics.getLast(true) && this.player.ownUnitsPhysics.getLast(true).unitType === 'warrior'){
+                this.player.addUnitToQueue('archer');
+            }
+            else{
+                this.player.addUnitToQueue('warrior');
+            }
+            
         }
     }
 
     defend(){ // Defensive strategy - prioritize single melee/healer combo to protect base
-        if (this.player.canAfford(20) && this.player.ownUnitsPhysics.getChildren().length < 3){ // If player can afford units and has space in queue
-            this.player.addUnitToQueue('warrior');
-            this.player.addUnitToQueue('healer');
+        if (this.player.canAfford(20) && this.player.ownUnitsPhysics.getChildren().length < 3){ 
+            if(this.player.ownUnitsPhysics.getLast(true) && this.player.ownUnitsPhysics.getLast(true).unitType === 'warrior'){
+                this.player.addUnitToQueue('healer');
+            }
+            else{
+                this.player.addUnitToQueue('warrior');
+            }
         }
     }
 
     defendDesperately(){ // Losing defensive strategy - prioritize spamming melee/healer combo
-        if (this.player.canAfford(20) && this.player.getUnitQueue().length < 9){ // If player can afford units and has space in queue
-            this.player.addUnitToQueue('warrior');
-            this.player.addUnitToQueue('healer');
+        if (this.player.canAfford(20)){ // If player can afford units and has space in queue
+            if(this.player.ownUnitsPhysics.getLast(true) &&this.player.ownUnitsPhysics.getLast(true).unitType === 'warrior'){
+                this.player.addUnitToQueue('healer');
+            }
+            else{
+                this.player.addUnitToQueue('warrior');
+            }
         }
     }
 }

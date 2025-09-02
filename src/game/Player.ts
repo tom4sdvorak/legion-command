@@ -16,7 +16,8 @@ export class Player {
     enemyUnitsPhysics: Phaser.Physics.Arcade.Group;
     projectiles: Phaser.Physics.Arcade.Group;
     unitCounter: number = 0;
-    unitQueue: string[] = [];
+    //unitQueue: string[] = [];
+    nextUnit: string = '';
     objectPool: ObjectPool;
     baseGroup: Phaser.GameObjects.Group;
     spawnTime: number = 0;
@@ -42,13 +43,14 @@ export class Player {
     }
 
     public addUnitToQueue(unitType: string) {
-        this.unitQueue.push(unitType);
+        //this.unitQueue.push(unitType);
+        this.nextUnit = unitType;
         let cost = this.configLoader.getUnitProps(unitType).cost;
         this.deduceMoney(cost);     
     }
 
     public getUnitQueue() {
-        return this.unitQueue;
+        return this.nextUnit;
     }
 
     public getMoney() {
@@ -96,18 +98,18 @@ export class Player {
         }
 
         // If there is unit in queue and base is not busy spawning one, setup new spawn timer and start spawning
-        if(this.unitQueue.length > 0 && !this.isSpawning){
-            this.spawnTime = this.configLoader.getUnitProps(this.unitQueue[0]).spawnTime;
+        if(this.nextUnit !== '' && !this.isSpawning){
+            this.spawnTime = this.configLoader.getUnitProps(this.nextUnit).spawnTime;
             this.isSpawning = true;
             this.spawnBarSize = this.spawnTime;
         }
         
         // If spawntime has been reduced below zero and base is not blocked, release the unit
-        if(!this.playerBase.isBlocked() && this.isSpawning &&this.unitQueue.length > 0 && this.spawnTime <= 0 && this.framesSinceSpawn >= 3){
-            if(devConfig.consoleLog) console.log(`Spawning ${this.faction} ${this.unitQueue[0]} unit`);
-            eventsCenter.emit('unit-spawned', this.faction, this.unitQueue[0]);
-            this.spawnUnit(this.unitQueue[0]);
-            this.unitQueue.shift();
+        if(!this.playerBase.isBlocked() && this.isSpawning && this.nextUnit !== '' && this.spawnTime <= 0 && this.framesSinceSpawn >= 3){
+            if(devConfig.consoleLog) console.log(`Spawning ${this.faction} ${this.nextUnit} unit`);
+            eventsCenter.emit('unit-spawned', this.faction, this.nextUnit);
+            this.spawnUnit(this.nextUnit);
+            this.nextUnit = '';
             this.spawnTime = 999999;
             this.framesSinceSpawn = 0;
             this.isSpawning = false;

@@ -1,4 +1,4 @@
 export const devConfig = {
     consoleLog: true,
-    AI: false
+    AI: true
 }

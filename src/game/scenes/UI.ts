@@ -8,21 +8,15 @@ export class UI extends Scene
     button: Phaser.GameObjects.Shape;
     unitSpawnButtons: Phaser.GameObjects.Container[] = [];
     player: Player;
-    unitQueueGraphics: Phaser.GameObjects.Group;
-    unitQueue: string[] = [];
     unitLimit: number = 1;
     moneyText: Phaser.GameObjects.BitmapText
     moneyImage: Phaser.GameObjects.Image;
-    unitQueueUI: UIComponent;
     hpBarUI: UIComponent;
     hpBar: Phaser.GameObjects.Graphics;
     playedUnits: string[];
     hpBarWidth: number = 0;
     hpBarHeight: number = 0;
     isSpawning: boolean = false;
-    unit1LoadingBar: Phaser.GameObjects.Rectangle;
-    unit2LoadingBar: Phaser.GameObjects.Rectangle;
-    unit3LoadingBar: Phaser.GameObjects.Rectangle;
 
     constructor ()
     {
@@ -34,7 +28,7 @@ export class UI extends Scene
         this.playedUnits = data.playedUnits;
     }
 
-    private renderUnitQueue():void{       
+    /*private renderUnitQueue():void{       
         this.unitQueueGraphics.clear(true, true);
         const spriteMaxWidth = this.unitQueueUI.getWidth()/2;
         const spriteMaxHeight = (this.unitQueueUI.getHeight()-12)/10
@@ -65,7 +59,7 @@ export class UI extends Scene
             sprite.setActive(true);
             yPos -= spriteMaxHeight;
         }
-    }
+    }*/
 
     public updateHPBar(){
         this.hpBar.clear();
@@ -78,18 +72,9 @@ export class UI extends Scene
 
     create ()
     {      
-        
-        this.unitQueueGraphics = this.add.group({
-            defaultKey: 'warrior_static', 
-            visible: false,
-            active: false
-        });
-
-        this.unitQueueUI = new UIComponent(this, 50, (this.game.config.height as number)/2, 50, (this.game.config.height as number)*0.7, 0, 0xffffff);
-        this.add.existing(this.unitQueueUI);
 
         // Create player healthbar
-        this.hpBarUI = new UIComponent(this, this.cameras.main.width/2, 50, this.cameras.main.width/2, 48, 0, undefined);
+        this.hpBarUI = new UIComponent(this, this.cameras.main.width/2, 50, this.cameras.main.width/2, 48, 0);
         this.add.existing(this.hpBarUI);
         this.hpBarWidth = this.hpBarUI.getWidth()-this.hpBarUI.getBorderThickness()[0]*2;
         this.hpBarHeight = this.hpBarUI.getHeight()-this.hpBarUI.getBorderThickness()[2]*2;
@@ -153,7 +138,7 @@ export class UI extends Scene
                     if(this.isSpawning || this.player.getUnitQueue().length >= this.unitLimit || !this.player.canAfford(this.player.getUnitCost(this.playedUnits[i+1]))) return;
                     eventsCenter.emit('spawn-red-unit', this.playedUnits[i+1]);
                     this.isSpawning = true;
-                    this.unitSpawnButtons.forEach((button, i) => {
+                    this.unitSpawnButtons.forEach((button) => {
                         let buttonUI : UIComponent= button.list[0] as UIComponent;
                         if(button.getData('canAfford') === true) buttonUI.changeTint(0x808080, 0xbfbfbf);
                     });
@@ -195,10 +180,10 @@ export class UI extends Scene
             });
         });
 
-        eventsCenter.on('unit-spawned', (faction: string, unitType: string) => {
+        eventsCenter.on('unit-spawned', (faction: string) => {
             if(faction != this.player.faction) return;
             this.isSpawning = false;
-            this.unitSpawnButtons.forEach((button, i) => {
+            this.unitSpawnButtons.forEach((button) => {
                 let buttonUI : UIComponent= button.list[0] as UIComponent;
                 if(button.getData('canAfford') === true) buttonUI.changeTint(-1,-1);
             });
@@ -245,8 +230,7 @@ export class UI extends Scene
         image2c.setData('parent', this.button);
     }
 
-    update(time: any, delta: number) {
-        this.unitQueue = this.player.getUnitQueue();
-        this.renderUnitQueue();
+    update() {
+        
     }
 }
