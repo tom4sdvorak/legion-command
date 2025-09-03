@@ -40,6 +40,10 @@ export class Player {
         this.baseGroup = baseGroup;
         this.playerBase = playerBase;
         this.resourceComponent = new ResourceComponent(this);
+
+        eventsCenter.on('unit-died', (unitFaction: string) => {
+            if(unitFaction !== this.faction) this.gainXP(10);
+        }, this);
     }
 
     public addUnitToQueue(unitType: string) {
@@ -80,6 +84,18 @@ export class Player {
     public getHealth(absolute: boolean = true) {
         if(absolute) return this.playerBase.getCurrentHealth();
         else return this.playerBase.getCurrentHealth() / this.playerBase.getMaxHealth();
+    }
+
+    public gainXP(amount: number) {
+        this.resourceComponent.addXP(amount);
+    }
+
+    public nextLevelXP() : number{
+        return this.resourceComponent.getMaxXP();
+    }
+
+    public setNextLevelXP(amount: number) : void {
+        this.resourceComponent.setMaxXP(amount);
     }
 
     // Sets passive (per second) income to amount (if override is true) or by default it increases income by the amount (if override is false)

@@ -54,7 +54,7 @@ export class PlayerBase extends Phaser.Physics.Arcade.Sprite{
         (this.proximityZone.body as Phaser.Physics.Arcade.Body).allowGravity = false;
 
         // Add healthbar
-        this.healthComponent = new HealthComponent(this, this.sizeW, 20, spawnPosition.y-this.sizeH/2, 5000);
+        this.healthComponent = new HealthComponent(this, 5000, false, this.sizeW, 20, spawnPosition.y-this.sizeH/2);
         this.on('death', this.die, this);
         //this.healthBar = this.scene.add.rectangle(this.x, this.y-this.height/2, this.width, 20, 0x00ff00).setDepth(1).setAlpha(1);       
     }

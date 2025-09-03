@@ -20,12 +20,12 @@ export class Projectile extends Phaser.Physics.Arcade.Sprite {
         this.setVelocity(0, 0);
         if(this.unitGroup) this.unitGroup.remove(this);
         target.takeDamage(this.damage);
+    }
 
-        this.scene.time.delayedCall(1000, () => {
-            (this.body as Phaser.Physics.Arcade.Body).reset(0, 0);
-            if(this.projectilePool) this.projectilePool.killAndHide(this);
-            this.unitGroup = null;
-            this.projectilePool = null;
-        }, undefined, this);
+    despawn(){
+        (this.body as Phaser.Physics.Arcade.Body).reset(0, 0);
+        if(this.projectilePool) this.projectilePool.killAndHide(this);
+        this.unitGroup = null;
+        this.projectilePool = null;
     }
 }

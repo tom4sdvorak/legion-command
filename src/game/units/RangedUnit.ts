@@ -168,6 +168,7 @@ export class RangedUnit extends Unit {
         let yPos = this.y+this.unitProps.projectileOffsetY+this.unitProps.offsetY/this.scale;
         if(!this.projectiles || !this.projectilePool || !this.unitGroup) return;
         const projectile = this.projectilePool.get(this.x, yPos) as Projectile;
+        projectile.setFlipX(this.direction === -1);
         if (!projectile) return;
         if(projectile instanceof Projectile){
             projectile.damage = this.unitProps.specialDamage;

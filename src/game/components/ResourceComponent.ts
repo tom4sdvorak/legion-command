@@ -3,6 +3,8 @@ import { Player } from "../Player";
 
 export class ResourceComponent {
     private money: number = 0;
+    private xp: number = 0;
+    private maxXP: number = 999;
     private parent: Player;
     private moneyPerSecond: number = 0;
 
@@ -22,6 +24,10 @@ export class ResourceComponent {
         return this.money;
     }
 
+    public getXP(): number {
+        return this.xp;
+    }
+
     public setMoney(amount: number): void {
         this.money = amount;
         eventsCenter.emit('money-changed', this.parent.faction, this.money);
@@ -30,6 +36,19 @@ export class ResourceComponent {
     public addMoney(amount: number): void {
         this.money += amount;
         eventsCenter.emit('money-changed', this.parent.faction, this.money);
+    }
+
+    public addXP(amount: number): void {
+        this.xp += amount;
+        eventsCenter.emit('xp-changed', this.parent.faction, this.xp);
+    }
+
+    public setMaxXP(amount: number) {
+        this.maxXP = amount;
+    }
+
+    public getMaxXP(): number {
+        return this.maxXP;
     }
 
     public removeMoney(amount: number): void {

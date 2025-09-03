@@ -15,5 +15,8 @@ export class Fireball extends Projectile {
     onHit(target: Unit | PlayerBase): void {
         this.play(`fireball_explode`, true);
         super.onHit(target);
+        this.scene.time.delayedCall(1000, () => {
+            this.despawn();
+        }, undefined, this);     
     }
 }

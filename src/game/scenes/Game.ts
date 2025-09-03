@@ -253,7 +253,7 @@ export class Game extends Scene
         this.createPlayers();
         this.setupColliders();
 
-        this.scene.launch('UI', { player: this.playerRed, playedUnits: this.playedUnits }); // Starts the UI scene on top of the game scene
+        this.scene.launch('UI', { player: this.playerRed, enemy: this.playerBlue,playedUnits: this.playedUnits }); // Starts the UI scene on top of the game scene
 
         if(this.input.keyboard){
             const cursors = this.input.keyboard.createCursorKeys();

@@ -3,6 +3,7 @@ import { UnitStates } from "../helpers/UnitStates";
 import { PlayerBase } from "../PlayerBase";
 import { HealthComponent } from "../components/HealthComponent";
 import { Game } from "../scenes/Game";
+import eventsCenter from "../EventsCenter";
 
 
 export class Unit extends Phaser.Physics.Arcade.Sprite {
@@ -22,7 +23,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         this.unitType = unitType;
         this.setOrigin(0.5, 1);
         this.postFX?.addGlow(0x000000, 1, 0, false);
-        this.healthComponent = new HealthComponent(this, 32, 5, scene.cameras.main.height+this.scene.getGlobalOffset().y+10, 100); // parent, width, height, yOffset, maxHealth
+        this.healthComponent = new HealthComponent(this, 100, true,32, 5, scene.cameras.main.height+this.scene.getGlobalOffset().y+10); // parent, maxHealth, visible?, width, height, yOffset, 
 
         // Listen to call of unit's death
         this.on('death', this.die, this);
@@ -87,6 +88,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         if(this.unitGroup) this.unitGroup.remove(this);
         this.play(`${this.unitType}_death`, true);
         this.anims.timeScale = 1;
+        eventsCenter.emit('unit-died', this.unitProps.faction);
         
         //this.disableBody();
        // (this.body as Phaser.Physics.Arcade.Body).setEnable(false);

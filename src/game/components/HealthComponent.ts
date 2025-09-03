@@ -1,17 +1,29 @@
 
 import { devConfig } from '../helpers/DevConfig';
+import { PlayerBase } from '../PlayerBase';
 import { Unit } from '../units/Unit';
 
+    /**
+     * HealthComponent is a class that manages the health of an unit or base and can display a health bar
+     * @param parent The object that owns this health component.
+     * @param maxHealth The maximum health of it
+     * @param hpBar A boolean indicating whether to display the health bar or not.
+     * @param {number} [width=30] The width of the health bar.
+     * @param {number} [height=5] The height of the health bar.
+     * @param {number} [yOffset=-20] The vertical offset of the health bar relative to the unit's position.
+     */
+
 export class HealthComponent {
-    private parent: Unit
+    private parent: Unit | PlayerBase
     private health: number;
     private maxHealth: number;
     private healthBar: Phaser.GameObjects.Rectangle | null;
     private barWidth: number;
     private barHeight: number;
     private posY: number;
+    private hpBarVisible: boolean = true;
 
-    constructor(parent: any, width: number, height: number, posY: number, maxHealth: number) {
+    constructor(parent: any, maxHealth: number, hpBar: boolean = true, width: number = 30, height: number = 5, posY: number = -20, ) {
         this.health = maxHealth;
         this.maxHealth = maxHealth;
         this.barWidth = width;
@@ -19,6 +31,7 @@ export class HealthComponent {
         this.posY = posY;
         this.parent = parent;
         this.healthBar = null;
+        this.hpBarVisible = hpBar;
         this.createHealthBar();
     }
 
@@ -58,11 +71,19 @@ export class HealthComponent {
 
     deactivate() : void {
         this.healthBar?.setVisible(false);
+        this.hpBarVisible = false;
     }
 
-    createHealthBar() {
+    createHealthBar() :void {
         this.healthBar = this.parent.scene.add.rectangle(-500, this.posY, this.barWidth, this.barHeight, 0x00ff00).setDepth(100).setAlpha(0.5);
+        this.healthBar.setVisible(this.hpBarVisible);
     }
+
+    toggleVisibility():void{
+        this.hpBarVisible = !this.hpBarVisible;
+        this.healthBar?.setVisible(this.hpBarVisible);
+    }
+
     takeDamage(damage: number): void {
         this.health -= damage;
         if(devConfig.consoleLog) console.log(`${this.parent.constructor.name} took ${damage} damage, remaining health is ${this.health}`);
