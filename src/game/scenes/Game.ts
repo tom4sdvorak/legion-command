@@ -224,7 +224,7 @@ export class Game extends Scene
     }
 
     create ()
-    {       
+    {             
         // Setup the game screen
         this.camera = this.cameras.main;
         this.cameras.main.setBounds(0, 0, this.worldWidth, this.worldHeight);
@@ -279,6 +279,11 @@ export class Game extends Scene
         this.input.on('pointerup',  () => {
             this.isDragging = false;
         });
+
+        this.input.on('gameout',  () => {
+            this.isDragging = false;
+        });
+
         
         
         //Listen to events
@@ -295,6 +300,12 @@ export class Game extends Scene
             this.gameOver(faction);
         });
 
+        eventsCenter.on('resume', (gameSpeed : number) => {
+            this.tweens.timeScale = gameSpeed;
+            this.physics.world.timeScale = 1 / gameSpeed;
+            this.time.timeScale = gameSpeed;
+            console.log(this.tweens.timeScale, this.physics.world.timeScale, this.time.timeScale);
+        });
 
     }
 

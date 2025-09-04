@@ -17,14 +17,14 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
     healthComponent: HealthComponent;
     declare scene: Game;
     meleeTarget: Unit | PlayerBase | null = null;
+    glow: Phaser.FX.Glow;
 
     constructor(scene: Game, unitType: string) {
         super(scene, -500, -500, unitType);
         this.unitType = unitType;
         this.setOrigin(0.5, 1);
-        this.postFX?.addGlow(0x000000, 1, 0, false);
         this.healthComponent = new HealthComponent(this, 100, true,32, 5, scene.cameras.main.height+this.scene.getGlobalOffset().y+10); // parent, maxHealth, visible?, width, height, yOffset, 
-
+        
         // Listen to call of unit's death
         this.on('death', this.die, this);
     }
@@ -44,6 +44,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         // Reinitialize the sprite's body
         this.setScale(unitProps.scale);
         
+        this.glow = this.postFX?.addGlow(0x000000, 1, 0, false);
         
         this.setActive(true);
         this.setVisible(true);
@@ -70,6 +71,18 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
             let bodyOffsetY = ((this.scene.camera.height-this.body.y-this.body.height+this.scene.getGlobalOffset().y)/this.unitProps.scale);
             this.body.setOffset(this.body.offset.x, bodyOffsetY);
         }
+
+        // Add mouse/touch interaction
+        this.setInteractive();
+        this.on('pointerover', () => {
+            this.postFX.remove(this.glow);
+            this.glow = this.postFX.addGlow(0xffff00, 10, 0, false, 1, 1);
+        }).on('pointerout', () => {
+            this.postFX.remove(this.glow);
+            this.glow = this.postFX?.addGlow(0x000000, 1, 0, false);
+        }).on('pointerup', () => {
+            console.log(this.unitProps);
+        })
         this.changeState(UnitStates.WALKING);
     }
     
@@ -98,6 +111,8 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
             if(this.unitPool) this.unitPool.killAndHide(this);
             this.unitGroup = null;
             this.unitPool = null;
+            this.removeInteractive();
+            this.postFX.remove(this.glow);
         }, undefined, this);
         
     }

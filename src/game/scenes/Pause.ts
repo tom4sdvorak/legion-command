@@ -1,6 +1,7 @@
 import { Scene } from 'phaser';
 import { Player } from '../Player';
 import { UIComponent } from '../components/UIComponent';
+import eventsCenter from '../EventsCenter';
 
 export class Pause extends Scene {
     player: Player;
@@ -8,6 +9,7 @@ export class Pause extends Scene {
     overlay: Phaser.GameObjects.Rectangle;
     levelPopUp: UIComponent;
     menu: UIComponent;
+    gameSpeed: number = 1;
     constructor() {
         super('Pause');
     }
@@ -38,15 +40,43 @@ export class Pause extends Scene {
     public resume(){
         this.scene.resume('Game');
         this.scene.resume('UI');
+        eventsCenter.emit('resume', this.gameSpeed);
         this.scene.stop('Pause');
     }
 
     public showMenu() {
         this.menu = new UIComponent(this, this.cameras.main.width/2, this.cameras.main.height/2, this.cameras.main.width/2, this.cameras.main.height/2, 1);
-        const resumeButton = this.add.bitmapText(0, 0, 'pixelFont', 'Resume', 48).setOrigin(0.5, 0).setInteractive().on('pointerup', () => this.resume());
-        this.menu.add(resumeButton);
+        const interactableGroup = this.add.group();
+        const resumeButton = this.add.bitmapText(0, -64, 'pixelFont', 'Resume', 48).setOrigin(0.5, 0.5).setInteractive().on('pointerup', () => this.resume());
+        const slowDownButton = this.add.bitmapText(-128, 0, 'pixelFont', '<', 64).setOrigin(0.5, 0.5).setInteractive().on('pointerup', () => {
+            if(this.gameSpeed > 1){
+                this.gameSpeed--;
+                gameSpeedText.setText(`Speed: ${this.gameSpeed}`);
+            } 
+        });
+        const gameSpeedText = this.add.bitmapText(0, 0, 'pixelFont', `Speed: ${this.gameSpeed}`, 48).setOrigin(0.5, 0.5);
+        const speedUpButton = this.add.bitmapText(128, 0, 'pixelFont', '>', 64).setOrigin(0.5, 0.5).setInteractive().on('pointerup', () => {
+            if(this.gameSpeed < 3){
+                this.gameSpeed++;
+                gameSpeedText.setText(`Speed: ${this.gameSpeed}`);
+            } 
+        });
+        this.menu.add([resumeButton, slowDownButton, gameSpeedText, speedUpButton]);
+        interactableGroup.add(resumeButton);
+        interactableGroup.add(slowDownButton);
+        interactableGroup.add(speedUpButton);
         this.menu.setDepth(1001);
         this.add.existing(this.menu);
+
+        interactableGroup.getChildren().forEach(child => {
+            child.setInteractive();
+            child.on('pointerover', () => {
+                (child as any).postFX.addGlow(0xFFFF00, 1, 0, false);
+            }, this);
+            child.on('pointerout', ()=>{
+                (child as any).postFX.clear();
+            }, this);
+        });
     }
 
     create() {

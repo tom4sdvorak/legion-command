@@ -278,6 +278,12 @@ export class UI extends Scene
             this.onLevelUp();
         });
 
+        eventsCenter.on('resume', (gameSpeed : number) => {
+            this.tweens.timeScale = gameSpeed;
+            this.physics.world.timeScale = 1 / gameSpeed;
+            this.time.timeScale = gameSpeed;
+        });
+
         // Keep record of time
         const timerEvent = this.time.addEvent({
         delay: 1000,

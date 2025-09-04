@@ -36,7 +36,7 @@ export class PreGame extends Scene
             })
             .on('pointerout', () => {
                 if(this.unitsToTake.length < 3) return;
-                this.readyButton.preFX?.clear();
+                this.readyButton.postFX?.clear();
             })
             .on('pointerup', () => {
                 if(this.unitsToTake.length < 3) return;
