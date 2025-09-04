@@ -23,6 +23,11 @@ export class UI extends Scene
     enemyHPBarHeight: number = 0;
     timeText: Phaser.GameObjects.BitmapText;
     XPBarUI: Phaser.GameObjects.Rectangle;
+    levelText: Phaser.GameObjects.BitmapText;
+    levelPopUp: UIComponent;
+    overlay: Phaser.GameObjects.Rectangle;
+    settingsImage: Phaser.GameObjects.Image;
+    elapsedTime: number = 0;
 
     constructor ()
     {
@@ -91,6 +96,14 @@ export class UI extends Scene
         if(this.XPBarUI.scaleX > 1) this.XPBarUI.scaleX = 1;
     }
 
+    public onLevelUp() {
+        this.scene.launch('Pause', { player: this.player, situation: 'LevelUp' });
+    }
+
+    public onPause(){
+        this.scene.launch('Pause', { player: this.player, situation: 'pause' });
+    }
+
     create ()
     {      
 
@@ -114,19 +127,33 @@ export class UI extends Scene
         this.updateEnemyHPBar();
 
         // Display resources
-        this.moneyText = this.add.bitmapText(this.cameras.main.width/4-(32+50+24), this.cameras.main.height - 96, 'pixelFont', `${this.player.getMoney()}`, 48).setOrigin(1, 0.5).setTintFill(0xffffff);
-        this.moneyImage = this.add.image(this.cameras.main.width/4-50, this.cameras.main.height - 96, 'coin').setOrigin(1, 0.5).setDisplaySize(48, 48);
+        this.moneyText = this.add.bitmapText(this.cameras.main.width/4-(32+50+24), this.cameras.main.height - (96), 'pixelFont', `${this.player.getMoney()}`, 48).setOrigin(1, 0.5).setTintFill(0xffffff);
+        this.moneyImage = this.add.image(this.cameras.main.width/4-50, this.cameras.main.height - (96), 'coin').setOrigin(1, 0.5).setDisplaySize(40, 40);
         let moneyImageBorder = this.add.graphics();
         moneyImageBorder.lineStyle(1, 0xffffff, 1);
-        moneyImageBorder.strokeCircle(this.cameras.main.width/4-(50+24), this.cameras.main.height - 96, 24);
+        moneyImageBorder.strokeCircle(this.cameras.main.width/4-(50+20), this.cameras.main.height - (96), 20);
+
+        // Display settings/pause menu
+        this.settingsImage = this.add.image(this.cameras.main.width/4*3+50, this.cameras.main.height - 96, 'cog').setOrigin(0, 0.5).setDisplaySize(64, 64).setInteractive();
+        this.settingsImage.postFX.addGlow(0xA8A9AD, 1, 1, false, 1, 5);
+        this.settingsImage.on('pointerup', () => {
+            this.onPause()
+        }).on('pointerover', () => {
+            this.settingsImage.postFX.addGlow(0xffffff, 4, 1, false, 1, 5);
+        }).on('pointerout', () => {
+            this.settingsImage.postFX.clear();
+            this.settingsImage.postFX.addGlow(0xA8A9AD, 1, 1, false, 1, 5);
+        })
 
         // Display elapsed time
         this.timeText = this.add.bitmapText(this.cameras.main.width/2, 48, 'pixelFont', `0:00`, 48).setOrigin(0.5, 0.5).setTintFill(0x000000);
 
+        // Display level
+        this.levelText = this.add.bitmapText(16, this.cameras.main.height-16, 'pixelFont', `Level ${this.player.getLevel()}`, 48).setOrigin(0, 1).setTintFill(0xffd700);
+
         // Create XP bar
         this.XPBarUI = this.add.rectangle(0, this.cameras.main.height, this.cameras.main.width, 16, 0xffd700).setOrigin(0, 1).setDepth(999);
         this.XPBarUI.scaleX = 0;
-
 
         // Create unit spawning buttons based on selected units
         for(let i = -1; i < 2; i++) {
@@ -242,6 +269,25 @@ export class UI extends Scene
         eventsCenter.on('xp-changed', (faction: string, amount: number) => {
             if(faction != this.player.faction) return;
             this.updateXPBar(amount);
+            this.levelText.setText(`Level ${this.player.level}`);
+        });
+
+        // Listener for level up events to update level bar
+        eventsCenter.on('level-up', (faction: string) => {
+            if(faction != this.player.faction) return;
+            this.onLevelUp();
+        });
+
+        // Keep record of time
+        const timerEvent = this.time.addEvent({
+        delay: 1000,
+        callback: () => {
+            this.elapsedTime++;
+            const formatedTime = [Math.floor(this.elapsedTime / 60), ((this.elapsedTime % 60).toFixed(0)).padStart(2, '0')].join(':');
+            this.timeText.setText(formatedTime);  
+        },
+        callbackScope: this,
+        loop: true
         });
 
 
@@ -281,8 +327,6 @@ export class UI extends Scene
     }
 
     update(time: number, delta: number) {
-        const elapsedSeconds = (this.time.now - this.time.startTime) / 1000;
-        const formatedTime = [Math.floor(elapsedSeconds / 60), ((elapsedSeconds % 60).toFixed(0)).padStart(2, '0')].join(':');
-        this.timeText.setText(formatedTime);     
+   
     }
 }

@@ -4,7 +4,7 @@ import { Player } from "../Player";
 export class ResourceComponent {
     private money: number = 0;
     private xp: number = 0;
-    private maxXP: number = 999;
+    private maxXP: number = 100;
     private parent: Player;
     private moneyPerSecond: number = 0;
 
@@ -41,6 +41,11 @@ export class ResourceComponent {
     public addXP(amount: number): void {
         this.xp += amount;
         eventsCenter.emit('xp-changed', this.parent.faction, this.xp);
+        // On overflow, signal level up and reset to 0, preserving the overflow amount
+        if (this.xp >= this.maxXP) {
+            eventsCenter.emit('level-up', this.parent.faction);
+            this.xp = this.xp - this.maxXP;
+        }
     }
 
     public setMaxXP(amount: number) {

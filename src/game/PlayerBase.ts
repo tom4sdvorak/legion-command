@@ -1,8 +1,5 @@
 import { Unit } from "./units/Unit";
 import { Projectile } from "./projectiles/Projectile";
-import { Scene } from "phaser";
-import { ObjectPool } from "./helpers/ObjectPool";
-import { Arrow } from "./projectiles/Arrow";
 import eventsCenter from "./EventsCenter";
 import { Game } from "./scenes/Game";
 import { HealthComponent } from "./components/HealthComponent";

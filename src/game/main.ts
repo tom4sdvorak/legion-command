@@ -6,6 +6,7 @@ import { UI } from './scenes/UI';
 import { AUTO, Game } from 'phaser';
 import { Preloader } from './scenes/Preloader';
 import { PreGame } from './scenes/PreGame';
+import { Pause } from './scenes/Pause';
 
 //  Find out more information about the Game Config at:
 //  https://docs.phaser.io/api-documentation/typedef/types-core#gameconfig
@@ -34,7 +35,8 @@ const config: Phaser.Types.Core.GameConfig = {
         PreGame,
         MainGame,
         GameOver,
-        UI
+        UI,
+        Pause
     ]
 };
 

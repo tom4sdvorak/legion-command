@@ -1,4 +1,3 @@
-import eventsCenter from '../EventsCenter';
 import { Player } from '../Player';
 
 const State = {
@@ -20,7 +19,7 @@ export class AIController {
         this.enemy = enemy;
     }
 
-    update(time: number, delta: number) {
+    update(time: number) {
         // Every desired time, reconsider current strategy (state)
         if (time - this.lastDecision > 5000) {
             this.lastDecision = time;

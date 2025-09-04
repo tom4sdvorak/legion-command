@@ -20,7 +20,7 @@ export class MainMenu extends Scene
         //test.setTint(0xffb3b3);
 
         // x, y, width, height, background (0: lighter, 1: darker), tint
-        this.mainMenu = new UIComponent(this, (this.game.config.width as number)/2, (this.game.config.height as number)/2, (this.game.config.width as number)*0.9, (this.game.config.height as number)*0.9, 0, 0xffffff);
+        this.mainMenu = new UIComponent(this, (this.game.config.width as number)/2, (this.game.config.height as number)/2, (this.game.config.width as number)*0.9, (this.game.config.height as number)*0.9, 0);
         this.add.existing(this.mainMenu);
 
 

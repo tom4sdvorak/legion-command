@@ -55,6 +55,7 @@ export class Preloader extends Scene
         this.load.atlas('mineBase', 'images/buildings/mine/texture.png', 'images/buildings/mine/texture.json');
         this.load.image('signpost', 'images/items/signpost.png');
         this.load.image('coin', 'images/items/coin.png');
+        this.load.image('cog', 'images/items/cog.png');
 
         // UI
         this.load.setPath('assets/images/UI');

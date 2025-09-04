@@ -316,7 +316,7 @@ export class Game extends Scene
             console.log(this.nextUnit);   
         } */
         this.playerBlue.update(time, delta);
-        if(devConfig.AI) this.AIController.update(time, delta);
+        if(devConfig.AI) this.AIController.update(time);
         this.playerRed.update(time, delta);
         
     }

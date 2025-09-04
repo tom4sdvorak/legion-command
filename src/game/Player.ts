@@ -6,7 +6,7 @@ import { UnitConfigLoader } from "./helpers/UnitConfigLoader";
 import { ResourceComponent } from "./components/ResourceComponent";
 import eventsCenter from './EventsCenter';
 
-export class Player {
+export class Player {   
     public playerBase: PlayerBase;
     public faction: 'red' | 'blue';
     public spawnPosition: Phaser.Math.Vector2;
@@ -25,6 +25,7 @@ export class Player {
     framesSinceSpawn: number = 0;
     configLoader: UnitConfigLoader;
     isSpawning: boolean = false;
+    level: number = 0;
 
     constructor(scene: Phaser.Scene, faction: 'red' | 'blue', playerBase: PlayerBase, spawnPosition: Phaser.Math.Vector2, ownUnitsPhysics: Phaser.Physics.Arcade.Group,
         enemyUnitsPhysics: Phaser.Physics.Arcade.Group, projectiles: Phaser.Physics.Arcade.Group,
@@ -42,7 +43,7 @@ export class Player {
         this.resourceComponent = new ResourceComponent(this);
 
         eventsCenter.on('unit-died', (unitFaction: string) => {
-            if(unitFaction !== this.faction) this.gainXP(10);
+            if(unitFaction !== this.faction) this.gainXP(50);
         }, this);
     }
 
@@ -86,6 +87,10 @@ export class Player {
         else return this.playerBase.getCurrentHealth() / this.playerBase.getMaxHealth();
     }
 
+    public getLevel() : number {
+       return this.level;
+    }
+
     public gainXP(amount: number) {
         this.resourceComponent.addXP(amount);
     }
@@ -96,6 +101,12 @@ export class Player {
 
     public setNextLevelXP(amount: number) : void {
         this.resourceComponent.setMaxXP(amount);
+    }
+
+    public levelUp() : void {
+        this.resourceComponent.setMaxXP(this.resourceComponent.getMaxXP() * 1.5); // Increase next level up xp by 50%
+        this.level++;
+        eventsCenter.emit('xp-changed', this.faction, this.resourceComponent.getXP());
     }
 
     // Sets passive (per second) income to amount (if override is true) or by default it increases income by the amount (if override is false)
