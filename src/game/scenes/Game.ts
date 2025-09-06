@@ -88,9 +88,12 @@ export class Game extends Scene
         // Create and setup main player
         const redPos = new Phaser.Math.Vector2(0, this.worldHeight+this.globalOffsetY);
         const redSprites = [
-            this.add.sprite(100, this.worldHeight+this.globalOffsetY+35, 'tower_red').setOrigin(0,1)
+            this.add.sprite(50, redPos.y, 'tent').setOrigin(0,1).setScale(1.5).setDepth(11),
+            this.add.sprite(10, redPos.y-10, 'tower').setOrigin(0,1).setScale(0.8),
+            this.add.sprite(-10, redPos.y-165, 'archer').setOrigin(0,1),
+            this.add.sprite(10, redPos.y-10, 'tower_frontlayer').setOrigin(0,1).setScale(0.8)
         ];
-        this.baseRed = new PlayerBase(this, 'red', redPos, this.blueUnitsPhysics, this.redProjectiles, this.objectPool.projectiles.arrows);
+        this.baseRed = new PlayerBase(this, 'red', redPos, this.blueUnitsPhysics, this.redProjectiles, this.objectPool.projectiles.arrows, redSprites[2]);
         this.playerRed = new Player(this, 'red', this.baseRed, redPos, this.redUnitsPhysics, this.blueUnitsPhysics, this.redProjectiles, this.objectPool, this.baseGroup, this.redConfigLoader);
         this.playerRed.changePassiveIncome(1, true);
         this.playerRed.addMoney(999);
@@ -103,7 +106,7 @@ export class Game extends Scene
             this.add.sprite(this.worldWidth-10, this.worldHeight+this.globalOffsetY+35, 'mineBase', 'mine_bg').setOrigin(1,1).setScale(1.1),
             this.add.sprite(this.worldWidth-10, this.worldHeight+this.globalOffsetY+35, 'mineBase', 'mine_fg').setOrigin(1,1).setDepth(10).setScale(1.1),
         ];
-        this.baseBlue = new PlayerBase(this, 'blue', bluePos, this.redUnitsPhysics, this.blueProjectiles, this.objectPool.projectiles.arrows);
+        this.baseBlue = new PlayerBase(this, 'blue', bluePos, this.redUnitsPhysics, this.blueProjectiles, this.objectPool.projectiles.arrows, redSprites[2]);
         this.playerBlue = new Player(this, 'blue', this.baseBlue, bluePos, this.blueUnitsPhysics, this.redUnitsPhysics, this.blueProjectiles, this.objectPool, this.baseGroup, this.blueConfigLoader);
         this.playerBlue.changePassiveIncome(1, true);
         this.playerBlue.addMoney(100);

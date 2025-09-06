@@ -237,5 +237,16 @@
       "frameRate": 10,
       "repeat": 0
     }
+  },
+  "firepit": {
+    "burning": {
+      "key": "firepit_burning",
+      "frames": {
+        "start": 0,
+        "count": 40
+      },
+      "frameRate": 10,
+      "repeat": -1
+    }
   }
 }

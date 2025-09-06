@@ -93,6 +93,8 @@ export class PreGame extends Scene
             mySprite.setDepth(mySprite.y);
         });
 
+        this.add.sprite(this.gameWidth/2, this.gameHeight/2, 'firepit_burning').play('firepit_burning').setDisplaySize(64,64);
+
         /*this.input.once('pointerup', () => {
 
             this.scene.start('Game');

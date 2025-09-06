@@ -24,8 +24,9 @@ export class PlayerBase extends Phaser.Physics.Arcade.Sprite{
     sizeW: number = 150;
     sizeH: number = 300;
     healthComponent : HealthComponent;
+    shootingSprite: Phaser.GameObjects.Sprite;
 
-    constructor(scene: Game, faction: 'red' | 'blue', spawnPosition: Phaser.Math.Vector2, enemyUnitsPhysics: Phaser.Physics.Arcade.Group, projectiles: Phaser.Physics.Arcade.Group, projectilePool: Phaser.Physics.Arcade.Group) {
+    constructor(scene: Game, faction: 'red' | 'blue', spawnPosition: Phaser.Math.Vector2, enemyUnitsPhysics: Phaser.Physics.Arcade.Group, projectiles: Phaser.Physics.Arcade.Group, projectilePool: Phaser.Physics.Arcade.Group, shootingSprite: Phaser.GameObjects.Sprite) {
         super(scene, spawnPosition.x, spawnPosition.y, 'single_pixel');
         const offsetX = (faction === 'blue') ? spawnPosition.x-this.sizeW : spawnPosition.x+100;
         this.setPosition(offsetX, spawnPosition.y-this.sizeH/2);
@@ -35,11 +36,14 @@ export class PlayerBase extends Phaser.Physics.Arcade.Sprite{
         this.scene = scene;
         this.projectiles = projectiles;
         this.projectilePool = projectilePool;
+        this.shootingSprite = shootingSprite;
+        this.shootingSprite.play(`${this.shootingSprite.texture.key}_idle`);
         scene.physics.add.existing(this, true);
         this.setPushable(false);
         this.setImmovable(true);
         this.setBodySize(this.sizeW, this.sizeH, true);
         this.body?.setOffset(0,-this.sizeH/2);
+
         
         // Create proximity zone around base to detect units
         
@@ -134,6 +138,8 @@ export class PlayerBase extends Phaser.Physics.Arcade.Sprite{
     public startShooting(): void {
         console.log("Start shooting");
         this.isShooting = true;
+        this.shootingSprite.play(`${this.shootingSprite.texture.key}_shoot`, true);
+        this.shootingSprite.anims.timeScale = (this.shootingSprite.anims?.currentAnim?.duration ?? 1) / this.attackSpeed;
         this.shootingTimer = this.scene.time.addEvent({
             delay: this.attackSpeed,
             callback: () => {
@@ -203,5 +209,7 @@ export class PlayerBase extends Phaser.Physics.Arcade.Sprite{
                 this.shootingTimer = null;
             }
             this.isShooting = false;
+            this.shootingSprite.play(`${this.shootingSprite.texture.key}_idle`, true);
+            this.shootingSprite.anims.timeScale = 1;
     }
 }
