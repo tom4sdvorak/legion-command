@@ -31,8 +31,8 @@ export class Preloader extends Scene
     {
         //  Load the assets for the game - Replace with your own assets
         this.load.setPath('src');
-        this.load.json('unitData', '/game/config/unitConfig.json');
-        this.load.json('AIUnitData', '/game/config/AIUnitConfig.json');
+        this.load.json('unitData', '/game/config/unitData.json');
+        this.load.json('unitUpgrades', '/game/config/unitUpgrades.json');
 
         this.load.setPath('assets');
         this.load.bitmapFont('pixelFont', 'fonts/BoldPixels.png', 'fonts/BoldPixels.xml');

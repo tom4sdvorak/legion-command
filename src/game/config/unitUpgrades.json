@@ -1,0 +1,92 @@
+[
+  {
+    "id": "generic_hp_percent",
+    "name": "Vitality Boost",
+    "description": "Increases max health by 5%.",
+    "rarity": "common",
+    "tags": ["health", "generic"],
+    "effects": [
+      { "stat": "maxHealth", "type": "percent", "value": 0.05 }
+    ]
+  },
+  {
+    "id": "generic_speed_percent",
+    "name": "Light Boots",
+    "description": "Increases movement speed by 5%.",
+    "rarity": "common",
+    "tags": ["speed", "generic"],
+    "effects": [
+      { "stat": "speed", "type": "percent", "value": 0.05 }
+    ]
+  },
+  {
+    "id": "generic_cost_reduction_percent",
+    "name": "Efficient Conscription",
+    "description": "Reduces unit cost by 10%",
+    "rarity": "common",
+    "tags": ["cost", "generic"],
+    "effects": [
+      { "stat": "cost", "type": "percent", "value": -0.10 }
+    ]
+  },
+  {
+    "id": "melee_damage_flat",
+    "name": "Sharpened Sword",
+    "description": "Increases melee attack damage by 5.",
+    "rarity": "common",
+    "tags": ["damage", "melee"],
+    "effects": [
+      { "stat": "attackDamage", "type": "flat", "value": 5 }
+    ]
+  },
+  {
+    "id": "ranged_damage_flat",
+    "name": "Fletching Kit",
+    "description": "Increases ranged damage by 5.",
+    "rarity": "common",
+    "tags": ["damage", "ranged"],
+    "effects": [
+      { "stat": "specialDamage", "type": "flat", "value": 5 }
+    ]
+  },
+  {
+    "id": "ranged_range_flat",
+    "name": "Eagle Eye",
+    "description": "Increases attack range by 50.",
+    "rarity": "common",
+    "tags": ["range", "ranged"],
+    "effects": [
+      { "stat": "specialRange", "type": "flat", "value": 50 }
+    ]
+  },
+  {
+    "id": "healer_support_value_flat",
+    "name": "Soothing Herbs",
+    "description": "Increases healing power by 10.",
+    "rarity": "common",
+    "tags": ["supportValue", "healer"],
+    "effects": [
+      { "stat": "specialDamage", "type": "flat", "value": 10 }
+    ]
+  },
+  {
+    "id": "healer_support_speed_percent",
+    "name": "Rapid Recovery",
+    "description": "Increases healing speed by 10%.",
+    "rarity": "common",
+    "tags": ["supportSpeed", "healer"],
+    "effects": [
+      { "stat": "specialSpeed", "type": "percent", "value": -0.10 }
+    ]
+  },
+  {
+    "id": "ranged_shooting_speed_percent",
+    "name": "Propellant Glands",
+    "description": "Increases shooting speed by 10.",
+    "rarity": "common",
+    "tags": ["shootingSpeed", "ranged"],
+    "effects": [
+      { "stat": "specialSpeed", "type": "percent", "value": -0.10 }
+    ]
+  }
+]

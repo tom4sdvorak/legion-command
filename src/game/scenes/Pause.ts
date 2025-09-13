@@ -2,6 +2,7 @@ import { Scene } from 'phaser';
 import { Player } from '../Player';
 import { UIComponent } from '../components/UIComponent';
 import eventsCenter from '../EventsCenter';
+import { UnitUpgrade } from '../helpers/UnitUpgrade';
 
 export class Pause extends Scene {
     player: Player;
@@ -77,6 +78,16 @@ export class Pause extends Scene {
                 (child as any).postFX.clear();
             }, this);
         });
+    }
+
+    private getRandomUpgrade(tags: string[]) {
+        const unitUpgradesJson = this.cache.json.get('unitUpgrades');
+        const filteredUnitUpgrades = unitUpgradesJson.filter((upgrade : UnitUpgrade) => {
+            return tags.some(tag => upgrade.tags.includes(tag));
+        });
+        const randomUpgradeIndex = Math.floor(Math.random() * filteredUnitUpgrades.length);
+        const randomUpgrade = filteredUnitUpgrades[randomUpgradeIndex];
+        return randomUpgrade;
     }
 
     create() {

@@ -82,8 +82,7 @@ export class Game extends Scene
 
         const unitDataJson = this.cache.json.get('unitData');
         this.redConfigLoader = new UnitConfigLoader(unitDataJson);
-        const AIUnitDataJson = this.cache.json.get('AIUnitData');
-        this.blueConfigLoader = new UnitConfigLoader(AIUnitDataJson);
+        this.blueConfigLoader = new UnitConfigLoader(unitDataJson);
 
         // Create and setup main player
         const redPos = new Phaser.Math.Vector2(0, this.worldHeight+this.globalOffsetY);
