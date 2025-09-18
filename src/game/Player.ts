@@ -5,6 +5,8 @@ import { devConfig } from "./helpers/DevConfig";
 import { UnitConfigLoader } from "./helpers/UnitConfigLoader";
 import { ResourceComponent } from "./components/ResourceComponent";
 import eventsCenter from './EventsCenter';
+import { UnitProps } from "./helpers/UnitProps";
+import { UnitUpgrade } from "./helpers/UnitUpgrade";
 
 export class Player {   
     public playerBase: PlayerBase;
@@ -26,10 +28,12 @@ export class Player {
     configLoader: UnitConfigLoader;
     isSpawning: boolean = false;
     level: number = 0;
+    public selectedUnits: Array<{unitType: string, unitConfig: UnitProps}> = [];
+    public unitsUpgrades: Array<{unitType: string, upgrades: UnitUpgrade[]}> = [];
 
     constructor(scene: Phaser.Scene, faction: 'red' | 'blue', playerBase: PlayerBase, spawnPosition: Phaser.Math.Vector2, ownUnitsPhysics: Phaser.Physics.Arcade.Group,
         enemyUnitsPhysics: Phaser.Physics.Arcade.Group, projectiles: Phaser.Physics.Arcade.Group,
-        objectPool: ObjectPool, baseGroup: Phaser.GameObjects.Group, configLoader: UnitConfigLoader) {
+        objectPool: ObjectPool, baseGroup: Phaser.GameObjects.Group, configLoader: UnitConfigLoader, selectedUnits: string[]) {
         this.configLoader = configLoader;
         this.spawnPosition = spawnPosition;
         this.scene = scene;
@@ -41,6 +45,16 @@ export class Player {
         this.baseGroup = baseGroup;
         this.playerBase = playerBase;
         this.resourceComponent = new ResourceComponent(this);
+        selectedUnits.forEach(unitType => {
+            this.selectedUnits.push({
+                unitType: unitType,
+                unitConfig: this.configLoader.getUnitProps(unitType)
+            });
+            this.unitsUpgrades.push({
+                unitType: unitType,
+                upgrades: []
+            })
+        });
 
         eventsCenter.on('unit-died', (unitFaction: string) => {
             if(unitFaction !== this.faction) this.gainXP(50);
@@ -103,10 +117,72 @@ export class Player {
         this.resourceComponent.setMaxXP(amount);
     }
 
-    public levelUp() : void {
+    public levelUp(unit: string, upgrade: UnitUpgrade) : void {
         this.resourceComponent.setMaxXP(this.resourceComponent.getMaxXP() * 1.5); // Increase next level up xp by 50%
         this.level++;
         eventsCenter.emit('xp-changed', this.faction, this.resourceComponent.getXP());
+        this.unitsUpgrades.find(unitUpgrades => unitUpgrades.unitType === unit)?.upgrades?.push(upgrade);
+    }
+
+    public getUnitStats(unitType: string) {
+        // Get base stats of the chosen unit
+        const baseStats : UnitProps = this.selectedUnits.find(unit => unit.unitType === unitType)!.unitConfig;
+
+        interface UnitModifier {
+            stat: keyof UnitProps; 
+            type: 'flat' | 'percent'; 
+            value: number;
+        }
+
+        // Get list of upgrades for specified unit then extract just the effect objects from it
+        const unitUpgrades = this.unitsUpgrades.find(unitUpgrades => unitUpgrades.unitType === unitType)?.upgrades || [];
+        const allUpgradeEffects = unitUpgrades.flatMap((upgrade: UnitUpgrade) => upgrade.effects);
+
+        //Split extracted effects to flat bonuses and percentage bonuses
+        const flatUpgrades : UnitModifier[]  = allUpgradeEffects.filter((effect: { stat: string; type: string; value: number; }) => effect.type === 'flat') as UnitModifier[]; 
+        const percentUpgrades : UnitModifier[] = allUpgradeEffects.filter((effect: { stat: string; type: string; value: number; }) => effect.type === 'percent') as UnitModifier[];
+
+        // Calculate new stats starting with base stats and increasing them directly by flat upgrades
+        const newStats = flatUpgrades.reduce((acc, modifier : UnitModifier) => {
+            const newAcc = {...acc};
+            const currentStat = modifier.stat;
+            const baseValue = (newAcc[currentStat] as number) ?? 0;
+
+            if (typeof baseValue === 'number' && modifier.type === 'flat') {
+                (newAcc[currentStat] as number) = baseValue + modifier.value;
+            }
+
+            return newAcc;
+        }, {...baseStats});
+
+        // Calculate percentage bonuses for each stat by adding them together
+        const percentageTotals: Partial<Record<keyof UnitProps, number>> = {};
+        percentUpgrades.forEach((modifier) => {
+            const stat = modifier.stat;
+            // Accumulate the percentage bonuses
+            percentageTotals[stat] = (percentageTotals[stat] || 0) + modifier.value;
+        });
+
+        let finalStats: UnitProps = { ...newStats }; // Start with the flat-modified stats
+
+        // Apply the percentage bonuses
+        for (const stat in percentageTotals) {
+            if (percentageTotals.hasOwnProperty(stat)) {
+                const currentStat = stat as keyof UnitProps;
+                const totalBonus = percentageTotals[currentStat]!;
+
+                // The multiplier is 1 + totalBonus
+                const multiplier = 1 + totalBonus; 
+                
+                const currentValue = (finalStats[currentStat] as number) ?? 0;
+
+                if (typeof currentValue === 'number') {
+                    // Apply the single multiplier and floor it down to next integer
+                    (finalStats[currentStat] as number) = Math.floor(currentValue * multiplier);
+                }
+            }
+        }
+        return finalStats;
     }
 
     // Sets passive (per second) income to amount (if override is true) or by default it increases income by the amount (if override is false)
@@ -178,7 +254,8 @@ export class Player {
         }
         if(unit){
             // Load base unit properties from JSON
-            let newUnitProps = this.configLoader.getUnitProps(unitType);
+            let newUnitProps = this.getUnitStats(unitType);
+            console.log("New unit stats: " + newUnitProps);
             
             // Add current data to unitProps to spawn unit correctly
    

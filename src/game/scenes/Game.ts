@@ -93,7 +93,7 @@ export class Game extends Scene
             this.add.sprite(10, redPos.y-10, 'tower_frontlayer').setOrigin(0,1).setScale(0.8)
         ];
         this.baseRed = new PlayerBase(this, 'red', redPos, this.blueUnitsPhysics, this.redProjectiles, this.objectPool.projectiles.arrows, redSprites[2]);
-        this.playerRed = new Player(this, 'red', this.baseRed, redPos, this.redUnitsPhysics, this.blueUnitsPhysics, this.redProjectiles, this.objectPool, this.baseGroup, this.redConfigLoader);
+        this.playerRed = new Player(this, 'red', this.baseRed, redPos, this.redUnitsPhysics, this.blueUnitsPhysics, this.redProjectiles, this.objectPool, this.baseGroup, this.redConfigLoader, this.playedUnits);
         this.playerRed.changePassiveIncome(1, true);
         this.playerRed.addMoney(999);
 
@@ -106,7 +106,7 @@ export class Game extends Scene
             this.add.sprite(this.worldWidth-10, this.worldHeight+this.globalOffsetY+35, 'mineBase', 'mine_fg').setOrigin(1,1).setDepth(10).setScale(1.1),
         ];
         this.baseBlue = new PlayerBase(this, 'blue', bluePos, this.redUnitsPhysics, this.blueProjectiles, this.objectPool.projectiles.arrows, redSprites[2]);
-        this.playerBlue = new Player(this, 'blue', this.baseBlue, bluePos, this.blueUnitsPhysics, this.redUnitsPhysics, this.blueProjectiles, this.objectPool, this.baseGroup, this.blueConfigLoader);
+        this.playerBlue = new Player(this, 'blue', this.baseBlue, bluePos, this.blueUnitsPhysics, this.redUnitsPhysics, this.blueProjectiles, this.objectPool, this.baseGroup, this.blueConfigLoader, ["warrior"]);
         this.playerBlue.changePassiveIncome(1, true);
         this.playerBlue.addMoney(100);
         if(devConfig.AI) this.AIController = new AIController(this.playerBlue, this.playerRed);

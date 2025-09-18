@@ -22,19 +22,50 @@ export class Pause extends Scene {
 
     public showLevelUp() : void {
         // Create level up UI
-        this.levelPopUp = new UIComponent(this, this.cameras.main.width/2, this.cameras.main.height/2, this.cameras.main.width/2, this.cameras.main.height/2, 1);
-        const levelUpButton = this.add.bitmapText(0, 0, 'pixelFont', 'Level Up', 48).setOrigin(0.5, 0.5).setTintFill(0xffd700).setInteractive();
-        levelUpButton.on('pointerup', () => this.levelUp());
-        this.levelPopUp.setDepth(1001);
-        this.levelPopUp.add(levelUpButton);
-        this.add.existing(this.levelPopUp);
+        const container = this.add.container(this.cameras.main.width/2, this.cameras.main.height/2);
+        const gap = 16;
+        let currentPosX = 0;
+        const UIElementWidth = this.cameras.main.width/4;
+        const UIElementHeight = this.cameras.main.height/2;
+
+        /* Will run for each selected unit (1-3) to display random upgrade for it */
+        this.player.selectedUnits.forEach(selectedUnit => {
+            const upgrade : UnitUpgrade = this.getRandomUpgrade(selectedUnit.unitConfig.tags);
+            if(upgrade === undefined) return;
+            const upgradeUIElement = new UIComponent(this, currentPosX+UIElementWidth/2, 0, UIElementWidth, UIElementHeight, 1);
+            upgradeUIElement.setSize(UIElementWidth, UIElementHeight);
+            const upgradeName = this.add.bitmapText(0, (32-UIElementHeight/2), 'pixelFont', upgrade.name, 32).setOrigin(0.5, 0).setMaxWidth(UIElementWidth-32);
+            const upgradeDescription = this.add.bitmapText(0, (-UIElementHeight/4), 'pixelFont', upgrade.description, 16).setOrigin(0.5, 0).setMaxWidth(UIElementWidth-32);
+            upgradeUIElement.add(upgradeName);
+            upgradeUIElement.add(upgradeDescription);
+            container.add(upgradeUIElement);
+            currentPosX += UIElementWidth + gap;
+            let currentGlow : any;
+            upgradeUIElement.setInteractive()
+                .on('pointerover', () => {
+                    let buttonBorder : Phaser.GameObjects.NineSlice = upgradeUIElement.list[2] as Phaser.GameObjects.NineSlice;
+                    if(currentGlow) buttonBorder.postFX.remove(currentGlow);
+                    currentGlow = buttonBorder.postFX.addGlow(0xffffff, 4, 0, false, 1, 5);
+                })
+                .on('pointerout', () => {
+                    let buttonBorder : Phaser.GameObjects.NineSlice = upgradeUIElement.list[2] as Phaser.GameObjects.NineSlice;
+                    if(currentGlow) buttonBorder.postFX.remove(currentGlow);
+                })
+                .on('pointerup', () => {
+                    this.levelUp(selectedUnit.unitType, upgrade);
+                });
+        });
+
+        container.x = this.cameras.main.width / 2 - (currentPosX - gap) / 2;
+        this.add.existing(container);
+        container.setDepth(1001);
     }
 
-    public levelUp() {
-        console.log("Level up");
+    public levelUp(unit: string, upgrade: UnitUpgrade) {
+        console.log("Level up upgrade: " + upgrade.name + " for unit: " + unit);
         this.scene.resume('Game');
         this.scene.resume('UI');
-        this.player.levelUp();
+        this.player.levelUp(unit, upgrade);
         this.scene.stop('Pause');
     }
 
@@ -80,7 +111,7 @@ export class Pause extends Scene {
         });
     }
 
-    private getRandomUpgrade(tags: string[]) {
+    private getRandomUpgrade(tags: string[]) : UnitUpgrade {
         const unitUpgradesJson = this.cache.json.get('unitUpgrades');
         const filteredUnitUpgrades = unitUpgradesJson.filter((upgrade : UnitUpgrade) => {
             return tags.some(tag => upgrade.tags.includes(tag));

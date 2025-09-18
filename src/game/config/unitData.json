@@ -1,7 +1,6 @@
 {
   "baseUnit": {
     "speed": 100,
-    "health": 100,
     "cost": 10,
     "maxHealth": 100,
     "attackDamage": 10,
@@ -15,36 +14,37 @@
     "projectileOffsetY": 0,
     "bodyWidth": 64,
     "bodyHeight": 96,
-    "projectileVelocity": 500
+    "projectileVelocity": 500,
+    "tags": ["generic"]
   },
 
   "unitClasses": {
     "meleeUnit": {
       "extends": "baseUnit",
-      "health": 200,
       "maxHealth": 200,
       "attackDamage": 20,
-      "attackSpeed": 1000
+      "attackSpeed": 1000,
+      "tags": ["melee"]
     },
 
     "rangedUnit": {
       "extends": "baseUnit",
-      "health": 80,
       "cost": 20,
       "maxHealth": 80,
       "specialDamage": 50,
       "specialRange": 200,
-      "specialSpeed": 1000
+      "specialSpeed": 1000,
+      "tags": ["ranged"]
     },
 
     "supportUnit": {
       "extends": "baseUnit",
-      "health": 100,
       "maxHealth": 100,
       "cost": 30,
       "specialDamage": 10,
       "specialRange": 100,
-      "specialSpeed": 500
+      "specialSpeed": 500,
+      "tags": ["support"]
     }
   },
 
@@ -52,18 +52,21 @@
     "warrior": {
       "extends": "meleeUnit",
       "offsetY": -1,
-      "scale": 0.9
+      "scale": 0.9,
+      "tags": ["warrior"]
     },
 
     "archer": {
       "extends": "rangedUnit",
-      "projectileOffsetY": -60
+      "projectileOffsetY": -60,
+      "tags": ["archer"]
     },
 
     "healer": {
       "extends": "supportUnit",
       "offsetY": -49,
-      "scale": 0.8
+      "scale": 0.8,
+      "tags": ["healer"]
     },
 
     "fireWorm": {
@@ -73,7 +76,8 @@
       "scale": 1.4,
       "bodyHeight": 96,
       "projectileOffsetY": -51,
-      "projectileVelocity": 300
+      "projectileVelocity": 300,
+      "tags": ["fireWorm"]
     }
   }
 }

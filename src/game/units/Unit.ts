@@ -35,7 +35,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         this.setFlipX(this.direction === -1);
         this.unitProps = unitProps;
         this.unitProps.speed = Math.abs(unitProps.speed) * this.direction;
-        this.healthComponent.spawn(unitProps.health);
+        this.healthComponent.spawn(unitProps.maxHealth);
         this.unitGroup = unitGroup;
         this.unitPool = unitPool;
         this.setDepth(5);

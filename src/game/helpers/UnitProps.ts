@@ -3,7 +3,6 @@ export interface UnitProps {
     y: number;
     cost: number;
     speed: number;
-    health: number;
     maxHealth: number;
     attackDamage: number;
     attackSpeed: number;
@@ -19,4 +18,5 @@ export interface UnitProps {
     bodyWidth: number;
     bodyHeight: number;
     projectileVelocity: number;
+    tags: string[];
 }

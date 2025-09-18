@@ -42,33 +42,41 @@ export class UnitConfigLoader {
 
     /**
      * Retrieves the fully merged properties for a specific unit type.
-     * This method correctly handles the inheritance chain from base unit to specific unit type.
+     * This method correctly handles the inheritance chain from base unit to specific unit type
+     * and correctly merges array properties like 'tags'.
      * @param unitType The string identifier for the unit (e.g., "warrior", "archer").
      * @returns The fully merged UnitProps object.
      */
     public getUnitProps(unitType: string): UnitProps {
-        // Find the specific unit type's configuration.
         const unit: RawUnitConfig = this.config.unitTypes[unitType];
 
-        // Basic error handling if the unit type doesn't exist.
         if (!unit) {
             console.error(`Error: Unit type '${unitType}' not found in configuration.`);
             return {} as UnitProps;
         }
 
-        // Start with the baseUnit properties, as every unit extends from it.
-        let finalProps: UnitProps = { ...this.config.baseUnit };
-        
-        // Next, get the parent class's properties and merge them.
         const parentClass: RawUnitConfig = this.config.unitClasses[unit.extends!];
-        if (parentClass) {
-            finalProps = { ...finalProps, ...parentClass };
-        }
-        
-        // Finally, merge the specific unit's properties. These will override any inherited values.
-        finalProps = { ...finalProps, ...unit };
 
-        // Clean up the final object by removing the `extends` property.
+        // Step 1: Perform the shallow merge for all properties.
+        // This will correctly override numbers, strings, etc., but will overwrite arrays.
+        let finalProps: UnitProps = {
+            ...this.config.baseUnit,
+            ...(parentClass || {}),
+            ...unit,
+        };
+
+        // Step 2: Manually merge the 'tags' array to combine them instead of overwriting.
+        const baseTags = this.config.baseUnit.tags || [];
+        const classTags = parentClass?.tags || [];
+        const unitTags = unit.tags || [];
+
+        // Combine all tags and use a Set to automatically handle duplicates.
+        const combinedTags = [...new Set([...baseTags, ...classTags, ...unitTags])];
+        
+        // Assign the correctly merged array to the final properties.
+        finalProps.tags = combinedTags;
+
+        // Step 3: Clean up the final object by removing the `extends` property.
         delete (finalProps as any).extends;
 
         return finalProps;
