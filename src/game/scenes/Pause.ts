@@ -36,6 +36,8 @@ export class Pause extends Scene {
             upgradeUIElement.setSize(UIElementWidth, UIElementHeight);
             const upgradeName = this.add.bitmapText(0, (32-UIElementHeight/2), 'pixelFont', upgrade.name, 32).setOrigin(0.5, 0).setMaxWidth(UIElementWidth-32);
             const upgradeDescription = this.add.bitmapText(0, (-UIElementHeight/4), 'pixelFont', upgrade.description, 16).setOrigin(0.5, 0).setMaxWidth(UIElementWidth-32);
+            const unitSprite = this.add.sprite(0, 0, `${selectedUnit.unitType}_static`).setOrigin(0, 1);
+            upgradeUIElement.add(unitSprite);
             upgradeUIElement.add(upgradeName);
             upgradeUIElement.add(upgradeDescription);
             container.add(upgradeUIElement);

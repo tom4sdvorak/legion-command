@@ -14,6 +14,7 @@ import { AIController } from '../components/AIController';
 import { devConfig } from '../helpers/DevConfig';
 import { FireWorm } from '../units/FireWorm';
 import { Fireball } from '../projectiles/Fireball';
+import { AIPlayer } from '../AIPlayer';
 
 export class Game extends Scene
 {
@@ -22,7 +23,7 @@ export class Game extends Scene
     worldHeight: number = 800;
     ground: Phaser.GameObjects.Image;
     playerRed: Player;
-    playerBlue: Player;
+    playerBlue: AIPlayer;
     baseRed: PlayerBase;
     baseBlue: PlayerBase;
     redUnitsPhysics: Phaser.Physics.Arcade.Group;
@@ -93,7 +94,7 @@ export class Game extends Scene
             this.add.sprite(10, redPos.y-10, 'tower_frontlayer').setOrigin(0,1).setScale(0.8)
         ];
         this.baseRed = new PlayerBase(this, 'red', redPos, this.blueUnitsPhysics, this.redProjectiles, this.objectPool.projectiles.arrows, redSprites[2]);
-        this.playerRed = new Player(this, 'red', this.baseRed, redPos, this.redUnitsPhysics, this.blueUnitsPhysics, this.redProjectiles, this.objectPool, this.baseGroup, this.redConfigLoader, this.playedUnits);
+        this.playerRed = new Player(this, this.baseRed, redPos, this.redUnitsPhysics, this.blueUnitsPhysics, this.redProjectiles, this.objectPool, this.baseGroup, this.redConfigLoader, this.playedUnits);
         this.playerRed.changePassiveIncome(1, true);
         this.playerRed.addMoney(999);
 
@@ -106,7 +107,7 @@ export class Game extends Scene
             this.add.sprite(this.worldWidth-10, this.worldHeight+this.globalOffsetY+35, 'mineBase', 'mine_fg').setOrigin(1,1).setDepth(10).setScale(1.1),
         ];
         this.baseBlue = new PlayerBase(this, 'blue', bluePos, this.redUnitsPhysics, this.blueProjectiles, this.objectPool.projectiles.arrows, redSprites[2]);
-        this.playerBlue = new Player(this, 'blue', this.baseBlue, bluePos, this.blueUnitsPhysics, this.redUnitsPhysics, this.blueProjectiles, this.objectPool, this.baseGroup, this.blueConfigLoader, ["warrior"]);
+        this.playerBlue = new AIPlayer(this, this.baseBlue, bluePos, this.blueUnitsPhysics, this.redUnitsPhysics, this.blueProjectiles, this.objectPool, this.baseGroup, this.blueConfigLoader, ["warrior"]);
         this.playerBlue.changePassiveIncome(1, true);
         this.playerBlue.addMoney(100);
         if(devConfig.AI) this.AIController = new AIController(this.playerBlue, this.playerRed);
@@ -240,15 +241,6 @@ export class Game extends Scene
         this.add.tileSprite(0, this.worldHeight+this.globalOffsetY+35, this.worldWidth, 0, 'bglayer4').setScrollFactor(0.8).setOrigin(0,1).setScale(1.8);
         const foreGround = this.add.tileSprite(0, this.worldHeight, this.worldWidth, 0, 'bglayer5').setOrigin(0,1).setDepth(9);
         foreGround.setDisplaySize(foreGround.width, 220);
-        //this.add.tileSprite(0, this.worldHeight, this.worldWidth, 0, 'bglayer6').setOrigin(0,1);
-        /*this.nextUnitContainer = this.add.container(0, this.worldHeight-100).setDepth(11).setSize(100,100);
-        this.nextUnitContainer.add(this.add.image(this.nextUnitContainer.width/2, 30, 'signpost').setOrigin(0.5,0.5).setScale(1.5));
-        this.nextUnit = this.add.image(0, 0, 'warrior_static').setScale(0.5).setOrigin(0.5,0);
-        this.nextUnitContainer.add(this.nextUnit);
-        console.log(this.nextUnitContainer.width);
-        //this.nextUnit.setPosition(this.nextUnitContainer.width/2, -this.nextUnitContainer.height/2);
-        //Phaser.Display.Align.In.TopCenter(this.nextUnit, this.nextUnitContainer.list[0]);
-        Phaser.Display.Align.In.TopCenter(this.nextUnit, this.nextUnitContainer.list[0]);*/
 
         // Create unit and projectile pools
         this.setupObjectPools();
@@ -324,10 +316,6 @@ export class Game extends Scene
             this.lastPointerPosition.y = this.input.activePointer.y;
         }
         // Run update methods of each player
-        /*if(this.playerRed.unitQueue.length > 0){
-            this.nextUnit.setTexture(`${this.playerRed.unitQueue[0]}_static`);
-            console.log(this.nextUnit);   
-        } */
         this.playerBlue.update(time, delta);
         if(devConfig.AI) this.AIController.update(time);
         this.playerRed.update(time, delta);

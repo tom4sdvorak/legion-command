@@ -1,3 +1,4 @@
+import { AIPlayer } from '../AIPlayer';
 import { Player } from '../Player';
 
 const State = {
@@ -9,12 +10,12 @@ const State = {
 };
 
 export class AIController {
-    private player: Player;
+    private player: AIPlayer;
     private state: string = State.IDLE;
     private lastDecision: number = 0;
     enemy: Player;
 
-    constructor(parent: Player, enemy: Player) {
+    constructor(parent: AIPlayer, enemy: Player) {
         this.player = parent;
         this.enemy = enemy;
     }

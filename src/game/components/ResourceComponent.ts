@@ -1,14 +1,15 @@
 import eventsCenter from "../EventsCenter";
 import { Player } from "../Player";
+import { PlayerController } from "./PlayerController";
 
 export class ResourceComponent {
     private money: number = 0;
     private xp: number = 0;
     private maxXP: number = 100;
-    private parent: Player;
+    private parent: PlayerController;
     private moneyPerSecond: number = 0;
 
-    constructor(parent: Player) {
+    constructor(parent: PlayerController) {
         this.parent = parent;
 
         this.parent.scene.time.addEvent({
