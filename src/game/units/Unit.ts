@@ -18,9 +18,12 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
     declare scene: Game;
     meleeTarget: Unit | PlayerBase | null = null;
     glow: Phaser.FX.Glow;
+    colorMatrix: Phaser.FX.ColorMatrix;
+    actionDisabled: boolean = false;
 
     constructor(scene: Game, unitType: string) {
         super(scene, -500, -500, unitType);
+        this.colorMatrix = this.preFX!.addColorMatrix();
         this.unitType = unitType;
         this.setOrigin(0.5, 1);
         this.healthComponent = new HealthComponent(this, 100, true,32, 5, scene.cameras.main.height+this.scene.getGlobalOffset().y+10); // parent, maxHealth, visible?, width, height, yOffset, 
@@ -39,8 +42,10 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         this.unitGroup = unitGroup;
         this.unitPool = unitPool;
         this.setDepth(5);
+        this.actionDisabled = false;
         this.state = UnitStates.WAITING;
-
+        this.colorMatrix.reset();
+        this.actionDisabled = false;
         // Reinitialize the sprite's body
         this.setScale(unitProps.scale);
         
@@ -86,18 +91,22 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         this.changeState(UnitStates.WALKING);
     }
     
+    stopEverything(): void { 
+        this.stopMoving();
+        this.stopSupporting();
+        this.stopShooting();
+        this.changeState(UnitStates.WAITING);
+        if(this.attackingTimer) this.attackingTimer.remove();
+        this.attackingTimer = null;
+    }
 
     die(): void {
-        
-        this.stopMoving();
+        this.stopEverything();
         this.changeState(UnitStates.DEAD);
+        this.actionDisabled = true;
         this.setDepth(1);
         if(this.unitProps.faction === 'red') this.scene.rewardPlayer('blue', this.unitProps.cost);
         else this.scene.rewardPlayer('red', this.unitProps.cost);
-
-        if(this.attackingTimer) this.attackingTimer.remove();
-        this.attackingTimer = null;
-        
         if(this.unitGroup) this.unitGroup.remove(this);
         this.play(`${this.unitType}_death`, true);
         this.anims.timeScale = 1;
@@ -124,7 +133,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         super.update(time, delta);
         // Keep unit moving when not blocked
         if (this.state !== UnitStates.DEAD) {
-            if (this.state !== UnitStates.SHOOTING && !this.isBlocked()) {
+            if (this.state !== UnitStates.SHOOTING && !this.isBlocked()[0]) {
                 this.moveForward();
             }
         }
@@ -139,7 +148,47 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
             this.clearTint();
         }, undefined, this);
         this.setTintFill(0xffffff);
-        this.healthComponent.takeDamage(damage);
+        const damageToTake = Math.round(damage * (1 - this.unitProps.armor / 100.0));
+        this.healthComponent.takeDamage(damageToTake);
+    }
+
+    public applyDebuff(debuff: string) : void {
+        switch(debuff){
+            case 'petrify':
+                // set sprite to greyscale
+                this.colorMatrix.grayscale(1);
+                // give sprite temporary armor
+                const prevArmor = this.unitProps.armor;
+                this.unitProps.armor = 90;
+                // set it to unable to move or attack
+                this.changeState(UnitStates.WAITING);
+                this.stop();
+                this.actionDisabled = true;
+                // add timer to remove petrification
+                this.scene.time.addEvent({
+                    delay: 5000,
+                    callback: () => {
+                        if (!this.active) {
+                            return;
+                        }
+                        this.actionDisabled = false;
+                        this.colorMatrix.grayscale(0);
+                        this.changeState(UnitStates.IDLE);
+                        this.unitProps.armor = prevArmor;
+
+                    },
+                    callbackScope: this,
+                    loop: false
+                });
+                break;
+            case 'burn':
+                // remove health over time
+                // set to tint/glow redish
+                // remove burn after time or death
+                break;
+            default:
+                break;
+        }
     }
 
     public handleCollision(target: Unit | PlayerBase) : void { 
@@ -172,7 +221,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         this.attackingTimer = this.scene.time.addEvent({
             delay: this.unitProps.attackSpeed,
             callback: () => {
-                if (!this.active) {
+                if (!this.active || this.state === UnitStates.DEAD || this.state === UnitStates.WAITING) {
                     return;
                 }
                 this.anims.timeScale = (this.anims?.currentAnim?.duration ?? 1) / (this.unitProps.attackSpeed + 100);
@@ -202,8 +251,16 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
     public handleState(): void {
         switch (this.state) {
             case UnitStates.IDLE:
-                if (!this.isBlocked()) {
+                let blockingSituation : [boolean, Unit | null] = this.isBlocked();
+                // Try to walk if not blocked
+                if(!blockingSituation[0]){
                     this.changeState(UnitStates.WALKING);
+                }
+                else{
+                    // If blocked, check if its enemy and trigger collision
+                    if(blockingSituation[1] instanceof Unit && blockingSituation[1].unitProps.faction !== this.unitProps.faction){
+                        this.handleCollision(blockingSituation[1]);
+                    }
                 }
                 break;
             case UnitStates.ATTACKING:                              
@@ -220,6 +277,8 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
     public changeState(newState: string): void {
         if(newState === this.state) return;
         if(this.state === UnitStates.DEAD) return;
+        if(this.actionDisabled) return;
+        console.log("Changing state from " + this.state + " to " + newState);
         this.state = newState;
 
         switch (newState) {
@@ -254,6 +313,9 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
             case UnitStates.DEAD:
                 this.stopMoving();
                 break;
+            case UnitStates.WAITING:
+                this.stopEverything();
+                break;
             default:
                 throw Error(`Unknown unit state: ${this.state}`);
         }
@@ -273,21 +335,31 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         return;
     }
 
-    isBlocked(): boolean {
+    isBlocked(): [boolean, Unit | null] {
         const detectionRectWidth = 20;
         if(this.body){
             const xOffset = (this.body.width * 0.5 + 1) * this.direction;
             const yOffset = -this.body.height * 0.5;
             // Use a physics overlap check to find a blocking unit in front
             let overlap = this.scene.physics.overlapRect(this.x + xOffset, this.y + yOffset, detectionRectWidth * this.direction, this.body.height);
-            return overlap.some(object => {
-                if (object.gameObject instanceof Unit && object.gameObject.isAlive()) {
-                    return true;
+
+            // Should really find at most 2 things but loop just in case
+            for (const object of overlap) {
+                if (object.gameObject) {
+                    const gameObject = object.gameObject;
+                    if (gameObject instanceof Unit && gameObject !== this && gameObject.isAlive()) {
+                        return [true, gameObject];
+                    }
                 }
-                return false;
-            });
+            }
+            /*return overlap.some(object => {
+                if (object.gameObject instanceof Unit && object.gameObject.isAlive()) {
+                    return [true, object.gameObject];
+                }
+                return [false, null];
+            });*/
         }
-        return false;
+        return [false, null];
         
     }
 

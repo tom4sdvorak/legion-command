@@ -201,6 +201,11 @@ export class PlayerController {
                 projectilePool = this.objectPool.projectiles.fireballs;
                 unit = pool.get();
                 break;
+            case 'gorgon':
+                pool = this.objectPool.units.gorgons;
+                projectilePool = null;
+                unit = pool.get();
+                break;
             default:
                 throw new Error(`Unknown unit type: ${unitType}`);
         }

@@ -15,6 +15,7 @@ import { devConfig } from '../helpers/DevConfig';
 import { FireWorm } from '../units/FireWorm';
 import { Fireball } from '../projectiles/Fireball';
 import { AIPlayer } from '../AIPlayer';
+import { Gorgon } from '../units/Gorgon';
 
 export class Game extends Scene
 {
@@ -168,6 +169,11 @@ export class Game extends Scene
                 }),
                 fireWorms: this.physics.add.group({
                     classType: FireWorm,
+                    maxSize: 50,
+                    runChildUpdate: true
+                }),
+                gorgons: this.physics.add.group({
+                    classType: Gorgon,
                     maxSize: 50,
                     runChildUpdate: true
                 }),

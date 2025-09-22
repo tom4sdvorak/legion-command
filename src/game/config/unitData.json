@@ -3,6 +3,7 @@
     "speed": 100,
     "cost": 10,
     "maxHealth": 100,
+    "armor": 0,
     "attackDamage": 10,
     "attackSpeed": 1000,
     "specialDamage": 10,
@@ -78,6 +79,12 @@
       "projectileOffsetY": -51,
       "projectileVelocity": 300,
       "tags": ["fireWorm"]
+    },
+
+    "gorgon": {
+      "extends": "meleeUnit",
+      "bodyWidth": 96,
+      "tags": ["gorgon"]
     }
   }
 }

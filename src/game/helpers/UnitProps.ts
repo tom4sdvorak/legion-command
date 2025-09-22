@@ -4,6 +4,7 @@ export interface UnitProps {
     cost: number;
     speed: number;
     maxHealth: number;
+    armor: number;
     attackDamage: number;
     attackSpeed: number;
     specialDamage: number;

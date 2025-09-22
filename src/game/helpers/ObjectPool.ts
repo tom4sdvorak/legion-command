@@ -6,6 +6,7 @@ export type ObjectPool = {
         warriors: Phaser.Physics.Arcade.Group;
         healers: Phaser.Physics.Arcade.Group;
         fireWorms: Phaser.Physics.Arcade.Group;
+        gorgons: Phaser.Physics.Arcade.Group;
     },
     projectiles: {
         arrows: Phaser.Physics.Arcade.Group;

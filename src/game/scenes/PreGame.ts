@@ -3,7 +3,7 @@ import { UIComponent } from '../components/UIComponent';
 
 export class PreGame extends Scene
 {
-    unitList = ['warrior', 'archer', 'healer', 'fireWorm'];
+    unitList = ['warrior', 'archer', 'healer', 'fireWorm', 'gorgon'];
     unitsToTake : string[] = [];
     readyCheck: Phaser.GameObjects.Container;
     gameWidth : number;

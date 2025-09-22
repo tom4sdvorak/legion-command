@@ -93,6 +93,14 @@ export class HealthComponent {
         }
     }
 
+    // Sets health to exact amount ignoring max health and sets max health to match
+    setHealth(amount: number): void {
+        this.health = amount;
+        if (amount > this.maxHealth) {
+            this.maxHealth = amount;
+        }
+    }
+
     heal(amount: number): void {
         this.health += amount;
         if(devConfig.consoleLog) console.log(`${this.parent.constructor.name} was healed by ${amount} hp, remaining health is ${this.health}`);

@@ -94,6 +94,8 @@ export class Preloader extends Scene
         this.load.image('healer_static', 'healer/static.png');
         this.load.spritesheet('fireWorm', 'fireWorm/sprite_sheet.png',{frameWidth: 90, frameHeight: 90});
         this.load.image('fireWorm_static', 'fireWorm/static.png');
+        this.load.spritesheet('gorgon', 'gorgon/sprite_sheet.png',{frameWidth: 128, frameHeight: 128});
+        this.load.image('gorgon_static', 'gorgon/static.png');
 
         // Projectile sprites
         this.load.setPath('assets/sprites/projectiles');
