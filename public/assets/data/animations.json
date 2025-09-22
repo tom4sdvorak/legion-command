@@ -170,7 +170,7 @@
       },
       "frameRate": 10,
       "repeat": -1,
-      "yoyo": true
+      "yoyo": false
     },
     "run": {
       "key": "fireWorm_run",
@@ -213,6 +213,54 @@
       "frames": {
         "start": 64,
         "count": 8
+      },
+      "frameRate": 10,
+      "repeat": 0
+    }
+  },
+  "gorgon": {
+    "idle": {
+      "key": "gorgon_idle",
+      "frames": {
+        "start": 0,
+        "count": 7
+      },
+      "frameRate": 10,
+      "repeat": -1,
+      "yoyo": false
+    },
+    "run": {
+      "key": "gorgon_run",
+      "frames": {
+        "start": 32,
+        "count": 7
+      },
+      "frameRate": 10,
+      "repeat": -1
+    },
+    "attack": {
+      "key": "gorgon_attack",
+      "frames": {
+        "start": 64,
+        "count": 7
+      },
+      "frameRate": 10,
+      "repeat": -1
+    },
+    "special": {
+      "key": "gorgon_special",
+      "frames": {
+        "start": 96,
+        "count": 5
+      },
+      "frameRate": 10,
+      "repeat": -1
+    },
+    "death": {
+      "key": "gorgon_death",
+      "frames": {
+        "start": 112,
+        "count": 3
       },
       "frameRate": 10,
       "repeat": 0
