@@ -17,6 +17,7 @@ export class Boot extends Scene
 
     create ()
     {
+        this.registry.set('allUnits', ['warrior', 'archer', 'healer', 'fireWorm', 'gorgon']);
         this.scene.start('Preloader');
     }
 }

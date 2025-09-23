@@ -1,5 +1,6 @@
 import { Game } from "../scenes/Game";
 import { RangedUnit } from "./RangedUnit";
+import { Unit } from "./Unit";
 
 export class FireWorm extends RangedUnit {
     constructor(scene: Game) {
@@ -8,7 +9,12 @@ export class FireWorm extends RangedUnit {
 
     public startAttackingTarget(): void {
         if (!this.meleeTarget) return;
-        this.takeDamage(9999999999);
-        this.meleeTarget.takeDamage(this.unitProps.attackDamage);
+
+        // Do special suicide attack that burns enemy target if meeting melee target
+        if(this.meleeTarget instanceof Unit){
+            this.takeDamage(9999999999);
+            this.meleeTarget.applyDebuff('burn');
+            this.meleeTarget.takeDamage(this.unitProps.attackDamage*5);
+        }        
     }
 }

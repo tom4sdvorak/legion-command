@@ -20,6 +20,8 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
     glow: Phaser.FX.Glow;
     colorMatrix: Phaser.FX.ColorMatrix;
     actionDisabled: boolean = false;
+    burningDebuff : {timer: Phaser.Time.TimerEvent | null, ticks: number, damage: number} | null = null;
+    petrifyDebuff : {timer: Phaser.Time.TimerEvent | null, duration: number} | null = null;
 
     constructor(scene: Game, unitType: string) {
         super(scene, -500, -500, unitType);
@@ -104,6 +106,14 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         this.stopEverything();
         this.changeState(UnitStates.DEAD);
         this.actionDisabled = true;
+
+        // Clear any ongoing debuffs
+        this.colorMatrix.reset();
+        this.burningDebuff?.timer?.remove();
+        this.burningDebuff = null;
+        this.petrifyDebuff?.timer?.remove();
+        this.petrifyDebuff = null;
+        
         this.setDepth(1);
         if(this.unitProps.faction === 'red') this.scene.rewardPlayer('blue', this.unitProps.cost);
         else this.scene.rewardPlayer('red', this.unitProps.cost);
@@ -165,8 +175,10 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
                 this.stop();
                 this.actionDisabled = true;
                 // add timer to remove petrification
-                this.scene.time.addEvent({
-                    delay: 5000,
+                if(this.petrifyDebuff?.timer) this.petrifyDebuff.timer.remove();
+                this.petrifyDebuff = {timer: null, duration: 5};
+                this.petrifyDebuff.timer = this.scene.time.addEvent({
+                    delay: this.petrifyDebuff!.duration * 1000,
                     callback: () => {
                         if (!this.active) {
                             return;
@@ -175,19 +187,47 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
                         this.colorMatrix.grayscale(0);
                         this.changeState(UnitStates.IDLE);
                         this.unitProps.armor = prevArmor;
-
+                        this.petrifyDebuff!.timer?.remove();
+                        this.petrifyDebuff = null;
                     },
                     callbackScope: this,
                     loop: false
                 });
                 break;
             case 'burn':
-                // remove health over time
+                // extend current burn debuff or create new one if none exists
+                if(this.burningDebuff){
+                    this.burningDebuff.ticks = 5;
+                    return;
+                }
+                this.burningDebuff = {timer: null, ticks: 5, damage: 10};
+
                 // set to tint/glow redish
-                // remove burn after time or death
+                this.colorMatrix.saturate(1.2, true).brightness(1.2, true).brown(true);
+
+                // remove health over time
+                this.burningDebuff.timer = this.scene.time.addEvent({
+                    delay: 1000, // Apply burn damage every 1s
+                    callback: () => {
+                        if (!this.active || this.state === UnitStates.DEAD || this.burningDebuff === null) {
+                            return;
+                        }
+                        this.takeDamage(this.burningDebuff.damage); // How much damage
+                        if(this.burningDebuff !== null){
+                            this.burningDebuff.ticks--; // Reduce ticks by 1
+                            if (this.burningDebuff.ticks <= 0) {
+                                this.colorMatrix.reset();
+                                this.burningDebuff.timer?.remove();
+                                this.burningDebuff = null;
+                            }
+                        }
+                    },
+                    callbackScope: this,
+                    loop: true
+                });
                 break;
             default:
-                break;
+                throw new Error(`Unknown debuff: ${debuff}`);
         }
     }
 

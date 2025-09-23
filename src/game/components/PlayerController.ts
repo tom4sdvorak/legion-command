@@ -32,7 +32,7 @@ export class PlayerController {
 
     constructor(scene: Phaser.Scene, playerBase: PlayerBase, spawnPosition: Phaser.Math.Vector2, ownUnitsPhysics: Phaser.Physics.Arcade.Group,
         enemyUnitsPhysics: Phaser.Physics.Arcade.Group, projectiles: Phaser.Physics.Arcade.Group,
-        objectPool: ObjectPool, baseGroup: Phaser.GameObjects.Group, configLoader: UnitConfigLoader, selectedUnits: string[]) {
+        objectPool: ObjectPool, baseGroup: Phaser.GameObjects.Group, configLoader: UnitConfigLoader) {
         this.configLoader = configLoader;
         this.spawnPosition = spawnPosition;
         this.scene = scene;
@@ -42,21 +42,7 @@ export class PlayerController {
         this.objectPool = objectPool;
         this.baseGroup = baseGroup;
         this.playerBase = playerBase;
-        this.resourceComponent = new ResourceComponent(this);
-
-        /* Save base stats of all selected units */
-        selectedUnits.forEach(unitType => {
-            this.selectedUnits.push({
-                unitType: unitType,
-                unitConfig: this.configLoader.getUnitProps(unitType)
-            });
-            this.unitsUpgrades.push({
-                unitType: unitType,
-                upgrades: []
-            })
-        });
-
-        
+        this.resourceComponent = new ResourceComponent(this);       
     }
 
     public addUnitToQueue(unitType: string) {

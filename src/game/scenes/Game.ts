@@ -45,17 +45,11 @@ export class Game extends Scene
     globalOffsetY: number = -200;
     nextUnitContainer: Phaser.GameObjects.Container;
     nextUnit: Phaser.GameObjects.Image;
-    playedUnits: string[];
-    
 
 
     constructor ()
     {
         super('Game');
-    }
-
-    init(data: {units: string[]}){
-        this.playedUnits = data.units;
     }
 
     createPlayers(){  
@@ -95,7 +89,7 @@ export class Game extends Scene
             this.add.sprite(10, redPos.y-10, 'tower_frontlayer').setOrigin(0,1).setScale(0.8)
         ];
         this.baseRed = new PlayerBase(this, 'red', redPos, this.blueUnitsPhysics, this.redProjectiles, this.objectPool.projectiles.arrows, redSprites[2]);
-        this.playerRed = new Player(this, this.baseRed, redPos, this.redUnitsPhysics, this.blueUnitsPhysics, this.redProjectiles, this.objectPool, this.baseGroup, this.redConfigLoader, this.playedUnits);
+        this.playerRed = new Player(this, this.baseRed, redPos, this.redUnitsPhysics, this.blueUnitsPhysics, this.redProjectiles, this.objectPool, this.baseGroup, this.redConfigLoader);
         this.playerRed.changePassiveIncome(1, true);
         this.playerRed.addMoney(999);
 
@@ -108,7 +102,7 @@ export class Game extends Scene
             this.add.sprite(this.worldWidth-10, this.worldHeight+this.globalOffsetY+35, 'mineBase', 'mine_fg').setOrigin(1,1).setDepth(10).setScale(1.1),
         ];
         this.baseBlue = new PlayerBase(this, 'blue', bluePos, this.redUnitsPhysics, this.blueProjectiles, this.objectPool.projectiles.arrows, redSprites[2]);
-        this.playerBlue = new AIPlayer(this, this.baseBlue, bluePos, this.blueUnitsPhysics, this.redUnitsPhysics, this.blueProjectiles, this.objectPool, this.baseGroup, this.blueConfigLoader, ["warrior"]);
+        this.playerBlue = new AIPlayer(this, this.baseBlue, bluePos, this.blueUnitsPhysics, this.redUnitsPhysics, this.blueProjectiles, this.objectPool, this.baseGroup, this.blueConfigLoader);
         this.playerBlue.changePassiveIncome(1, true);
         this.playerBlue.addMoney(100);
         if(devConfig.AI) this.AIController = new AIController(this.playerBlue, this.playerRed);
@@ -253,7 +247,7 @@ export class Game extends Scene
         this.createPlayers();
         this.setupColliders();
 
-        this.scene.launch('UI', { player: this.playerRed, enemy: this.playerBlue,playedUnits: this.playedUnits }); // Starts the UI scene on top of the game scene
+        this.scene.launch('UI', { player: this.playerRed, enemy: this.playerBlue}); // Starts the UI scene on top of the game scene
 
         if(this.input.keyboard){
             const cursors = this.input.keyboard.createCursorKeys();

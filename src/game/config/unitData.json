@@ -72,7 +72,6 @@
 
     "fireWorm": {
       "extends": "rangedUnit",
-      "attackDamage": 200,
       "offsetY": -32,
       "scale": 1.4,
       "bodyHeight": 96,

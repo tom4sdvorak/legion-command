@@ -47,10 +47,7 @@ export class Preloader extends Scene
 
         this.load.json('animationData', 'data/animations.json');
         this.load.image('single_pixel', 'images/single_pixel.png');
-        this.load.image('tower_red', 'images/tower_red.png');
-        this.load.image('base_blue', 'images/buildings/mine.png');
         this.load.image('background', 'images/bg.png');
-        this.load.atlas('groundAtlas', 'images/grounds/texture.png', 'images/grounds/texture.json');
         this.load.atlas('mineBase', 'images/buildings/mine/texture.png', 'images/buildings/mine/texture.json');
         
 

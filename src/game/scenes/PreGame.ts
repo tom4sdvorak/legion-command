@@ -3,7 +3,6 @@ import { UIComponent } from '../components/UIComponent';
 
 export class PreGame extends Scene
 {
-    unitList = ['warrior', 'archer', 'healer', 'fireWorm', 'gorgon'];
     unitsToTake : string[] = [];
     readyCheck: Phaser.GameObjects.Container;
     gameWidth : number;
@@ -55,12 +54,15 @@ export class PreGame extends Scene
         this.readyCheck.add(noText);
         const yesText = this.add.text(-50, 0, 'Yes', {color: '#000', fontSize: '64px', fontFamily: 'Arial Black'}).setOrigin(1, 0.5).setInteractive().on('pointerup', () => {
             this.readyCheck.setVisible(false);
-            this.scene.start('Game', {units: this.unitsToTake});
+            this.registry.set('playerUnits', this.unitsToTake);
+            this.scene.start('Game');
         });
         this.readyCheck.add(yesText);
 
-        this.unitList.forEach(unit => {
-            const mySprite = this.add.sprite(200, 400, unit, 0).setScale(1.3).setRandomPosition(100, this.gameHeight/3, this.gameWidth*0.6, this.gameHeight/3).setOrigin(0.5).setInteractive().on('pointerup', () => {
+        const unitList : string[] = this.registry.get('allUnits');
+        unitList.forEach(unit => {
+            const mySprite = this.add.sprite(200, 400, unit, 0).setScale(1.3).setRandomPosition(100, this.gameHeight/3, this.gameWidth*0.6, this.gameHeight/3).setOrigin(0.5).setInteractive({ pixelPerfect: true });
+            mySprite.on('pointerup', () => {
                 let destX, destY, direction;
                 if(mySprite.x < (this.gameWidth*0.7)){
                     if(this.unitsToTake.length >= 3) return;
@@ -88,9 +90,19 @@ export class PreGame extends Scene
                         mySprite.play(`${mySprite.texture.key}_idle`);
                     }
                 });
-            }).play(`${unit}_idle`);
-            mySprite.postFX?.addGlow(0x000000, 1, 0, false);
+            });
+            let glow = mySprite.postFX?.addGlow(0x000000, 1, 0, false);
+            mySprite.on('pointerover', () => {
+                mySprite.postFX.remove(glow);
+                glow = mySprite.postFX.addGlow(0xffff00, 10, 0, false, 1, 1);
+            }).on('pointerout', () => {
+                mySprite.postFX.remove(glow);
+                glow = mySprite.postFX?.addGlow(0x000000, 1, 0, false);
+            });
+
+            mySprite.play(`${unit}_idle`);
             mySprite.setDepth(mySprite.y);
+            
         });
 
         this.add.sprite(this.gameWidth/2, this.gameHeight/2, 'firepit_burning').play('firepit_burning').setDisplaySize(64,64);

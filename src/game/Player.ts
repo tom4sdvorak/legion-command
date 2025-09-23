@@ -12,9 +12,23 @@ export class Player extends PlayerController {
 
     constructor(scene: Phaser.Scene, playerBase: PlayerBase, spawnPosition: Phaser.Math.Vector2, ownUnitsPhysics: Phaser.Physics.Arcade.Group,
                 enemyUnitsPhysics: Phaser.Physics.Arcade.Group, projectiles: Phaser.Physics.Arcade.Group,
-                objectPool: ObjectPool, baseGroup: Phaser.GameObjects.Group, configLoader: UnitConfigLoader, selectedUnits: string[])
+                objectPool: ObjectPool, baseGroup: Phaser.GameObjects.Group, configLoader: UnitConfigLoader)
     {
-        super(scene, playerBase, spawnPosition, ownUnitsPhysics, enemyUnitsPhysics, projectiles, objectPool, baseGroup, configLoader, selectedUnits);
+        super(scene, playerBase, spawnPosition, ownUnitsPhysics, enemyUnitsPhysics, projectiles, objectPool, baseGroup, configLoader);
+
+        /* Save base stats of all selected units */
+        let selectedUnits : string[] = this.scene.registry.get('playerUnits');
+        selectedUnits.forEach(unitType => {
+            this.selectedUnits.push({
+                unitType: unitType,
+                unitConfig: this.configLoader.getUnitProps(unitType)
+            });
+            this.unitsUpgrades.push({
+                unitType: unitType,
+                upgrades: []
+            })
+        });
+
         this.faction = 'red';
         this.unitQueueMaxSize = 1;
         // Listener for units dying, awarding human player XP
