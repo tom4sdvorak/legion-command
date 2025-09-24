@@ -286,15 +286,107 @@
       "repeat": 0
     }
   },
-  "firepit": {
+  "campfire": {
     "burning": {
-      "key": "firepit_burning",
+      "key": "campfire_burning",
       "frames": {
         "start": 0,
         "count": 40
       },
       "frameRate": 10,
       "repeat": -1
+    }
+  },
+  "alchemist": {
+    "idle": {
+      "key": "alchemist_idle",
+      "frames": {
+        "start": 0,
+        "count": 6
+      },
+      "frameRate": 10,
+      "repeat": 10,
+      "yoyo": false
+    },
+    "idle2": {
+      "key": "alchemist_idle2",
+      "frames": {
+        "start": 14,
+        "count": 9
+      },
+      "frameRate": 10,
+      "repeat": 0,
+      "yoyo": false
+    },
+    "idleToWork": {
+      "key": "alchemist_idleToWork",
+      "frames": {
+        "start": 28,
+        "count": 3
+      },
+      "frameRate": 10,
+      "repeat": 0,
+      "yoyo": false
+    },
+    "work": {
+      "key": "alchemist_work",
+      "frames": {
+        "start": 42,
+        "count": 10
+      },
+      "frameRate": 10,
+      "repeat": -1,
+      "yoyo": false
+    },
+    "work2": {
+      "key": "alchemist_work2",
+      "frames": {
+        "start": 56,
+        "count": 14
+      },
+      "frameRate": 10,
+      "repeat": -1,
+      "yoyo": false
+    },
+    "workToIdle": {
+      "key": "alchemist_workToIdle",
+      "frames": {
+        "start": 70,
+        "count": 3
+      },
+      "frameRate": 10,
+      "repeat": 0,
+      "yoyo": false
+    },
+    "idleToDialog": {
+      "key": "alchemist_idleToDialog",
+      "frames": {
+        "start": 84,
+        "count": 3
+      },
+      "frameRate": 10,
+      "repeat": 0,
+      "yoyo": false
+    },
+    "dialog": {
+      "key": "alchemist_dialog",
+      "frames": {
+        "start": 98,
+        "count": 10
+      },
+      "frameRate": 10,
+      "repeat": -1,
+      "yoyo": false
+    },
+    "dialogToIdle": {
+      "key": "alchemist_dialogToIdle",
+      "frames": {
+        "start": 112,
+        "count": 3
+      },
+      "frameRate": 10,
+      "repeat": 0,
+      "yoyo": false
     }
   }
 }

@@ -4,7 +4,7 @@ import { UIComponent } from '../components/UIComponent';
 export class PreGame extends Scene
 {
     unitsToTake : string[] = [];
-    readyCheck: Phaser.GameObjects.Container;
+    readyCheck: UIComponent;
     gameWidth : number;
     gameHeight : number;
     readyButton: Phaser.GameObjects.Text;
@@ -28,6 +28,8 @@ export class PreGame extends Scene
         this.add.image(0, 0, 'pregamelayer4').setDisplaySize(this.gameWidth, this.gameHeight).setOrigin(0, 0);
         this.add.image(0, 0, 'pregamelayer5').setDisplaySize(this.gameWidth, this.gameHeight).setOrigin(0, 0);
 
+        this.readyCheckLogic();
+
         this.readyButton = this.add.text(this.gameWidth-100, this.gameHeight-100, 'Selected 0/3', {color: '#000', fontSize: '48px', fontFamily: 'Arial Black'}).setOrigin(1, 1).setInteractive()
             .on('pointerover', () => {
                 if(this.unitsToTake.length < 3) return;
@@ -41,27 +43,10 @@ export class PreGame extends Scene
                 if(this.unitsToTake.length < 3) return;
                 this.readyCheck.setVisible(true);
             });
-    
-
-        const UI = new UIComponent(this, 0, 0, this.gameWidth/2, this.gameHeight/2, 1);
-        this.readyCheck = this.add.container(this.gameWidth/2, this.gameHeight/2);
-        this.readyCheck.add(UI).setVisible(false).setDepth(999);
-        const readyText = this.add.text(0, -this.gameHeight/6, 'Ready?', {color: '#000', fontSize: '64px', fontFamily: 'Arial Black'}).setOrigin(0.5, 0);
-        this.readyCheck.add(readyText);
-        const noText = this.add.text(50, 0, 'No', {color: '#000', fontSize: '64px', fontFamily: 'Arial Black'}).setOrigin(0, 0.5).setInteractive().on('pointerup', () => {
-            this.readyCheck.setVisible(false);
-        });
-        this.readyCheck.add(noText);
-        const yesText = this.add.text(-50, 0, 'Yes', {color: '#000', fontSize: '64px', fontFamily: 'Arial Black'}).setOrigin(1, 0.5).setInteractive().on('pointerup', () => {
-            this.readyCheck.setVisible(false);
-            this.registry.set('playerUnits', this.unitsToTake);
-            this.scene.start('Game');
-        });
-        this.readyCheck.add(yesText);
 
         const unitList : string[] = this.registry.get('allUnits');
         unitList.forEach(unit => {
-            const mySprite = this.add.sprite(200, 400, unit, 0).setScale(1.3).setRandomPosition(100, this.gameHeight/3, this.gameWidth*0.6, this.gameHeight/3).setOrigin(0.5).setInteractive({ pixelPerfect: true });
+            const mySprite = this.add.sprite(200, 400, unit, 0).setScale(1).setRandomPosition(100, this.gameHeight/3, this.gameWidth*0.6, this.gameHeight/3).setOrigin(0.5).setInteractive({ pixelPerfect: true });
             mySprite.on('pointerup', () => {
                 let destX, destY, direction;
                 if(mySprite.x < (this.gameWidth*0.7)){
@@ -104,14 +89,49 @@ export class PreGame extends Scene
             mySprite.setDepth(mySprite.y);
             
         });
+        this.alchemistLogic();
+        this.add.sprite(this.gameWidth/2, this.gameHeight/2, 'campfire').play('campfire_burning').setDisplaySize(64,64);
+    }
 
-        this.add.sprite(this.gameWidth/2, this.gameHeight/2, 'firepit_burning').play('firepit_burning').setDisplaySize(64,64);
-
-        /*this.input.once('pointerup', () => {
-
+    readyCheckLogic(){
+        this.readyCheck = new UIComponent(this, this.gameWidth/2, this.gameHeight/2, this.gameWidth/2, this.gameHeight/2, 1);
+        const readyText = this.add.bitmapText(0, 0, 'pixelFont', 'Ready?', 64).setOrigin(0.5, 0.5);
+        const noText = this.add.bitmapText(0, 0, 'pixelFont', 'No', 64).setOrigin(0.5, 0.5).setInteractive().on('pointerup', () => {
+            this.readyCheck.setVisible(false);
+        });
+        const yesText = this.add.bitmapText(0, 0, 'pixelFont', 'Yes', 64).setOrigin(0.5, 0.5).setInteractive().on('pointerup', () => {
+            this.readyCheck.setVisible(false);
+            this.registry.set('playerUnits', this.unitsToTake);
             this.scene.start('Game');
+        });
+        this.readyCheck.insertElement(readyText);
+        this.readyCheck.insertElement([ noText, yesText ]);
+        this.readyCheck.positionElements(['center', 'center'], 16, 16);
+        this.add.existing(this.readyCheck);
+        this.readyCheck.setVisible(false).setDepth(999);
+    }
 
-        });*/
+    alchemistLogic(){
+        const alchemist = this.add.sprite(100, 300, 'alchemist').play('alchemist_idle').setScale(2);
+        alchemist.setInteractive({ pixelPerfect: true }).on('pointerup', () => {
+            alchemist.playAfterRepeat('alchemist_idleToDialog').playAfterRepeat('alchemist_dialog');
+            this.showPotions();
+        });
+
+        alchemist.on('animationcomplete', (anim : Phaser.Animations.Animation, frame : Phaser.Animations.AnimationFrame) => {
+            switch (anim.key) {
+                case 'alchemist_idle':
+                    alchemist.play('alchemist_idle2');
+                    break;
+                case 'alchemist_idle2':
+                    alchemist.play('alchemist_idle');
+                    break;
+            }
+        });
+
+    }
+    showPotions() {
+        throw new Error('Method not implemented.');
     }
 
     update(){

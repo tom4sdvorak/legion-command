@@ -14,6 +14,10 @@ export class UIComponent extends Phaser.GameObjects.Container {
     private sizeW: number;
     private sizeH: number;
     private borderStroke: Phaser.GameObjects.Graphics;
+    private content: (Phaser.GameObjects.GameObject | Phaser.GameObjects.GameObject[])[] = [];
+    private order: ['left' | 'center' | 'right', 'top' | 'center' | 'bottom'] = ['center', 'center'];
+    private gap: number = 16;
+    private padding: number = 16;
 
     constructor(scene: Phaser.Scene, x: number, y: number, width: number, height: number, background: number) {
         super(scene, x, y);
@@ -43,8 +47,7 @@ export class UIComponent extends Phaser.GameObjects.Container {
 
         this.border = this.scene.add.nineslice(-width/2, -height/2, 'UI_border', undefined, width, height, 8, 8, 6, 6);
         this.border.setOrigin(0, 0);
-        this.add(this.border);
-        
+        this.add(this.border);        
     }
 
     public getWidth(): number {
@@ -77,5 +80,166 @@ export class UIComponent extends Phaser.GameObjects.Container {
         }
         this.border.setTint(borderTint);
         if(bgTint !== undefined) this.background.setTint(bgTint);
+    }
+
+    /**
+     * Adds gameObject into the UI and reorganizes all the content
+     * @param element GameObject to add
+     */
+    public insertElement(element: Phaser.GameObjects.GameObject | Phaser.GameObjects.GameObject[]): void {
+        if(Array.isArray(element)){
+            element.forEach(e => {
+                if('displayHeight' in e){
+                    this.add(e);
+                }
+                else{
+                    console.error('UIComponent: insertElement() called with invalid element!');
+                }
+                
+            });
+            this.content.push(element);
+        }
+        else if('displayHeight' in element){
+            this.add(element);
+            this.content.push(element);
+        }
+        else{
+            console.error('UIComponent: insertElement() called with invalid element!');
+        }
+
+        this.positionElements(this.order);
+        
+    }
+
+    public setPadding(padding: number): void {
+        this.padding = padding;
+        this.positionElements(this.order);
+    }
+
+    public setGap(gap: number): void {
+        this.gap = gap;
+        this.positionElements(this.order);
+    }
+
+    /**
+     * @param position an array of two strings ['left' | 'center' | 'right', 'top' | 'center' | 'bottom']
+     * @param gap the distance between elements in pixels, default is the current gap
+     * @param padding the distance between elements and the border in pixels, default is the current padding
+     */
+    positionElements(position: ['left' | 'center' | 'right', 'top' | 'center' | 'bottom'] = ['center', 'center'], gap: number = this.gap, padding: number = this.padding): void {
+        this.order = position;
+        this.gap = gap;
+        this.padding = padding;
+
+        // Helper function for typescript to check element properties/methods
+        function isLayoutElement(element: any): element is { setOrigin: Function, setPosition: Function, displayHeight: number, displayWidth: number, originY: number } {
+            return 'setOrigin' in element && 'setPosition' in element && 'displayHeight' in element && 'displayWidth' in element && 'originY' in element;
+        }
+
+        const itemCount = this.content.length;
+        if(itemCount <= 0) {
+            console.error('UIComponent: positionElements() called without any elements!');
+            return;
+        }
+
+        // Calculate height of all elements
+        const totalContentHeight = this.content.reduce((height, obj) => {
+            // Check if the current item is an array and use the first element if it is
+            const item = Array.isArray(obj) ? obj[0] : obj;
+            if(isLayoutElement(item)){
+                return height + item.displayHeight;
+            }
+            else{
+                console.error('UIComponent: positionElements() called with invalid element!');
+                return height;
+            }
+        }, 0) + (itemCount - 1) * this.gap;
+
+        // Figure out starting vertical position
+        let startY;
+        switch (position[1]) {
+            case 'top':
+                startY = (-this.sizeH / 2) + this.padding;
+                break;
+            case 'bottom':
+                startY = (this.sizeH / 2) - totalContentHeight - this.padding;
+                break;
+            case 'center':
+            default:
+                startY = -totalContentHeight / 2;
+                break;
+        }
+
+        // Figure out starting horizontal position
+        let startX, originX;
+        switch (position[0]) {
+            case 'left':
+                startX = (-this.sizeW / 2) + this.padding;
+                originX = 0;
+                break;
+            case 'right':
+                startX = (this.sizeW / 2) - this.padding;
+                originX = 1;
+                break;
+            default:
+                startX = 0;
+                originX = 0.5;
+                break;
+        }
+
+        let posY = startY;
+        // Loop thrugh all elements positioning them correctly
+        this.content.forEach((element, index) => {
+            // If element is instead array of elements, position them next to each other on current Y position, respecting horizontal align (left, center, right)
+            if(Array.isArray(element)){
+                if(element.length <= 0){
+                    console.error('UIComponent: positionElements() called with empty array as element');
+                    return;
+                }
+                // Calculate width of all elements in the array
+                const totalContentWidth = element.reduce((width, obj) => {
+                    if(isLayoutElement(obj)){
+                        return width + obj.displayWidth;
+                    }
+                    else{
+                        console.error('UIComponent: positionElements() called with invalid element!');
+                        return width;
+                    }
+                }, 0) + (element.length - 1) * this.gap;
+                let posX = startX;
+
+                // Figure out starting horizontal position
+                switch (position[0]) {
+                    case 'center':   
+                        posX = posX - totalContentWidth / 2; 
+                        break;
+                    case 'right':  
+                        posX = posX-totalContentWidth;
+                        break;
+                    default: 
+                        break;
+                }
+
+                // Loop thru the elements inside array and position them correctly in current row
+                element.forEach(e => {
+                    if(isLayoutElement(e)){
+                        console.log("Setting position of " + e.constructor.name + " to " + posX + " with width of " + e.displayWidth);
+                        e.setOrigin(0, 0.5);
+                        e.setPosition(posX, posY + (e.displayHeight * e.originY));
+                        posX += e.displayWidth + this.gap;
+                        
+                    }
+                });
+                // Move to next row by height of first element in array and gap
+                if(isLayoutElement(element[0])) posY += element[0].displayHeight + this.gap;
+            }
+            else{
+                if(isLayoutElement(element)){
+                    element.setOrigin(originX, 0.5);
+                    element.setPosition(startX, posY + (element.displayHeight * element.originY));
+                    posY += element.displayHeight + this.gap;
+                }
+            }
+        });
     }
 }
