@@ -1,0 +1,30 @@
+[
+  {
+    "id": "potion_might",
+    "name": "Might",
+    "description": "Units damage +20%",
+    "cost": 1,
+    "effects": [
+      { "stat": "attackDamage", "type": "percent", "value": 0.20 },
+      { "stat": "specialDamage", "type": "percent", "value": 0.20 }
+    ]
+  },
+  {
+    "id": "potion_health",
+    "name": "Health",
+    "description": "Units health +20%",
+    "cost": 1,
+    "effects": [
+      { "stat": "maxHealth", "type": "percent", "value": 0.20 }
+    ]
+  },
+  {
+    "id": "potion_speed",
+    "name": "Swiftness",
+    "description": "Units move speed +30%",
+    "cost": 1,
+    "effects": [
+      { "stat": "speed", "type": "percent", "value": 0.30 }
+    ]
+  }
+]

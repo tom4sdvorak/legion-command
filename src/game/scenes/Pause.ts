@@ -37,9 +37,11 @@ export class Pause extends Scene {
             const upgradeName = this.add.bitmapText(0, (32-UIElementHeight/2), 'pixelFont', upgrade.name, 32).setOrigin(0.5, 0).setMaxWidth(UIElementWidth-32);
             const upgradeDescription = this.add.bitmapText(0, (-UIElementHeight/4), 'pixelFont', upgrade.description, 16).setOrigin(0.5, 0).setMaxWidth(UIElementWidth-32);
             const unitSprite = this.add.sprite(0, UIElementHeight/2, `${selectedUnit.unitType}_static`).setOrigin(0, 1);
-            upgradeUIElement.add(unitSprite);
-            upgradeUIElement.add(upgradeName);
-            upgradeUIElement.add(upgradeDescription);
+            upgradeUIElement.insertElement(unitSprite);
+            upgradeUIElement.insertElement(upgradeName);
+            upgradeUIElement.insertElement(upgradeDescription);
+            upgradeUIElement.positionElements(['center', 'top'], 32, 16);
+
             container.add(upgradeUIElement);
             currentPosX += UIElementWidth + gap;
             let currentGlow : any;
@@ -81,21 +83,23 @@ export class Pause extends Scene {
     public showMenu() {
         this.menu = new UIComponent(this, this.cameras.main.width/2, this.cameras.main.height/2, this.cameras.main.width/2, this.cameras.main.height/2, 1);
         const interactableGroup = this.add.group();
-        const resumeButton = this.add.bitmapText(0, -64, 'pixelFont', 'Resume', 48).setOrigin(0.5, 0.5).setInteractive().on('pointerup', () => this.resume());
-        const slowDownButton = this.add.bitmapText(-128, 0, 'pixelFont', '<', 64).setOrigin(0.5, 0.5).setInteractive().on('pointerup', () => {
+        const resumeButton = this.add.bitmapText(0, 0, 'pixelFont', 'Resume', 48).setOrigin(0.5, 0.5).setInteractive().on('pointerup', () => this.resume());
+        const slowDownButton = this.add.bitmapText(0, 0, 'pixelFont', '<', 64).setOrigin(0.5, 0.5).setInteractive().on('pointerup', () => {
             if(this.gameSpeed > 1){
                 this.gameSpeed--;
                 gameSpeedText.setText(`Speed: ${this.gameSpeed}`);
             } 
         });
         const gameSpeedText = this.add.bitmapText(0, 0, 'pixelFont', `Speed: ${this.gameSpeed}`, 48).setOrigin(0.5, 0.5);
-        const speedUpButton = this.add.bitmapText(128, 0, 'pixelFont', '>', 64).setOrigin(0.5, 0.5).setInteractive().on('pointerup', () => {
+        const speedUpButton = this.add.bitmapText(0, 0, 'pixelFont', '>', 64).setOrigin(0.5, 0.5).setInteractive().on('pointerup', () => {
             if(this.gameSpeed < 3){
                 this.gameSpeed++;
                 gameSpeedText.setText(`Speed: ${this.gameSpeed}`);
             } 
         });
-        this.menu.add([resumeButton, slowDownButton, gameSpeedText, speedUpButton]);
+        this.menu.insertElement(resumeButton);
+        this.menu.insertElement([slowDownButton, gameSpeedText, speedUpButton]);
+        this.menu.positionElements(['center', 'center'], 32, 32);
         interactableGroup.add(resumeButton);
         interactableGroup.add(slowDownButton);
         interactableGroup.add(speedUpButton);

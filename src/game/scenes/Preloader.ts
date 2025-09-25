@@ -29,22 +29,14 @@ export class Preloader extends Scene
 
     preload ()
     {
-        //  Load the assets for the game - Replace with your own assets
-        this.load.setPath('src');
-        this.load.json('unitData', '/game/config/unitData.json');
-        this.load.json('unitUpgrades', '/game/config/unitUpgrades.json');
+        // Load data jsons
+        this.load.setPath('src/game/config');
+        this.load.json('unitData', 'unitData.json');
+        this.load.json('unitUpgrades', 'unitUpgrades.json');
+        this.load.json('potionData', 'potionData.json');
 
         this.load.setPath('assets');
         this.load.bitmapFont('pixelFont', 'fonts/BoldPixels.png', 'fonts/BoldPixels.xml');
-        
-        // Load font
-        //this.load.xml('pixelFont-xml', 'fonts/BoldPixels.xml');
-        //this.load.image('pixelFont-img', 'fonts/BoldPixels.png');
-        /*this.load.on('complete', () => {
-            // Manually add the font after both files have loaded
-            this.cache.bitmapFont.add('pixelFont', this.textures.get('pixelFont-img'), this.cache.xml.get('pixelFont-xml'));
-        });*/
-
         this.load.json('animationData', 'data/animations.json');
         this.load.image('single_pixel', 'images/single_pixel.png');
         this.load.image('background', 'images/bg.png');

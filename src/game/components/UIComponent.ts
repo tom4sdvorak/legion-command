@@ -23,6 +23,7 @@ export class UIComponent extends Phaser.GameObjects.Container {
         super(scene, x, y);
         this.sizeW = width;
         this.sizeH = height;
+        this.setSize(width, height);
         let chosenBackground : string;
         switch (background) {
             case 0:
@@ -111,6 +112,11 @@ export class UIComponent extends Phaser.GameObjects.Container {
         
     }
 
+    public setVisible(visible: boolean): this {
+        this.emit('uicomponent-visibility-changed', visible);
+        return super.setVisible(visible);
+    }
+
     public setPadding(padding: number): void {
         this.padding = padding;
         this.positionElements(this.order);
@@ -132,8 +138,8 @@ export class UIComponent extends Phaser.GameObjects.Container {
         this.padding = padding;
 
         // Helper function for typescript to check element properties/methods
-        function isLayoutElement(element: any): element is { setOrigin: Function, setPosition: Function, displayHeight: number, displayWidth: number, originY: number } {
-            return 'setOrigin' in element && 'setPosition' in element && 'displayHeight' in element && 'displayWidth' in element && 'originY' in element;
+        function isLayoutElement(element: any): element is { setPosition: Function, displayHeight: number, displayWidth: number, originY: number } {
+            return 'setPosition' in element && 'displayHeight' in element && 'displayWidth' in element && 'originY' in element;
         }
 
         const itemCount = this.content.length;
@@ -223,8 +229,8 @@ export class UIComponent extends Phaser.GameObjects.Container {
                 // Loop thru the elements inside array and position them correctly in current row
                 element.forEach(e => {
                     if(isLayoutElement(e)){
-                        console.log("Setting position of " + e.constructor.name + " to " + posX + " with width of " + e.displayWidth);
-                        e.setOrigin(0, 0.5);
+                        // @ts-ignore
+                        if('setOrigin' in e) e.setOrigin(0, 0.5);
                         e.setPosition(posX, posY + (e.displayHeight * e.originY));
                         posX += e.displayWidth + this.gap;
                         
@@ -235,7 +241,8 @@ export class UIComponent extends Phaser.GameObjects.Container {
             }
             else{
                 if(isLayoutElement(element)){
-                    element.setOrigin(originX, 0.5);
+                    // @ts-ignore
+                    if('setOrigin' in element) element.setOrigin(originX, 0.5);
                     element.setPosition(startX, posY + (element.displayHeight * element.originY));
                     posY += element.displayHeight + this.gap;
                 }

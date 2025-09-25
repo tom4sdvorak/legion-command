@@ -293,7 +293,7 @@
         "start": 0,
         "count": 40
       },
-      "frameRate": 10,
+      "frameRate": 0,
       "repeat": -1
     }
   },
@@ -305,7 +305,7 @@
         "count": 6
       },
       "frameRate": 10,
-      "repeat": 10,
+      "repeat": 0,
       "yoyo": false
     },
     "idle2": {
@@ -314,7 +314,7 @@
         "start": 14,
         "count": 9
       },
-      "frameRate": 10,
+      "frameRate": 7,
       "repeat": 0,
       "yoyo": false
     },
@@ -335,7 +335,7 @@
         "count": 10
       },
       "frameRate": 10,
-      "repeat": -1,
+      "repeat": 0,
       "yoyo": false
     },
     "work2": {
@@ -345,7 +345,7 @@
         "count": 14
       },
       "frameRate": 10,
-      "repeat": -1,
+      "repeat": 0,
       "yoyo": false
     },
     "workToIdle": {
@@ -375,7 +375,7 @@
         "count": 10
       },
       "frameRate": 10,
-      "repeat": -1,
+      "repeat": 0,
       "yoyo": false
     },
     "dialogToIdle": {

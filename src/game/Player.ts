@@ -18,6 +18,12 @@ export class Player extends PlayerController {
 
         /* Save base stats of all selected units */
         let selectedUnits : string[] = this.scene.registry.get('playerUnits');
+        const potionBuff = this.scene.registry.get('playerPotion');
+        let initialUpgrades : UnitUpgrade[] = [];
+        if(potionBuff !== undefined){
+            const initialUpgrade : UnitUpgrade = {...potionBuff, rarity: "potion", tags: [] as string[]};
+            initialUpgrades.push(initialUpgrade);
+        }
         selectedUnits.forEach(unitType => {
             this.selectedUnits.push({
                 unitType: unitType,
@@ -25,7 +31,7 @@ export class Player extends PlayerController {
             });
             this.unitsUpgrades.push({
                 unitType: unitType,
-                upgrades: []
+                upgrades: [...initialUpgrades]
             })
         });
 
