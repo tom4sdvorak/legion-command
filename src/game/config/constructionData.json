@@ -1,0 +1,74 @@
+[
+  {
+    "id": "watchtower_1",
+    "name": "Basic Watchtower",
+    "description": "Simple watchtower with an archer.",
+    "type": "watchtower",
+    "cost": 1,
+    "effects": [
+      { "stat": "baseDamage", "type": "flat", "value": 10 },
+      { "stat": "baseRange", "type": "flat", "value": 100 },
+      { "stat": "baseProjectiles", "type": "arrows", "value": -1 }
+    ],
+    "prerequisites": []
+  },
+  {
+    "id": "watchtower_2",
+    "name": "Flaming Arrow Watchtower",
+    "description": "Now with a flaming arrows.",
+    "type": "watchtower",
+    "cost": 1,
+    "effects": [
+      { "stat": "baseDamage", "type": "flat", "value": 20 },
+      { "stat": "baseRange", "type": "flat", "value": 100 },
+      { "stat": "baseProjectiles", "type": "fireballs", "value": -1 }
+    ],
+    "prerequisites": ["watchtower_1"]
+  },
+  {
+    "id": "walls_1",
+    "name": "Basic walls",
+    "description": "Some walls to last longer.",
+    "type": "walls",
+    "cost": 1,
+    "effects": [
+      { "stat": "baseMaxHealth", "type": "percent", "value": 0.1 }
+    ],
+    "prerequisites": []
+  },
+  {
+    "id": "walls_2",
+    "name": "Better walls",
+    "description": "Bit better walls to last longer.",
+    "type": "walls",
+    "cost": 1,
+    "effects": [
+      { "stat": "baseMaxHealth", "type": "percent", "value": 0.2 }
+    ],
+    "prerequisites": ["walls_1"]
+  },
+  {
+    "id": "campfire_1",
+    "name": "Campfire",
+    "description": "Campfire to warm foodbodies and food, increasing morale (health, speed) by a bit.",
+    "type": "campfire",
+    "cost": 1,
+    "effects": [
+      { "stat": "speed", "type": "percent", "value": 0.05 },
+      { "stat": "maxHealth", "type": "percent", "value": 0.05 }
+    ],
+    "prerequisites": []
+  },
+  {
+    "id": "campfire_2",
+    "name": "Campfire with cauldron",
+    "description": "Better meals, better morale (health, speed).",
+    "type": "campfire",
+    "cost": 1,
+    "effects": [
+      { "stat": "speed", "type": "percent", "value": 0.1 },
+      { "stat": "maxHealth", "type": "percent", "value": 0.1 }
+    ],
+    "prerequisites": ["campfire_1"]
+  }
+]

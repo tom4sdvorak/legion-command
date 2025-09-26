@@ -388,5 +388,16 @@
       "repeat": 0,
       "yoyo": false
     }
+  },
+  "sawmill": {
+    "work": {
+      "key": "sawmill_work",
+      "frames": {
+        "start": 0,
+        "count": 6
+      },
+      "frameRate": 10,
+      "repeat": -1
+    }
   }
 }

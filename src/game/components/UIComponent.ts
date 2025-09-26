@@ -68,6 +68,22 @@ export class UIComponent extends Phaser.GameObjects.Container {
     }
 
     /**
+     * 
+     * @returns Array with the content of the UI component
+     */
+    public getContent(): (Phaser.GameObjects.GameObject | Phaser.GameObjects.GameObject[])[] {
+        return this.content;
+    }
+
+    /**
+     * 
+     * @returns Number of items in the UI component's content array
+     */
+    public getContentLength(): number {
+        return this.content.length;
+    }
+
+    /**
      * Changes tint of the UI elements borders and background separately
      * @param borderTint hex color to change to or -1 to clear
      * @param bgTint optional, hex color to change to or -1 to clear
@@ -229,11 +245,18 @@ export class UIComponent extends Phaser.GameObjects.Container {
                 // Loop thru the elements inside array and position them correctly in current row
                 element.forEach(e => {
                     if(isLayoutElement(e)){
-                        // @ts-ignore
-                        if('setOrigin' in e) e.setOrigin(0, 0.5);
+                        if(e instanceof Phaser.GameObjects.Container){
+                            e.getAll().forEach(child => {
+                                // @ts-ignore
+                                if('setOrigin' in child) child.setOrigin(0, 0.5);
+                            });
+                        }
+                        else{
+                            // @ts-ignore
+                            if('setOrigin' in e) e.setOrigin(0, 0.5);
+                        }
                         e.setPosition(posX, posY + (e.displayHeight * e.originY));
                         posX += e.displayWidth + this.gap;
-                        
                     }
                 });
                 // Move to next row by height of first element in array and gap
@@ -241,10 +264,19 @@ export class UIComponent extends Phaser.GameObjects.Container {
             }
             else{
                 if(isLayoutElement(element)){
-                    // @ts-ignore
-                    if('setOrigin' in element) element.setOrigin(originX, 0.5);
+                    if(element instanceof Phaser.GameObjects.Container){
+                        element.getAll().forEach(child => {
+                            // @ts-ignore
+                            if('setOrigin' in child) child.setOrigin(originX, 0.5);
+                        });
+                    }
+                    else{
+                        // @ts-ignore
+                        if('setOrigin' in element) element.setOrigin(originX, 0.5);
+                    }
                     element.setPosition(startX, posY + (element.displayHeight * element.originY));
                     posY += element.displayHeight + this.gap;
+                    
                 }
             }
         });

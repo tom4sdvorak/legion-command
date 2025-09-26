@@ -34,6 +34,7 @@ export class Preloader extends Scene
         this.load.json('unitData', 'unitData.json');
         this.load.json('unitUpgrades', 'unitUpgrades.json');
         this.load.json('potionData', 'potionData.json');
+        this.load.json('constructionData', 'constructionData.json');
 
         this.load.setPath('assets');
         this.load.bitmapFont('pixelFont', 'fonts/BoldPixels.png', 'fonts/BoldPixels.xml');
@@ -52,6 +53,7 @@ export class Preloader extends Scene
         this.load.image('tent_large', 'tent_large.png');
         this.load.image('tower', 'tower.png');
         this.load.image('tower_frontlayer', 'tower_frontlayer.png');
+        this.load.image('poles', 'poles.png');
 
         // UI
         this.load.setPath('assets/images/UI');
@@ -95,6 +97,7 @@ export class Preloader extends Scene
         this.load.setPath('assets/sprites/other');
         this.load.spritesheet('campfire', 'campfire/sprite_sheet.png',{frameWidth: 32, frameHeight: 32});
         this.load.spritesheet('alchemist', 'alchemist/sprite_sheet.png',{frameWidth: 64, frameHeight: 64});
+        this.load.spritesheet('sawmill', 'sawmill/sprite_sheet.png',{frameWidth: 64, frameHeight: 64});
         
     }
 

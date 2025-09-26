@@ -16,6 +16,7 @@ import { FireWorm } from '../units/FireWorm';
 import { Fireball } from '../projectiles/Fireball';
 import { AIPlayer } from '../AIPlayer';
 import { Gorgon } from '../units/Gorgon';
+import { UnitUpgrade } from '../helpers/UnitUpgrade';
 
 export class Game extends Scene
 {
@@ -82,16 +83,12 @@ export class Game extends Scene
 
         // Create and setup main player
         const redPos = new Phaser.Math.Vector2(0, this.worldHeight+this.globalOffsetY);
-        const redSprites = [
-            this.add.sprite(50, redPos.y, 'tent').setOrigin(0,1).setScale(1.5).setDepth(11),
-            this.add.sprite(10, redPos.y-10, 'tower').setOrigin(0,1).setScale(0.8),
-            this.add.sprite(-10, redPos.y-165, 'archer').setOrigin(0,1),
-            this.add.sprite(10, redPos.y-10, 'tower_frontlayer').setOrigin(0,1).setScale(0.8)
-        ];
-        this.baseRed = new PlayerBase(this, 'red', redPos, this.blueUnitsPhysics, this.redProjectiles, this.objectPool.projectiles.arrows, redSprites[2]);
+        this.add.sprite(50, redPos.y, 'tent').setOrigin(0,1).setScale(1.5).setDepth(11);
+        this.baseRed = new PlayerBase(this, 'red', redPos, this.blueUnitsPhysics, this.redProjectiles);
         this.playerRed = new Player(this, this.baseRed, redPos, this.redUnitsPhysics, this.blueUnitsPhysics, this.redProjectiles, this.objectPool, this.baseGroup, this.redConfigLoader);
         this.playerRed.changePassiveIncome(1, true);
         this.playerRed.addMoney(999);
+        this.applyPermaUpgrades();
 
         // Create and setup AI player
         const bluePos = new Phaser.Math.Vector2(this.worldWidth, this.worldHeight+this.globalOffsetY);
@@ -101,7 +98,7 @@ export class Game extends Scene
             this.add.sprite(this.worldWidth-10, this.worldHeight+this.globalOffsetY+35, 'mineBase', 'mine_bg').setOrigin(1,1).setScale(1.1),
             this.add.sprite(this.worldWidth-10, this.worldHeight+this.globalOffsetY+35, 'mineBase', 'mine_fg').setOrigin(1,1).setDepth(10).setScale(1.1),
         ];
-        this.baseBlue = new PlayerBase(this, 'blue', bluePos, this.redUnitsPhysics, this.blueProjectiles, this.objectPool.projectiles.arrows, redSprites[2]);
+        this.baseBlue = new PlayerBase(this, 'blue', bluePos, this.redUnitsPhysics, this.blueProjectiles);
         this.playerBlue = new AIPlayer(this, this.baseBlue, bluePos, this.blueUnitsPhysics, this.redUnitsPhysics, this.blueProjectiles, this.objectPool, this.baseGroup, this.blueConfigLoader);
         this.playerBlue.changePassiveIncome(1, true);
         this.playerBlue.addMoney(100);
@@ -109,6 +106,75 @@ export class Game extends Scene
 
         this.baseGroup.add(this.baseRed);
         this.baseGroup.add(this.baseBlue);
+    }
+
+    applyPermaUpgrades(){
+        const constructionJson = this.cache.json.get('constructionData');
+        
+        // Get list of ID of all bought upgrades 
+        const allBuiltConstructions : string[] = this.registry.get('builtonstructions') ?? [];
+        let highestUpgrades = new Map<string, number>();
+        let permaUpgrades = new Map<string, { stat: string; type: string; value: number }[]>();
+
+        // Get highest tier of each upgrade
+        allBuiltConstructions.forEach(conID => {
+            const construction = conID.split('_');
+            const buildingName = construction[0];
+            const currentTier = parseInt(construction[1]);
+
+            if(!highestUpgrades.has(buildingName)) highestUpgrades.set(buildingName, 0);
+            if (highestUpgrades.get(buildingName)! < currentTier) { highestUpgrades.set(buildingName, currentTier); }
+        });
+
+        // Get data from JSON for each upgrade
+        highestUpgrades.forEach((tier, building) => {
+            const construction = constructionJson.find((con: any) => con.id === `${building}_${tier}`);
+            if(construction){
+                permaUpgrades.set(construction.type, construction.effects);
+            }
+        });
+
+        permaUpgrades.forEach((effects, type) => {
+            switch (type) {
+                case 'watchtower':
+                    //Retrieve the stats
+                    const baseDamage : number = effects.find(effect => effect.stat === 'baseDamage')?.value ?? 0;
+                    const baseRange : number = effects.find(effect => effect.stat === 'baseRange')?.value ?? 0;
+                    const baseProjectiles : string = effects.find(effect => effect.stat === 'baseProjectiles')?.type ?? '';
+
+                    // Retrieve correct object pool
+                    type ProjectileKey = keyof ObjectPool['projectiles'];
+                    const key = baseProjectiles as ProjectileKey;
+                    const projectileGroup = this.objectPool.projectiles[key];
+                    if(projectileGroup === undefined) return;
+
+                    this.baseRed.enableWatchtower(baseDamage, baseRange, projectileGroup);
+                    break;
+                case 'walls':
+                    const baseMaxHealthMultiplier : number = effects.find(effect => effect.stat === 'baseMaxHealth')?.value ?? 0;
+                    this.baseRed.setMaxHealth(this.baseRed.getMaxHealth() * (baseMaxHealthMultiplier+1));
+                    this.baseRed.buildWalls();
+                    break;
+                case 'campfire':
+                    // Translate construction upgrade as unit upgrade
+                    const newUnitUpgrade : UnitUpgrade = {
+                        id: "campfire_buff",
+                        name: "Campfire Buff",
+                        description: "Increased morale",
+                        rarity: "common",
+                        tags: [],
+                        effects: effects,
+                    }
+                    // Apply to all units of player
+                    this.playerRed.unitsUpgrades.forEach(unit => {
+                        unit.upgrades.push(newUnitUpgrade);
+                    });
+                    break;
+                default:
+                    break;
+            }
+        });
+
     }
 
     onUnitRemoved(unit: Unit){

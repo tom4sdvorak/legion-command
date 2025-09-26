@@ -11,7 +11,7 @@ export class PlayerBase extends Phaser.Physics.Arcade.Sprite{
     yOffset: number; // How high from groundLevel to spawn
     proximityZone: Phaser.GameObjects.Zone;
     enemiesInRange: Unit[] = [];
-    attackDamage: number = 70;
+    damage: number = 0;
     isShooting: boolean = false;
     attackSpeed: number = 1000;
     shootingTimer: Phaser.Time.TimerEvent | null = null;
@@ -25,9 +25,12 @@ export class PlayerBase extends Phaser.Physics.Arcade.Sprite{
     sizeH: number = 300;
     healthComponent : HealthComponent;
     shootingSprite: Phaser.GameObjects.Sprite;
+    watchtowerEnabled: boolean = false;
+    spawnPosition: Phaser.Math.Vector2;
 
-    constructor(scene: Game, faction: 'red' | 'blue', spawnPosition: Phaser.Math.Vector2, enemyUnitsPhysics: Phaser.Physics.Arcade.Group, projectiles: Phaser.Physics.Arcade.Group, projectilePool: Phaser.Physics.Arcade.Group, shootingSprite: Phaser.GameObjects.Sprite) {
+    constructor(scene: Game, faction: 'red' | 'blue', spawnPosition: Phaser.Math.Vector2, enemyUnitsPhysics: Phaser.Physics.Arcade.Group, projectiles: Phaser.Physics.Arcade.Group) {
         super(scene, spawnPosition.x, spawnPosition.y, 'single_pixel');
+        this.spawnPosition = spawnPosition;
         const offsetX = (faction === 'blue') ? spawnPosition.x-this.sizeW : spawnPosition.x+100;
         this.setPosition(offsetX, spawnPosition.y-this.sizeH/2);
         this.setOrigin(0, 1);
@@ -35,24 +38,11 @@ export class PlayerBase extends Phaser.Physics.Arcade.Sprite{
         this.faction = faction;
         this.scene = scene;
         this.projectiles = projectiles;
-        this.projectilePool = projectilePool;
-        this.shootingSprite = shootingSprite;
-        this.shootingSprite.play(`${this.shootingSprite.texture.key}_idle`);
         scene.physics.add.existing(this, true);
         this.setPushable(false);
         this.setImmovable(true);
         this.setBodySize(this.sizeW, this.sizeH, true);
         this.body?.setOffset(0,-this.sizeH/2);
-
-        
-        // Create proximity zone around base to detect units
-        
-        const zoneOffsetX = (faction === 'blue') ? this.x-this.range : this.x+this.sizeW;
-        this.proximityZone = this.scene.add.zone(zoneOffsetX, this.y+this.sizeH/2, this.range, this.sizeH);
-        this.proximityZone.setOrigin(0, 1);
-        this.scene.physics.add.existing(this.proximityZone, true);
-        (this.proximityZone.body as Phaser.Physics.Arcade.Body).pushable = false;
-        (this.proximityZone.body as Phaser.Physics.Arcade.Body).allowGravity = false;
 
         // Add healthbar
         this.healthComponent = new HealthComponent(this, 5000, false, this.sizeW, 20, spawnPosition.y-this.sizeH/2);
@@ -66,37 +56,39 @@ export class PlayerBase extends Phaser.Physics.Arcade.Sprite{
         }
         super.update(time, delta);
         this.healthComponent.update();
-        this.checkForEnemies();
+        
+        if(this.watchtowerEnabled){
+            this.checkForEnemies();
 
-        // Clear dead enemies from range list
-        for (let i = this.enemiesInRange.length - 1; i >= 0; i--) {
-            if (!this.enemiesInRange[i].isAlive()) {
-                this.enemiesInRange.splice(i, 1);
+            // Clear dead enemies from range list
+            for (let i = this.enemiesInRange.length - 1; i >= 0; i--) {
+                if (!this.enemiesInRange[i].isAlive()) {
+                    this.enemiesInRange.splice(i, 1);
+                }
+            }
+
+            // Sort list of enemies in range by distance
+            if(this.faction  === 'red'){
+                this.enemiesInRange.sort((a, b) => {
+                    return a.x - b.x;
+                }); 
+            }
+            else{
+                this.enemiesInRange.sort((a, b) => {
+                    return b.x - a.x;
+                });
+            }
+
+            // Start attacking if there are enemies in range
+            if(this.enemiesInRange.length > 0 && this.isShooting === false){
+                this.startShooting();
+            }
+
+            // Stop attacking if there are no enemies in range
+            if(this.enemiesInRange.length === 0 && this.isShooting === true){
+                this.stopShooting();
             }
         }
-
-        // Sort list of enemies in range by distance
-        if(this.faction  === 'red'){
-            this.enemiesInRange.sort((a, b) => {
-                return a.x - b.x;
-            }); 
-        }
-        else{
-            this.enemiesInRange.sort((a, b) => {
-                return b.x - a.x;
-            });
-        }
-
-        // Start attacking if there are enemies in range
-        if(this.enemiesInRange.length > 0 && this.isShooting === false){
-            this.startShooting();
-        }
-
-        // Stop attacking if there are no enemies in range
-        if(this.enemiesInRange.length === 0 && this.isShooting === true){
-            this.stopShooting();
-        }
-
     }
 
     die(): void {
@@ -118,6 +110,35 @@ export class PlayerBase extends Phaser.Physics.Arcade.Sprite{
         }, undefined, this);
     }
 
+    public enableWatchtower(dmg: number, range: number, projectilePool: Phaser.Physics.Arcade.Group): void {
+        this.projectilePool = projectilePool;
+        this.damage = dmg;
+        this.range = range;
+        
+        this.scene.add.sprite(10, this.spawnPosition.y-15, 'tower').setOrigin(0,1).setScale(0.8).setDepth(2);
+        this.shootingSprite = this.scene.add.sprite(-15, this.spawnPosition.y-165, 'archer').setOrigin(0,1).setDepth(2);
+        this.scene.add.sprite(10, this.spawnPosition.y-15, 'tower_frontlayer').setOrigin(0,1).setScale(0.8).setDepth(2);
+        this.shootingSprite.play(`${this.shootingSprite.texture.key}_idle`);
+
+        // Create proximity zone around base to detect units
+        const zoneOffsetX = (this.faction === 'blue') ? this.x-this.range : this.x+this.sizeW;
+        this.proximityZone = this.scene.add.zone(zoneOffsetX, this.y+this.sizeH/2, this.range, this.sizeH);
+        this.proximityZone.setOrigin(0, 1);
+        this.scene.physics.add.existing(this.proximityZone, true);
+        (this.proximityZone.body as Phaser.Physics.Arcade.Body).pushable = false;
+        (this.proximityZone.body as Phaser.Physics.Arcade.Body).allowGravity = false;
+
+        this.watchtowerEnabled = true;
+    }
+
+    public buildWalls(): void {
+        this.scene.add.tileSprite(0, this.spawnPosition.y-16, 32*8, 0, 'poles').setOrigin(0,1).setDepth(1);
+    }
+
+    public setMaxHealth(maxHealth: number): void {
+        this.healthComponent.setHealth(maxHealth);
+    }
+
     public takeDamage(damage: number): void {
         this.healthComponent.takeDamage(damage);
         eventsCenter.emit('base-take-damage', this.faction);
@@ -136,7 +157,6 @@ export class PlayerBase extends Phaser.Physics.Arcade.Sprite{
     }
 
     public startShooting(): void {
-        console.log("Start shooting");
         this.isShooting = true;
         this.shootingSprite.play(`${this.shootingSprite.texture.key}_shoot`, true);
         this.shootingSprite.anims.timeScale = (this.shootingSprite.anims?.currentAnim?.duration ?? 1) / this.attackSpeed;
@@ -172,7 +192,7 @@ export class PlayerBase extends Phaser.Physics.Arcade.Sprite{
         const projectile = this.projectilePool.get(this.x, this.y);
         if (!projectile) return;
         if(projectile instanceof Projectile){
-            projectile.damage = this.attackDamage;
+            projectile.damage = this.damage;
             projectile.spawn(this.projectiles, this.projectilePool);
         }
         // Calculate projectile angle and launch it

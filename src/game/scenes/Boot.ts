@@ -17,6 +17,7 @@ export class Boot extends Scene
 
     create ()
     {
+        // Save list of all unit types
         this.registry.set('allUnits', ['warrior', 'archer', 'healer', 'fireWorm', 'gorgon']);
         this.scene.start('Preloader');
     }
