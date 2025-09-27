@@ -112,7 +112,7 @@ export class Game extends Scene
         const constructionJson = this.cache.json.get('constructionData');
         
         // Get list of ID of all bought upgrades 
-        const allBuiltConstructions : string[] = this.registry.get('builtonstructions') ?? [];
+        const allBuiltConstructions : string[] = this.registry.get('builtConstructions') ?? [];
         let highestUpgrades = new Map<string, number>();
         let permaUpgrades = new Map<string, { stat: string; type: string; value: number }[]>();
 

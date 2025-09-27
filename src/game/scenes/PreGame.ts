@@ -124,14 +124,18 @@ export class PreGame extends Scene
         });
         const yesText = this.add.bitmapText(0, 0, 'pixelFont', 'Yes', 64).setOrigin(0.5, 0.5).setInteractive().on('pointerup', () => {
             this.readyCheck.setVisible(false);
-            this.registry.set('playerUnits', this.unitsToTake);
-            this.scene.start('Game');
+            this.startGame();
         });
         this.readyCheck.insertElement(readyText);
         this.readyCheck.insertElement([ noText, yesText ]);
         this.readyCheck.positionElements(['center', 'center'], 16, 16);
         this.add.existing(this.readyCheck);
         this.readyCheck.setVisible(false).setDepth(1001).setInteractive();
+    }
+    startGame() {
+        this.registry.set('playerUnits', this.unitsToTake);
+        //SaveManager.saveGame(this);
+        this.scene.start('Game');
     }
 
     /* Handles sawmill sprite and construction upgrades */
@@ -163,7 +167,7 @@ export class PreGame extends Scene
                     this.constructionMenu.destroy();
                     this.overlay.setVisible(false);
                     builtConstructions.push(con.id);
-                    this.registry.set('builtonstructions', builtConstructions);
+                    this.registry.set('builtConstructions', builtConstructions);
                 });
 
                 this.constructionMenu.insertElement(conName);
