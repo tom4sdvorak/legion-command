@@ -5,6 +5,8 @@ export class OverlayComponent extends Phaser.Events.EventEmitter {
     private tintRect: Phaser.GameObjects.Rectangle;
     private blurEffect: Phaser.FX.Blur | null = null;
     private overlayDepth: number = 999;
+    sharpCamera: Phaser.Cameras.Scene2D.Camera | null = null;
+    sharpObject: Phaser.GameObjects.GameObject | null = null;
 
     constructor(scene: Phaser.Scene, tintColor: number = 0x000000, tintAlpha: number = 0.5) {
         super();
@@ -19,25 +21,52 @@ export class OverlayComponent extends Phaser.Events.EventEmitter {
         .setDepth(this.overlayDepth)
         .setVisible(false)
         .setInteractive();
-        this.blurEffect = this.tintRect.postFX.addBlur(0.5, 4, 4);
+
         this.tintRect.on('pointerup', () => {
             this.emit('overlay-clicked'); 
         });
     }
 
-    // Public method to show the overlay
-    public show() {
-        /*if (!this.blurEffect) {
-            this.blurEffect = this.tintRect.postFX.addBlur(0.5, 4, 4);
-        }*/
+    /** Show the overlay and blur everything below it
+     * @param sharpObject Object to show sharply
+     * */
+    public show(sharpObject: Phaser.GameObjects.GameObject | null= null) {
+        const mainCamera = this.scene.cameras.main;
+        // Create second camera
+        this.sharpCamera = this.scene.cameras.add(
+            0, 0, 
+            mainCamera.width, 
+            mainCamera.height
+        );
+        this.sharpCamera.setScroll(mainCamera.scrollX, mainCamera.scrollY);
+        this.sharpCamera.setZoom(mainCamera.zoom);
+
+        // If given object to show sharply, remove it from main camera while removing all but it from second camera
+        if (sharpObject) {
+            mainCamera.ignore(sharpObject);
+            this.sharpCamera.ignore(mainCamera.renderList);
+            this.sharpObject = sharpObject;
+        }
+        // Blur main camera
+        if (!this.blurEffect) {
+            this.blurEffect = mainCamera.postFX.addBlur(0.5, 4, 4);
+        }
         this.tintRect.setVisible(true);
     }
 
-    // Public method to hide the overlay
+    // Hide the overlay, remove blur and destroy second camera
     public hide() {
+        const mainCamera = this.scene.cameras.main;
         if (this.blurEffect) {
-            this.tintRect.postFX.remove(this.blurEffect);
+            mainCamera.postFX.remove(this.blurEffect);
+            this.blurEffect = null;
         }
+        // Remove second camera
+        if (this.sharpCamera) {
+            this.scene.cameras.remove(this.sharpCamera);
+            this.sharpCamera = null;
+        }
+
         this.tintRect.setVisible(false);
     }
 }

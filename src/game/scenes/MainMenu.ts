@@ -23,6 +23,8 @@ export class MainMenu extends Scene
         // x, y, width, height, background (0: lighter, 1: darker)
         this.mainMenu = new UIComponent(this, (this.game.config.width as number)/2, (this.game.config.height as number)/2, (this.game.config.width as number)*0.6, (this.game.config.height as number)*0.9, 1); 
         const interactableGroup = this.add.group();
+        this.overlay = new OverlayComponent(this);
+        this.overlay.on('overlay-clicked', () => this.overlay.hide());
         
         // Menu buttons
         const buttonSize = 48;
@@ -39,7 +41,6 @@ export class MainMenu extends Scene
         this.mainMenu.insertElement(creditsButton);
         this.mainMenu.positionElements(['center', 'center'], 16, 16);
         this.add.existing(this.mainMenu);
-        this.add.text(100, 100, 'Main Menu', { fontFamily: 'Arial Black', fontSize: 64, color: '#ffffff', stroke: '#000000', strokeThickness: 8, align: 'center' }).setOrigin(0.5, 0.5).setDepth(1000);
 
         interactableGroup.getChildren().forEach(child => {
             child.setInteractive();
@@ -52,9 +53,7 @@ export class MainMenu extends Scene
         });
     }
 
-    public showSaveSlots() : void {
-        this.overlay.show();
-        this.overlay.on('overlay-clicked', () => this.overlay.hide());
+    public showSaveSlots() : void {        
         // Create UI to show 3 save slots
         const container = this.add.container((this.game.config.width as number)/2, (this.game.config.height as number)/2);
         container.setDepth(9999);
@@ -103,6 +102,7 @@ export class MainMenu extends Scene
         container.x = (this.game.config.width as number) / 2 - (currentPosX - gap) / 2;
         this.add.existing(container);
         container.setDepth(1001);
+        this.overlay.show(container);
     }
 
     chooseSaveSlot(saveSlot: string) {
@@ -112,7 +112,7 @@ export class MainMenu extends Scene
     newGame() {
     
         this.showSaveSlots();
-        //this.scene.start('PreGame');
+        this.scene.start('PreGame');
     }
 
     showCredits() {
