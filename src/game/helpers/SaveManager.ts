@@ -19,7 +19,7 @@ export default class SaveManager {
     private static defaultSave : SaveData = {
         metadata: {
             version: 0.1,
-            saveName: "NewGame",
+            saveName: "New Game",
             timestamp: new Date().toISOString(),
             playTimeSeconds: 0
         },
@@ -32,29 +32,94 @@ export default class SaveManager {
         }
     };
 
+    /**
+     * 
+     * @returns A new SaveData object
+     */
     static getNewSave(): SaveData {
         return JSON.parse(JSON.stringify(this.defaultSave)); 
     }
 
-
-    
-    static saveGame(scene: Phaser.Scene): void {
-        const newSave = {
-            playerName: 'Player 1',
-            builtUpgrades: scene.registry.get('builtConstructions'),
-        };
-        localStorage.setItem('gameSave', JSON.stringify(newSave));
+    /**
+     * 
+     * @param scene Any scene that will have access to global registry
+     * @returns SaveData object with the data from the registry
+     */
+    static createSaveFromData(scene: Phaser.Scene): SaveData {
+        let newSave = SaveManager.getNewSave();
+        newSave.metadata.saveName = scene.registry.get('saveName');
+        newSave.metadata.timestamp = new Date().toISOString();
+        newSave.metadata.playTimeSeconds = scene.registry.get('playTime');
+        newSave.playerData.builtUpgrades = scene.registry.get('builtConstructions');
+        newSave.playerData.unlockedUnits = scene.registry.get('unlockedUnits');
+        newSave.playerData.coins = scene.registry.get('coins');
+        newSave.playerData.gamesPlayed = scene.registry.get('gamesPlayed');
+        newSave.playerData.gamesWon = scene.registry.get('gamesWon');
+        return newSave;
     }
 
-    static loadGame(): void {
-        const save = localStorage.getItem('gameSave');
-        if (save) {
-            const saveData = JSON.parse(save);
-            // Load the game state from the save data
-            // ...
+
+    /**
+     * 
+     * @param save SaveData object to save to localStorage
+     * @param saveSlot string name of slot to save to
+     * @returns true if successful
+     */
+    static saveGame(save: SaveData, saveSlot: string): boolean {
+        try {
+            localStorage.setItem(saveSlot, JSON.stringify(save));
         }
+        catch(e) {
+            console.error("Local storage issue: " + e);
+            return false;
+        }
+        console.log("Saved game to " + saveSlot);
+        console.log(save);
+        return true;
     }
 
+    /**
+     * 
+     * @param saveSlot string name of slot to save to
+     * @returns true if successful
+     */
+    static createAndSaveGame(saveSlot: string): boolean {
+        let newSave = SaveManager.getNewSave();
+        newSave.metadata.saveName = `Save ${saveSlot.split('_')[1]}`;
+        newSave.metadata.timestamp = new Date().toISOString();
+        const saved = SaveManager.saveGame(newSave, saveSlot);
+        return saved;
+    }
+
+    /**
+     * 
+     * @param scene Any scene that will have access to global registry
+     * @param saveSlot string name of slot to save to
+     * @returns true if successful
+     */
+    static loadGame(scene: Phaser.Scene, saveSlot: string): boolean {
+        const save = localStorage.getItem(saveSlot);
+        if (save) {
+            const saveData : SaveData = JSON.parse(save);
+            // Save to phaser registry all loaded data
+            scene.registry.set('saveName', saveData.metadata.saveName);
+            scene.registry.set('playTime', saveData.metadata.playTimeSeconds);
+            scene.registry.set('builtConstructions', saveData.playerData.builtUpgrades);
+            scene.registry.set('unlockedUnits', saveData.playerData.unlockedUnits);
+            scene.registry.set('coins', saveData.playerData.coins);
+            scene.registry.set('gamesPlayed', saveData.playerData.gamesPlayed);
+            scene.registry.set('gamesWon', saveData.playerData.gamesWon);
+            console.log("Loaded game from " + saveSlot);
+            return true;
+        }
+        return false;
+    }
+
+
+    /**
+     * 
+     * @returns Map of three saves under keys (save_1, save_2, save_3) that hold saveName and timestamp of last save
+     */
     static getSaves(): Map<string, {saveName: string, timestamp: string}> {
         let saves : Map<string, {saveName: string, timestamp: string}> = new Map<string, {saveName: string, timestamp: string}>();
         const unparsedSaves : (string | null)[] = [localStorage.getItem('save_1'), localStorage.getItem('save_2'), localStorage.getItem('save_3')];

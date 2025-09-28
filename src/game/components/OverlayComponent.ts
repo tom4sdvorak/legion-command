@@ -28,10 +28,16 @@ export class OverlayComponent extends Phaser.Events.EventEmitter {
     }
 
     /** Show the overlay and blur everything below it
+     * 
+     * @param blurred True if everything (but sharpObject) should be blurred
      * @param sharpObject Object to show sharply
      * */
-    public show(sharpObject: Phaser.GameObjects.GameObject | null= null) {
+    public show(blurred: boolean = false, sharpObject: Phaser.GameObjects.GameObject | null= null) {
         const mainCamera = this.scene.cameras.main;
+        if(!blurred) {
+            this.tintRect.setVisible(true);
+            return;
+        }
         // Create second camera
         this.sharpCamera = this.scene.cameras.add(
             0, 0, 
@@ -51,7 +57,7 @@ export class OverlayComponent extends Phaser.Events.EventEmitter {
         if (!this.blurEffect) {
             this.blurEffect = mainCamera.postFX.addBlur(0.5, 4, 4);
         }
-        this.tintRect.setVisible(true);
+        
     }
 
     // Hide the overlay, remove blur and destroy second camera

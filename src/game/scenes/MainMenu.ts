@@ -1,6 +1,6 @@
 import { Scene, GameObjects } from 'phaser';
 import { UIComponent } from '../components/UIComponent';
-import SaveManager from '../helpers/SaveManager';
+import SaveManager, { SaveData } from '../helpers/SaveManager';
 import { OverlayComponent } from '../components/OverlayComponent';
 
 export class MainMenu extends Scene
@@ -28,16 +28,13 @@ export class MainMenu extends Scene
         
         // Menu buttons
         const buttonSize = 48;
-        const continueButton = this.add.bitmapText(0, 0, 'pixelFont', 'Continue', buttonSize).setOrigin(0.5, 0.5).setInteractive().on('pointerup', () => this.continue());
-        interactableGroup.add(continueButton);
-        const newGameButton = this.add.bitmapText(0, 0, 'pixelFont', 'New Game', buttonSize).setOrigin(0.5, 0.5).setInteractive().on('pointerup', () => this.newGame());
-        interactableGroup.add(newGameButton);
+        const playButton = this.add.bitmapText(0, 0, 'pixelFont', 'Play', buttonSize).setOrigin(0.5, 0.5).setInteractive().on('pointerup', () => this.showSaveSlots());
+        interactableGroup.add(playButton);
         const creditsButton = this.add.bitmapText(0, 0, 'pixelFont', 'Credits', buttonSize).setOrigin(0.5, 0.5).setInteractive().on('pointerup', () => this.showCredits());
         interactableGroup.add(creditsButton);
 
         //this.mainMenu.add([continueButton, newGameButton, creditsButton]);
-        this.mainMenu.insertElement(continueButton);
-        this.mainMenu.insertElement(newGameButton);
+        this.mainMenu.insertElement(playButton);
         this.mainMenu.insertElement(creditsButton);
         this.mainMenu.positionElements(['center', 'center'], 16, 16);
         this.add.existing(this.mainMenu);
@@ -67,8 +64,10 @@ export class MainMenu extends Scene
             saveSlotUIElement.setSize(UIElementWidth, UIElementHeight);
             const saveSlotName = this.add.bitmapText(0, (32-UIElementHeight/2), 'pixelFont', saveData.saveName, 32).setOrigin(0.5, 0).setMaxWidth(UIElementWidth-32).setDepth(9999);
             saveSlotUIElement.insertElement(saveSlotName);
+            let isNew = true;
             // Dont show date for empty save slot
-            if(saveData.saveName !== 'NewGame'){
+            if(saveData.saveName !== 'New Game'){
+                isNew = false;
                 const date = new Date(saveData.timestamp);
                 const options: Intl.DateTimeFormatOptions = {
                     day: '2-digit',
@@ -96,30 +95,36 @@ export class MainMenu extends Scene
                     if(currentGlow) buttonBorder.postFX.remove(currentGlow);
                 })
                 .on('pointerup', () => {
-                    this.chooseSaveSlot(saveSlot);
+                    this.chooseSaveSlot(saveSlot,isNew);
                 });
         });
         container.x = (this.game.config.width as number) / 2 - (currentPosX - gap) / 2;
         this.add.existing(container);
         container.setDepth(1001);
-        this.overlay.show(container);
+        this.overlay.show(true,container);
     }
 
-    chooseSaveSlot(saveSlot: string) {
-        throw new Error('Method not implemented.');
-    }
+    chooseSaveSlot(saveSlot: string, isNew: boolean) {
+        let loaded = false;
+        // If new game, create new save and load its default values
+        if(isNew){
+            let saved = SaveManager.createAndSaveGame(saveSlot);
+            if(saved) loaded = SaveManager.loadGame(this, saveSlot);
+        }
+        else{
+            loaded = SaveManager.loadGame(this, saveSlot);
+        }
         
-    newGame() {
-    
-        this.showSaveSlots();
-        this.scene.start('PreGame');
+        if(loaded) {
+            this.scene.start('PreGame');
+        }
+        else{
+            throw new Error('Could not load save');
+        }
     }
 
     showCredits() {
         throw new Error('Method not implemented.');
     }
-    
-    continue() {
-        throw new Error('Method not implemented.');
-    }
+
 }
