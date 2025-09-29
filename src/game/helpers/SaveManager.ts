@@ -2,6 +2,7 @@
 export interface SaveData {
     metadata: {
         version: number;
+        saveSlot: string;
         saveName: string;
         timestamp: string;
         playTimeSeconds: number;
@@ -19,6 +20,7 @@ export default class SaveManager {
     private static defaultSave : SaveData = {
         metadata: {
             version: 0.1,
+            saveSlot: "",
             saveName: "New Game",
             timestamp: new Date().toISOString(),
             playTimeSeconds: 0
@@ -36,7 +38,7 @@ export default class SaveManager {
      * 
      * @returns A new SaveData object
      */
-    static getNewSave(): SaveData {
+    private static getNewSave(): SaveData {
         return JSON.parse(JSON.stringify(this.defaultSave)); 
     }
 
@@ -45,9 +47,10 @@ export default class SaveManager {
      * @param scene Any scene that will have access to global registry
      * @returns SaveData object with the data from the registry
      */
-    static createSaveFromData(scene: Phaser.Scene): SaveData {
+    private static createSaveFromData(scene: Phaser.Scene): SaveData {
         let newSave = SaveManager.getNewSave();
         newSave.metadata.saveName = scene.registry.get('saveName');
+        newSave.metadata.saveSlot = scene.registry.get('saveSlot');
         newSave.metadata.timestamp = new Date().toISOString();
         newSave.metadata.playTimeSeconds = scene.registry.get('playTime');
         newSave.playerData.builtUpgrades = scene.registry.get('builtConstructions');
@@ -58,6 +61,17 @@ export default class SaveManager {
         return newSave;
     }
 
+    /**
+     * 
+     * @param scene Any scene that will have access to global registry
+     * @returns True if successful
+     */
+    public static saveGame(scene: Phaser.Scene) : boolean {
+        const save = SaveManager.createSaveFromData(scene);
+        const saved = SaveManager.save(save, save.metadata.saveSlot);
+        return saved;
+    }
+
 
     /**
      * 
@@ -65,7 +79,7 @@ export default class SaveManager {
      * @param saveSlot string name of slot to save to
      * @returns true if successful
      */
-    static saveGame(save: SaveData, saveSlot: string): boolean {
+    private static save(save: SaveData, saveSlot: string): boolean {
         try {
             localStorage.setItem(saveSlot, JSON.stringify(save));
         }
@@ -86,8 +100,9 @@ export default class SaveManager {
     static createAndSaveGame(saveSlot: string): boolean {
         let newSave = SaveManager.getNewSave();
         newSave.metadata.saveName = `Save ${saveSlot.split('_')[1]}`;
+        newSave.metadata.saveSlot = saveSlot;
         newSave.metadata.timestamp = new Date().toISOString();
-        const saved = SaveManager.saveGame(newSave, saveSlot);
+        const saved = SaveManager.save(newSave, saveSlot);
         return saved;
     }
 
@@ -103,6 +118,7 @@ export default class SaveManager {
             const saveData : SaveData = JSON.parse(save);
             // Save to phaser registry all loaded data
             scene.registry.set('saveName', saveData.metadata.saveName);
+            scene.registry.set('saveSlot', saveData.metadata.saveSlot);
             scene.registry.set('playTime', saveData.metadata.playTimeSeconds);
             scene.registry.set('builtConstructions', saveData.playerData.builtUpgrades);
             scene.registry.set('unlockedUnits', saveData.playerData.unlockedUnits);

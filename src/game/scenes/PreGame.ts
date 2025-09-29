@@ -1,5 +1,6 @@
 import { Scene, GameObjects } from 'phaser';
 import { UIComponent } from '../components/UIComponent';
+import SaveManager from '../helpers/SaveManager';
 
 export class PreGame extends Scene
 {
@@ -28,7 +29,10 @@ export class PreGame extends Scene
 
     create ()
     {     
-        //this.input.topOnly = true; 
+        
+        //Save game on entering pregame
+        SaveManager.saveGame(this);
+
         this.add.image(0, 0, 'pregamelayer3').setDisplaySize(this.gameWidth, this.gameHeight).setOrigin(0, 0);
         this.add.image(0, 0, 'pregamelayer1').setDisplaySize(this.gameWidth, this.gameHeight).setOrigin(0, 0);
         this.add.image(0, 0, 'pregamelayer2').setDisplaySize(this.gameWidth, this.gameHeight).setOrigin(0, 0);
@@ -134,7 +138,8 @@ export class PreGame extends Scene
     }
     startGame() {
         this.registry.set('playerUnits', this.unitsToTake);
-        //SaveManager.saveGame(this);
+        this.registry.get('gamesPlayed') ? this.registry.set('gamesPlayed', this.registry.get('gamesPlayed') + 1) : this.registry.set('gamesPlayed', 1);
+        SaveManager.saveGame(this);
         this.scene.start('Game');
     }
 
@@ -146,7 +151,7 @@ export class PreGame extends Scene
         this.constructionMenu.setInteractive();
 
         const constructionJson = this.cache.json.get('constructionData');
-        let builtConstructions : string[] = this.registry.get('builtonstructions') ?? [];
+        let builtConstructions : string[] = this.registry.get('builtConstructions') ?? [];
         constructionJson.forEach((con : any) => {
             if(!builtConstructions.includes(con.id)){
                 if(con.prerequisites.some((prereq : string) => !builtConstructions.includes(prereq))){

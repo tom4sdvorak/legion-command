@@ -45,6 +45,14 @@ export class PlayerController {
         this.resourceComponent = new ResourceComponent(this);       
     }
 
+    destroy() {
+        this.ownUnitsPhysics.getChildren().forEach(unit => {
+            if(unit instanceof Unit) {
+                unit.die();
+            }
+        });
+    }
+
     public addUnitToQueue(unitType: string) {
         if(this.unitQueue.length >= this.unitQueueMaxSize) return;
         this.unitQueue.push(unitType);

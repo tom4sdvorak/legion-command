@@ -1,4 +1,5 @@
 import { Scene } from 'phaser';
+import eventsCenter from '../EventsCenter';
 
 export class GameOver extends Scene
 {
@@ -13,6 +14,8 @@ export class GameOver extends Scene
 
     create ()
     {
+        // Clean up all listeners we were using in previous scenes
+        eventsCenter.removeAllListeners();
         this.camera = this.cameras.main
         this.camera.setBackgroundColor(0xff0000);
 

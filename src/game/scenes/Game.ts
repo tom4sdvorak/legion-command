@@ -275,8 +275,7 @@ export class Game extends Scene
     }
 
     gameOver(faction: string){
-        this.scene.stop('UI');
-        this.scene.start('GameOver', {"faction" : faction});
+        this.scene.stop('Game');
     }
 
     rewardPlayer(faction: string, money: number = 0, xp: number = 0){

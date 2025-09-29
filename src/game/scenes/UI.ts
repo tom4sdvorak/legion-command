@@ -2,13 +2,14 @@ import { Scene } from 'phaser';
 import eventsCenter from '../EventsCenter';
 import { Player } from '../Player';
 import { UIComponent } from '../components/UIComponent';
+import { AIPlayer } from '../AIPlayer';
 
 export class UI extends Scene
 {
     button: Phaser.GameObjects.Shape;
     unitSpawnButtons: Phaser.GameObjects.Container[] = [];
     player: Player;
-    enemyPlayer: Player;
+    enemyPlayer: AIPlayer;
     unitLimit: number = 1;
     moneyText: Phaser.GameObjects.BitmapText
     moneyImage: Phaser.GameObjects.Image;
@@ -27,6 +28,7 @@ export class UI extends Scene
     overlay: Phaser.GameObjects.Rectangle;
     settingsImage: Phaser.GameObjects.Image;
     elapsedTime: number = 0;
+    timerEvent: Phaser.Time.TimerEvent | null = null;
 
     constructor ()
     {
@@ -283,8 +285,14 @@ export class UI extends Scene
             this.time.timeScale = gameSpeed;
         });
 
+        // Listens to base destroyed event that is fired with losing faction
+        eventsCenter.on('base-destroyed', (faction : string) => {
+            const winner : string = (faction === this.player.faction) ? this.enemyPlayer.faction : this.player.faction;
+            this.gameOver(winner);
+        });
+
         // Keep record of time
-        const timerEvent = this.time.addEvent({
+        this.timerEvent = this.time.addEvent({
         delay: 1000,
         callback: () => {
             this.elapsedTime++;
@@ -331,7 +339,27 @@ export class UI extends Scene
         image2c.setData('parent', this.button);
     }
 
+    /**
+     * Handles all saving and clean up after game over
+     * @param faction Faction of the winner
+     */
+    gameOver(faction: string) {
+        // Save data about the game and player to register
+        this.registry.set('playTime', this.registry.get('playTime') + this.elapsedTime);
+        if(faction === this.player.faction) this.registry.set('gamesWon', this.registry.get('gamesWon') + 1);
+        this.scene.stop('UI');
+        this.scene.start('GameOver');
+    }
+
     update(time: number, delta: number) {
    
+    }
+
+    shutdown() {
+        this.timerEvent?.destroy;
+        this.timerEvent = null;
+        this.tweens.killAll();
+        this.player.destroy();
+        this.enemyPlayer.destroy();
     }
 }
