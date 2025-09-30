@@ -20,7 +20,9 @@ export class PreGame extends Scene
         super('PreGame');
     }
 
-    preload(){
+    init(){
+        this.unitsToTake = [];
+        this.potionSelected = false;
         this.gameWidth = this.game.config.width as number;
         this.gameHeight = this.game.config.height as number;
         this.largeWindowSize.w = (this.gameWidth/4*3);
@@ -29,7 +31,6 @@ export class PreGame extends Scene
 
     create ()
     {     
-        
         //Save game on entering pregame
         SaveManager.saveGame(this);
 

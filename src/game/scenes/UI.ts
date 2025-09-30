@@ -106,6 +106,7 @@ export class UI extends Scene
 
     create ()
     {      
+        this.events.once('shutdown', () => this.shutdown());
 
         // Create player healthbar
         let desiredBarWidth = this.cameras.main.width/4;
@@ -347,7 +348,6 @@ export class UI extends Scene
         // Save data about the game and player to register
         this.registry.set('playTime', this.registry.get('playTime') + this.elapsedTime);
         if(faction === this.player.faction) this.registry.set('gamesWon', this.registry.get('gamesWon') + 1);
-        this.scene.stop('UI');
         this.scene.start('GameOver');
     }
 
@@ -359,7 +359,5 @@ export class UI extends Scene
         this.timerEvent?.destroy;
         this.timerEvent = null;
         this.tweens.killAll();
-        this.player.destroy();
-        this.enemyPlayer.destroy();
     }
 }

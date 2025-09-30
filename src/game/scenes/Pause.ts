@@ -82,7 +82,9 @@ export class Pause extends Scene {
 
     public showMenu() {
         this.menu = new UIComponent(this, this.cameras.main.width/2, this.cameras.main.height/2, this.cameras.main.width/2, this.cameras.main.height/2, 1);
-        const interactableGroup = this.add.group();
+        
+
+        // Create items for menu
         const resumeButton = this.add.bitmapText(0, 0, 'pixelFont', 'Resume', 48).setOrigin(0.5, 0.5).setInteractive().on('pointerup', () => this.resume());
         const slowDownButton = this.add.bitmapText(0, 0, 'pixelFont', '<', 64).setOrigin(0.5, 0.5).setInteractive().on('pointerup', () => {
             if(this.gameSpeed > 1){
@@ -97,12 +99,20 @@ export class Pause extends Scene {
                 gameSpeedText.setText(`Speed: ${this.gameSpeed}`);
             } 
         });
+        const giveUpButton = this.add.bitmapText(0, 0, 'pixelFont', 'Give Up', 48).setOrigin(0.5, 0.5).setInteractive().on('pointerup', () => this.giveUp());
+
+        // Insert them in order of appearance in menu
         this.menu.insertElement(resumeButton);
         this.menu.insertElement([slowDownButton, gameSpeedText, speedUpButton]);
+        this.menu.insertElement(giveUpButton);
         this.menu.positionElements(['center', 'center'], 32, 32);
+
+        // Group them all as clickable elements and give them on hover glow
+        const interactableGroup = this.add.group();
         interactableGroup.add(resumeButton);
         interactableGroup.add(slowDownButton);
         interactableGroup.add(speedUpButton);
+        interactableGroup.add(giveUpButton);
         this.menu.setDepth(1001);
         this.add.existing(this.menu);
 
@@ -115,6 +125,13 @@ export class Pause extends Scene {
                 (child as any).postFX.clear();
             }, this);
         });
+    }
+    giveUp() {
+        this.scene.resume('Game');
+        this.scene.resume('UI');
+        // Mimic event of player's base destruction
+        eventsCenter.emit('base-destroyed', this.player.faction);
+        this.scene.stop('Pause');
     }
 
     private getRandomUpgrade(tags: string[]) : UnitUpgrade {

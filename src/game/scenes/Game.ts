@@ -53,6 +53,10 @@ export class Game extends Scene
         super('Game');
     }
 
+    init(){
+        this.isDragging = false;
+    }
+
     createPlayers(){  
         this.blueUnitsPhysics = this.physics.add.group({
             classType: Unit,
@@ -275,6 +279,8 @@ export class Game extends Scene
     }
 
     gameOver(faction: string){
+        this.playerRed.destroy();
+        this.playerBlue.destroy();
         this.scene.stop('Game');
     }
 

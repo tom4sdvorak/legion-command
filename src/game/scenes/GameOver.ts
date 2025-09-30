@@ -1,5 +1,6 @@
 import { Scene } from 'phaser';
 import eventsCenter from '../EventsCenter';
+import SaveManager from '../helpers/SaveManager';
 
 export class GameOver extends Scene
 {
@@ -14,8 +15,17 @@ export class GameOver extends Scene
 
     create ()
     {
+        // Save game
+        SaveManager.saveGame(this);
+
         // Clean up all listeners we were using in previous scenes
         eventsCenter.removeAllListeners();
+
+        // Clean up temporary data
+        this.registry.set('playerUnits', []);
+        this.registry.set('playerPotion', '');
+        console.log(this.registry.get('playerUnits'));
+
         this.camera = this.cameras.main
         this.camera.setBackgroundColor(0xff0000);
 
@@ -30,8 +40,7 @@ export class GameOver extends Scene
         this.gameover_text.setOrigin(0.5);
 
         this.input.once('pointerdown', () => {
-
-            this.scene.start('MainMenu');
+            this.scene.start('PreGame');
 
         });
     }
