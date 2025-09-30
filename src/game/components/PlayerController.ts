@@ -243,7 +243,10 @@ export class PlayerController {
 
     
 
-    /* If true returns value of current health, if false returns percentage */
+    /**
+     * @param absolute true for current health, false for percentage of maxHealth
+     * @returns Returns value or percentage of current health
+     */
     public getHealth(absolute: boolean = true) : number {
         if(absolute) return this.playerBase.getCurrentHealth();
         else return this.playerBase.getCurrentHealth() / this.playerBase.getMaxHealth();
