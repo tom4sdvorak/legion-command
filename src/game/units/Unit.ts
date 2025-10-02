@@ -167,9 +167,9 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
             case 'petrify':
                 // set sprite to greyscale
                 this.colorMatrix.grayscale(1);
-                // give sprite temporary armor
+                // give sprite temporary antiarmor
                 const prevArmor = this.unitProps.armor;
-                this.unitProps.armor = 90;
+                this.unitProps.armor = -100;
                 // set it to unable to move or attack
                 this.changeState(UnitStates.WAITING);
                 this.stop();

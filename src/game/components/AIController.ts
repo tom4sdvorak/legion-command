@@ -47,25 +47,30 @@ export class AIController {
         this.handleState();
     }
     handleState() {
+        if(this.player.isSpawning) return;
         switch (this.state) {
             case State.IDLE:
                 this.idle();
                 break;
-            case State.ATTACKING:
+            case State.ATTACK:
                 this.attack()
                 break;
-            case State.DEFENDING:
+            case State.DEFEND:
                 this.defend();
                 break;
-            case State.LOSING:
-                this.defendDesperately();
-                break;
-            case State.DEAD:
+            case State.SAVE:
+                this.save();
                 break;
             default:
-                break;
+                throw new Error('Invalid state');
         }
         //console.log("I have this many units: " + this.player.ownUnitsPhysics.getChildren().length);
+    }
+
+    changeState(state: string) { 
+        if(this.state === state) return;
+        console.log("AI has decided to " + state);
+        this.state = state;
     }
 
     /**
@@ -99,7 +104,7 @@ export class AIController {
 
         /* STATE OF THE GAME VOTE */
         if(this.player.getHealth(false) > 0.9) {
-            strategyVote.save += 2; // Prefer to save if very healthy
+            strategyVote.save += 2; // Prefer to save if very healthy   
             strategyVote.attack += 1; // Prefer to attack if very healthy
         }
         else if(this.player.getHealth(false) < 0.3) {
@@ -113,6 +118,20 @@ export class AIController {
         else if(this.enemy.getHealth(false) < 0.3) {
             strategyVote.attack += 2; // Prefer to attack if enemy is very hurt
             strategyVote.save -= 1; // Prefer to not save if enemy is very hurt
+        }
+
+        /* Decide strategy */
+        if (strategyVote.attack > strategyVote.defend && strategyVote.attack > strategyVote.save) {
+            this.changeState(State.ATTACK);
+        }
+        else if (strategyVote.defend >= strategyVote.attack && strategyVote.defend >= strategyVote.save) {
+            this.changeState(State.DEFEND);
+        }
+        else if (strategyVote.save > strategyVote.attack && strategyVote.save > strategyVote.defend) {
+            this.changeState(State.SAVE);
+        }
+        else {
+            this.changeState(State.IDLE);
         }
 
     }
@@ -129,43 +148,68 @@ export class AIController {
         });
     }
 
+    /**
+     * 
+     * @param stat Which stat to check
+     * @param highest If should find unit with highest or lowest stat
+     * @param unitsToCheck Units to check, all selected units by default
+     * @returns Object {unitType: string, unitConfig: UnitProps}
+     */
+    private getBestUnitByStat(stat: keyof UnitProps, highest: boolean = true, unitsToCheck: Array<{unitType: string, unitConfig: UnitProps}> = this.player.selectedUnits, ): {unitType: string, unitConfig: UnitProps} {
+        if(highest){
+            return this.player.selectedUnits.reduce((prev, curr) => {
+                return prev.unitConfig[stat] > curr.unitConfig[stat] ? prev : curr;
+            });
+        }
+        else{
+            return this.player.selectedUnits.reduce((prev, curr) => {
+                return prev.unitConfig[stat] < curr.unitConfig[stat] ? prev : curr;
+            });
+        }
+        
+    }
+
     idle(){ // Idle strategy - just ocassionally send unit out
-        if (this.player.canAfford(10) &&  this.player.ownUnitsPhysics.getChildren().length < 1){
-            this.player.addUnitToQueue('warrior');
+        if(this.player.ownUnitsPhysics.getChildren().length > 0){
+            return;
+        }
+        else{
+            const unit = this.getBestUnitByStat('cost', false);
+            this.player.canAfford(unit.unitConfig.cost) && this.player.addUnitToQueue(unit.unitType);
         }
     }
 
-    attack() { // Offensive strategy - prioritize spamming melee/ranged combo
-        if (this.player.canAfford(20)){
-            if(this.player.ownUnitsPhysics.getLast(true) && this.player.ownUnitsPhysics.getLast(true).unitType === 'warrior'){
-                this.player.addUnitToQueue('archer');
-            }
-            else{
-                this.player.addUnitToQueue('warrior');
-            }
-            
-        }
-    }
-
-    defend(){ // Defensive strategy - prioritize single melee/healer combo to protect base
-        if (this.player.canAfford(20) && this.player.ownUnitsPhysics.getChildren().length < 3){ 
-            if(this.player.ownUnitsPhysics.getLast(true) && this.player.ownUnitsPhysics.getLast(true).unitType === 'warrior'){
-                this.player.addUnitToQueue('healer');
-            }
-            else{
-                this.player.addUnitToQueue('warrior');
+    attack() { // Offensive strategy - prioritize dps
+        let units = this.getUnitsByTag('dps');
+        if (units.length === 0) {
+            units = this.getUnitsByTag('ranged');
+            if(units.length === 0) {
+                units = this.getUnitsByTag('generic');
             }
         }
+        const bestUnit = this.getBestUnitByStat('attackDamage', true, units);
+        this.player.canAfford(bestUnit.unitConfig.cost) && this.player.addUnitToQueue(bestUnit.unitType);
     }
 
-    defendDesperately(){ // Losing defensive strategy - prioritize spamming melee/healer combo
-        if (this.player.canAfford(20)){ // If player can afford units and has space in queue
-            if(this.player.ownUnitsPhysics.getLast(true) &&this.player.ownUnitsPhysics.getLast(true).unitType === 'warrior'){
-                this.player.addUnitToQueue('healer');
+    defend(){ // Defensive strategy - prioritize stalling
+        let units = this.getUnitsByTag('tank');
+        if (units.length === 0) {
+            units = this.getUnitsByTag('melee');
+            if(units.length === 0) {
+                units = this.getUnitsByTag('generic');
             }
-            else{
-                this.player.addUnitToQueue('warrior');
-            }
+        }
+        const bestUnit = this.getBestUnitByStat('maxHealth', true, units);
+        this.player.canAfford(bestUnit.unitConfig.cost) && this.player.addUnitToQueue(bestUnit.unitType);
+    }
+
+    save(){ // Money saving strategy, do not summon units unless necessary
+        if(this.player.enemyUnitsPhysics.getChildren().length === 0){
+            return;
+        }
+        else{
+            const unit = this.getBestUnitByStat('cost', false);
+            this.player.canAfford(unit.unitConfig.cost) && this.player.addUnitToQueue(unit.unitType);
         }
     }
 }

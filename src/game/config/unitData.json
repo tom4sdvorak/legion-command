@@ -54,13 +54,13 @@
       "extends": "meleeUnit",
       "offsetY": -1,
       "scale": 0.9,
-      "tags": ["warrior"]
+      "tags": ["warrior", "tank"]
     },
 
     "archer": {
       "extends": "rangedUnit",
       "projectileOffsetY": -60,
-      "tags": ["archer"]
+      "tags": ["archer", "dps"]
     },
 
     "healer": {
@@ -77,7 +77,7 @@
       "bodyHeight": 96,
       "projectileOffsetY": -51,
       "projectileVelocity": 300,
-      "tags": ["fireWorm"]
+      "tags": ["fireWorm", "dps"]
     },
 
     "gorgon": {
