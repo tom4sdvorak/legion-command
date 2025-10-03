@@ -303,8 +303,8 @@ export class UI extends Scene
         callbackScope: this,
         loop: true
         });
-
-
+        
+        
 
         this.button = this.add.circle(500, 500, 40, 0x000000)
             .setStrokeStyle(2, 0xffffff)

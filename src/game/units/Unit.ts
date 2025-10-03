@@ -56,20 +56,19 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         this.setActive(true);
         this.setVisible(true);
         // Calculate spawn position of unit based on desired position, moved by offset (how many empty pixels are under feet of the sprite) timed by scale of the unit (which scales the empty pixels too)
-        let newPositionY = unitProps.y - unitProps.offsetY*unitProps.scale;
-        this.setPosition(unitProps.x, newPositionY);
+        let newPositionX = unitProps.x - this.direction * 64;
+        this.setPosition(newPositionX, unitProps.y);
         this.unitGroup.add(this);
 
         //this.setDisplaySize(this.sizeW, this.sizeH);
         //this.setBodySize(this.size, this.size, true);
         
         (this.body as Phaser.Physics.Arcade.Body).enable = true;
-        (this.body as Phaser.Physics.Arcade.Body).reset(unitProps.x, newPositionY);
+        (this.body as Phaser.Physics.Arcade.Body).reset(newPositionX, unitProps.y);
         (this.body as Phaser.Physics.Arcade.Body).pushable = false;
         console.log("Unit spawned at: " + this.x + " " + this.y);
         if(this.body){
             this.setBodySize(unitProps.bodyWidth/unitProps.scale, unitProps.bodyHeight/unitProps.scale, true);
-            //this.body.setOffset(this.body.offset.x, this.body.offset.y+(35+this.unitProps.offsetY)*unitProps.scale);
 
             /* Calculate offset of units body on Y axis by taking the bottom cooridinate of game screen 
             and minus current body location, height of the body, (negative) globatOffsetY defined in game scene
@@ -115,7 +114,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         this.petrifyDebuff = null;
         
         this.setDepth(1);
-        if(this.unitProps.faction === 'red') this.scene.rewardPlayer('blue', this.unitProps.cost);
+        if(this.unitProps.faction === 'red') this.scene.rewardPlayer('blue', 10);
         else this.scene.rewardPlayer('red', this.unitProps.cost);
         if(this.unitGroup) this.unitGroup.remove(this);
         this.play(`${this.unitType}_death`, true);

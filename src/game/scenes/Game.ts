@@ -186,7 +186,7 @@ export class Game extends Scene
     }
 
     handleUnitCollision(unit1: Unit, unit2: Unit){
-        //console.log("Collision between " + unit1.unitProps.unitID + " and " + unit2.unitProps.unitID);
+        // console.log("Collision between " + unit1.unitProps.unitID + " and " + unit2.unitProps.unitID);
         unit1.handleCollision(unit2);
         unit2.handleCollision(unit1);            
     }

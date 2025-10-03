@@ -9,8 +9,7 @@
     "specialDamage": 10,
     "specialRange": 100,
     "specialSpeed": 1000,
-    "spawnTime": 1000,
-    "offsetY": 0,
+    "spawnTime": 2000,
     "scale": 1,
     "projectileOffsetY": 0,
     "bodyWidth": 64,
@@ -44,7 +43,6 @@
       "cost": 30,
       "specialDamage": 10,
       "specialRange": 100,
-      "specialSpeed": 500,
       "tags": ["support"]
     }
   },
@@ -52,38 +50,40 @@
   "unitTypes": {
     "warrior": {
       "extends": "meleeUnit",
-      "offsetY": -1,
+      "cost": 10,
       "scale": 0.9,
       "tags": ["warrior", "tank"]
     },
 
     "archer": {
       "extends": "rangedUnit",
+      "cost": 20,
       "projectileOffsetY": -60,
       "tags": ["archer", "dps"]
     },
 
     "healer": {
       "extends": "supportUnit",
-      "offsetY": -49,
+      "cost": 30,
       "scale": 0.8,
       "tags": ["healer"]
     },
 
     "fireWorm": {
       "extends": "rangedUnit",
-      "offsetY": -32,
+      "cost": 15,
       "scale": 1.4,
       "bodyHeight": 96,
-      "projectileOffsetY": -51,
+      "projectileOffsetY": -19,
       "projectileVelocity": 300,
       "tags": ["fireWorm", "dps"]
     },
 
     "gorgon": {
       "extends": "meleeUnit",
+      "cost": 30,
       "bodyWidth": 96,
-      "tags": ["gorgon"]
+      "tags": ["gorgon", "disruptor"]
     }
   }
 }

@@ -13,7 +13,6 @@ export interface UnitProps {
     faction: 'red' | 'blue';
     unitID: number;
     spawnTime: number;
-    offsetY: number;
     scale: number;
     projectileOffsetY: number;
     bodyWidth: number;

@@ -157,12 +157,12 @@ export class AIController {
      */
     private getBestUnitByStat(stat: keyof UnitProps, highest: boolean = true, unitsToCheck: Array<{unitType: string, unitConfig: UnitProps}> = this.player.selectedUnits, ): {unitType: string, unitConfig: UnitProps} {
         if(highest){
-            return this.player.selectedUnits.reduce((prev, curr) => {
+            return unitsToCheck.reduce((prev, curr) => {
                 return prev.unitConfig[stat] > curr.unitConfig[stat] ? prev : curr;
             });
         }
         else{
-            return this.player.selectedUnits.reduce((prev, curr) => {
+            return unitsToCheck.reduce((prev, curr) => {
                 return prev.unitConfig[stat] < curr.unitConfig[stat] ? prev : curr;
             });
         }
@@ -181,6 +181,7 @@ export class AIController {
 
     attack() { // Offensive strategy - prioritize dps
         let units = this.getUnitsByTag('dps');
+        
         if (units.length === 0) {
             units = this.getUnitsByTag('ranged');
             if(units.length === 0) {
@@ -189,6 +190,7 @@ export class AIController {
         }
         const bestUnit = this.getBestUnitByStat('attackDamage', true, units);
         this.player.canAfford(bestUnit.unitConfig.cost) && this.player.addUnitToQueue(bestUnit.unitType);
+        console.log("Found units", bestUnit);
     }
 
     defend(){ // Defensive strategy - prioritize stalling

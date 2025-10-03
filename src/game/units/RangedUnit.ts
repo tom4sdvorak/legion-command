@@ -75,7 +75,7 @@ export class RangedUnit extends Unit {
         
         // Move proximity zone in front of the unit
         const zoneXOffset = (this.direction === -1) ? this.x-this.unitProps.specialRange : this.x;
-        this.proximityZone.setPosition(zoneXOffset, this.y+this.unitProps.offsetY*this.scale);
+        this.proximityZone.setPosition(zoneXOffset, this.y);
 
         this.checkForEnemies();
         
@@ -165,7 +165,7 @@ export class RangedUnit extends Unit {
 
     private fireProjectile(target: Unit | PlayerBase): void {
         // Calculate Y position of sprite from which projectile should originate
-        let yPos = this.y+this.unitProps.projectileOffsetY+this.unitProps.offsetY/this.scale;
+        let yPos = this.y+this.unitProps.projectileOffsetY;
         if(!this.projectiles || !this.projectilePool || !this.unitGroup) return;
         const projectile = this.projectilePool.get(this.x, yPos) as Projectile;
         projectile.setFlipX(this.direction === -1);

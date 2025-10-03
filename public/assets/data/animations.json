@@ -58,19 +58,10 @@
       "repeat": -1,
       "yoyo": true
     },
-    "walk": {
-      "key": "archer_walk",
-      "frames": {
-        "start": 160,
-        "count": 36
-      },
-      "frameRate": 48,
-      "repeat": -1
-    },
     "run": {
       "key": "archer_run",
       "frames": {
-        "start": 200,
+        "start": 160,
         "count": 26
       },
       "frameRate": 48,
@@ -79,7 +70,7 @@
     "attack": {
       "key": "archer_attack",
       "frames": {
-        "start": 230,
+        "start": 190,
         "count": 43
       },
       "frameRate": 10,
@@ -88,7 +79,7 @@
     "shoot": {  
       "key": "archer_shoot",
       "frames": {
-        "start": 280,
+        "start": 240,
         "count": 133
       },
       "frameRate": 10,
@@ -97,7 +88,7 @@
     "death": {
       "key": "archer_death",
       "frames": {
-        "start": 420,
+        "start": 380,
         "count": 92
       },
       "frameRate": 48,
