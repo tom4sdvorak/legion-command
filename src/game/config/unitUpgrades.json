@@ -30,23 +30,13 @@
     ]
   },
   {
-    "id": "melee_damage_flat",
+    "id": "generic_damage_flat",
     "name": "Sharpened Sword",
-    "description": "Increases melee attack damage by 5.",
+    "description": "Increases attack damage by 5.",
     "rarity": "common",
-    "tags": ["damage", "melee"],
+    "tags": ["damage", "generic"],
     "effects": [
-      { "stat": "attackDamage", "type": "flat", "value": 5 }
-    ]
-  },
-  {
-    "id": "ranged_damage_flat",
-    "name": "Fletching Kit",
-    "description": "Increases ranged damage by 5.",
-    "rarity": "common",
-    "tags": ["damage", "ranged"],
-    "effects": [
-      { "stat": "specialDamage", "type": "flat", "value": 5 }
+      { "stat": "damage", "type": "flat", "value": 5 }
     ]
   },
   {
@@ -56,37 +46,17 @@
     "rarity": "common",
     "tags": ["range", "ranged"],
     "effects": [
-      { "stat": "specialRange", "type": "flat", "value": 50 }
+      { "stat": "attackRange", "type": "flat", "value": 50 }
     ]
   },
   {
-    "id": "wizard_support_value_flat",
-    "name": "Soothing Herbs",
-    "description": "Increases healing power by 10.",
-    "rarity": "common",
-    "tags": ["supportValue", "wizard"],
-    "effects": [
-      { "stat": "specialDamage", "type": "flat", "value": 10 }
-    ]
-  },
-  {
-    "id": "wizard_support_speed_percent",
-    "name": "Rapid Recovery",
-    "description": "Increases healing speed by 10%.",
-    "rarity": "common",
-    "tags": ["supportSpeed", "wizard"],
-    "effects": [
-      { "stat": "specialSpeed", "type": "percent", "value": -0.10 }
-    ]
-  },
-  {
-    "id": "ranged_shooting_speed_percent",
+    "id": "generic_attack_speed_percent",
     "name": "Propellant Glands",
-    "description": "Increases shooting speed by 10.",
+    "description": "Increases attack speed by 10%.",
     "rarity": "common",
-    "tags": ["shootingSpeed", "ranged"],
+    "tags": ["actionSpeed", "generic"],
     "effects": [
-      { "stat": "specialSpeed", "type": "percent", "value": -0.10 }
+      { "stat": "actionSpeed", "type": "percent", "value": -0.10 }
     ]
   }
 ]

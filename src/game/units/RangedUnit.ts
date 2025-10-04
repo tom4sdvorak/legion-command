@@ -37,10 +37,10 @@ export class RangedUnit extends Unit {
         this.baseGroup = baseGroup;
         
         // Reinitialize proximity zone
-        const zoneXOffset = (this.direction === -1) ? this.x-this.unitProps.specialRange-this.width/2 : this.x+this.width/2;
+        const zoneXOffset = (this.direction === -1) ? this.x-this.unitProps.attackRange-this.width/2 : this.x+this.width/2;
         this.proximityZone.setPosition(zoneXOffset, 0);
-        this.proximityZone.setSize(this.unitProps.specialRange, this.unitProps.bodyHeight);
-        (this.proximityZone.body as Phaser.Physics.Arcade.Body).setSize(this.unitProps.specialRange, this.unitProps.bodyHeight);
+        this.proximityZone.setSize(this.unitProps.attackRange, this.unitProps.bodyHeight);
+        (this.proximityZone.body as Phaser.Physics.Arcade.Body).setSize(this.unitProps.attackRange, this.unitProps.bodyHeight);
         this.proximityZone.setActive(true);
         this.proximityZone.setVisible(true);
         (this.proximityZone.body as Phaser.Physics.Arcade.Body).enable = true;
@@ -74,7 +74,7 @@ export class RangedUnit extends Unit {
         }
         
         // Move proximity zone in front of the unit
-        const zoneXOffset = (this.direction === -1) ? this.x-this.unitProps.specialRange : this.x;
+        const zoneXOffset = (this.direction === -1) ? this.x-this.unitProps.attackRange : this.x;
         this.proximityZone.setPosition(zoneXOffset, this.y);
 
         this.checkForEnemies();
@@ -132,9 +132,9 @@ export class RangedUnit extends Unit {
     }
 
     public startShooting(): void {
-        if (this.shootingTimer) return;     
+        if (this.shootingTimer) return;
         this.shootingTimer = this.scene.time.addEvent({
-                delay: this.unitProps.specialSpeed,
+                delay: this.unitProps.actionSpeed,
                 callback: () => {
                     if (!this.active) {
                         this.stopShooting();
@@ -171,7 +171,7 @@ export class RangedUnit extends Unit {
         projectile.setFlipX(this.direction === -1);
         if (!projectile) return;
         if(projectile instanceof Projectile){
-            projectile.damage = this.unitProps.specialDamage;
+            projectile.damage = this.unitProps.damage;
             projectile.spawn(this.projectiles, this.projectilePool);
         }        
         // Calculate projectile angle and launch it

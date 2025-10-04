@@ -5,11 +5,10 @@ export interface UnitProps {
     speed: number;
     maxHealth: number;
     armor: number;
-    attackDamage: number;
-    attackSpeed: number;
-    specialDamage: number;
+    damage: number;
+    actionSpeed: number;
+    attackRange: number;
     specialRange: number;
-    specialSpeed: number;
     faction: 'red' | 'blue';
     unitID: number;
     spawnTime: number;

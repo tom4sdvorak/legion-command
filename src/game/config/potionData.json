@@ -5,8 +5,7 @@
     "description": "Units damage +20%",
     "cost": 1,
     "effects": [
-      { "stat": "attackDamage", "type": "percent", "value": 0.20 },
-      { "stat": "specialDamage", "type": "percent", "value": 0.20 }
+      { "stat": "damage", "type": "percent", "value": 0.20 }
     ]
   },
   {

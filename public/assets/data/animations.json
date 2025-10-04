@@ -133,6 +133,15 @@
       "frameRate": 10,
       "repeat": -1
     },
+    "shoot": {
+      "key": "wizard_shoot",
+      "frames": {
+        "start": 24,
+        "count": 8
+      },
+      "frameRate": 10,
+      "repeat": -1
+    },
     "hit": {
       "key": "wizard_hit",
       "frames": {

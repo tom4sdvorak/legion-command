@@ -258,17 +258,17 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         if (!this.meleeTarget) return;
 
         this.attackingTimer = this.scene.time.addEvent({
-            delay: this.unitProps.attackSpeed,
+            delay: this.unitProps.actionSpeed,
             callback: () => {
                 if (!this.active || this.state === UnitStates.DEAD || this.state === UnitStates.WAITING) {
                     return;
                 }
-                this.anims.timeScale = (this.anims?.currentAnim?.duration ?? 1) / (this.unitProps.attackSpeed + 100);
+                this.anims.timeScale = (this.anims?.currentAnim?.duration ?? 1) / (this.unitProps.actionSpeed + 100);
                 if(this.meleeTarget instanceof Unit && this.meleeTarget.active && this.meleeTarget.isAlive()){
-                    this.meleeTarget.takeDamage(this.unitProps.attackDamage);
+                    this.meleeTarget.takeDamage(this.unitProps.damage);
                 }
                 else if(this.meleeTarget instanceof PlayerBase && this.meleeTarget.active){
-                    this.meleeTarget.takeDamage(this.unitProps.attackDamage);
+                    this.meleeTarget.takeDamage(this.unitProps.damage);
                 }
                 else{
                     this.meleeTarget = null;
@@ -324,20 +324,20 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
             case UnitStates.SUPPORTING:
                 this.startSupporting();
                 this.play(`${this.unitType}_support`, true);
-                this.anims.timeScale = (this.anims?.currentAnim?.duration ?? 1) / this.unitProps.specialSpeed;
+                this.anims.timeScale = (this.anims?.currentAnim?.duration ?? 1) / this.unitProps.actionSpeed;
                 break;
             case UnitStates.SHOOTING:
                 this.stopMoving();
                 this.startShooting();
                 this.play(`${this.unitType}_shoot`, true);
-                this.anims.timeScale = (this.anims?.currentAnim?.duration ?? 1) / this.unitProps.specialSpeed;
+                this.anims.timeScale = (this.anims?.currentAnim?.duration ?? 1) / this.unitProps.actionSpeed;
                 break;
             case UnitStates.ATTACKING:
                 this.stopSupporting();
                 this.stopShooting();
                 this.startAttackingTarget();
                 this.play(`${this.unitType}_attack`, true);
-                this.anims.timeScale = (this.anims?.currentAnim?.duration ?? 1) / (this.unitProps.attackSpeed + 100);
+                this.anims.timeScale = (this.anims?.currentAnim?.duration ?? 1) / (this.unitProps.actionSpeed + 100);
                 break;
             case UnitStates.IDLE:
                 this.stopShooting();

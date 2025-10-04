@@ -24,9 +24,9 @@ export class Wizard extends SupportUnit {
     }
     
     public startSupporting(): void {
-        this.anims.timeScale = this.anims.duration / this.unitProps.specialSpeed;        
+        this.anims.timeScale = this.anims.duration / this.unitProps.actionSpeed;        
         this.supportTimer = this.scene.time.addEvent({
-            delay: this.unitProps.specialSpeed,
+            delay: this.unitProps.actionSpeed,
             callback: () => {
                 if (!this.active) {
                     this.stopSupporting();
@@ -44,7 +44,7 @@ export class Wizard extends SupportUnit {
         });
     }
     support(target: Unit) {
-        target.heal(this.unitProps.specialDamage);
+        target.heal(this.unitProps.damage);
     }
 
 }

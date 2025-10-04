@@ -14,7 +14,7 @@ export class FireWorm extends RangedUnit {
         if(this.meleeTarget instanceof Unit){
             this.takeDamage(9999999999);
             this.meleeTarget.applyDebuff('burn');
-            this.meleeTarget.takeDamage(this.unitProps.attackDamage*5);
+            this.meleeTarget.takeDamage(this.unitProps.damage*5);
         }        
     }
 }

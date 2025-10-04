@@ -4,11 +4,9 @@
     "cost": 10,
     "maxHealth": 100,
     "armor": 0,
-    "attackDamage": 10,
-    "attackSpeed": 1000,
-    "specialDamage": 10,
+    "damage": 10,
+    "actionSpeed": 1000,
     "specialRange": 100,
-    "specialSpeed": 1000,
     "spawnTime": 1000,
     "scale": 1,
     "projectileOffsetY": 0,
@@ -22,8 +20,8 @@
     "meleeUnit": {
       "extends": "baseUnit",
       "maxHealth": 200,
-      "attackDamage": 20,
-      "attackSpeed": 1000,
+      "damage": 20,
+      "actionSpeed": 1000,
       "tags": ["melee"]
     },
 
@@ -31,22 +29,22 @@
       "extends": "baseUnit",
       "cost": 20,
       "maxHealth": 80,
-      "specialDamage": 50,
-      "specialRange": 200,
-      "specialSpeed": 1000,
+      "damage": 50,
+      "attackRange": 200,
+      "actionSpeed": 1000,
       "tags": ["ranged"]
     },
 
     "supportUnit": {
-      "extends": "baseUnit",
+      "extends": "rangedUnit",
       "maxHealth": 100,
       "cost": 30,
-      "specialDamage": 10,
+      "damage": 10,
       "specialRange": 100,
       "tags": ["support"]
     }
   },
-
+  
   "unitTypes": {
     "warrior": {
       "extends": "meleeUnit",

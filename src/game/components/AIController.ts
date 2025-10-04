@@ -188,7 +188,7 @@ export class AIController {
                 units = this.getUnitsByTag('generic');
             }
         }
-        const bestUnit = this.getBestUnitByStat('attackDamage', true, units);
+        const bestUnit = this.getBestUnitByStat('damage', true, units);
         this.player.canAfford(bestUnit.unitConfig.cost) && this.player.addUnitToQueue(bestUnit.unitType);
         console.log("Found units", bestUnit);
     }
