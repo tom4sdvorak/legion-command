@@ -81,8 +81,8 @@ export class Preloader extends Scene
         this.load.image('warrior_static', 'warrior/static.png');
         this.load.spritesheet('archer', 'archer/sprite_sheet.png',{frameWidth: 128, frameHeight: 128});
         this.load.image('archer_static', 'archer/static.png');
-        this.load.spritesheet('healer', 'healer/sprite_sheet.png',{frameWidth: 231, frameHeight: 190});
-        this.load.image('healer_static', 'healer/static.png');
+        this.load.spritesheet('wizard', 'wizard/sprite_sheet.png',{frameWidth: 231, frameHeight: 190});
+        this.load.image('wizard_static', 'wizard/static.png');
         this.load.spritesheet('fireWorm', 'fireWorm/sprite_sheet.png',{frameWidth: 90, frameHeight: 90});
         this.load.image('fireWorm_static', 'fireWorm/static.png');
         this.load.spritesheet('gorgon', 'gorgon/sprite_sheet.png',{frameWidth: 128, frameHeight: 128});
@@ -92,6 +92,8 @@ export class Preloader extends Scene
         this.load.setPath('assets/sprites/projectiles');
         this.load.spritesheet('arrow', 'arrow/sprite.png',{frameWidth: 30, frameHeight: 5});
         this.load.spritesheet('fireball', 'fireball/sprite_sheet.png',{frameWidth: 46, frameHeight: 46});
+        this.load.spritesheet('purpleBall', 'purple ball/sprite_sheet.png',{frameWidth: 50, frameHeight: 50});
+        this.load.spritesheet('fireArrow', 'fire arrow/sprite.png',{frameWidth: 42, frameHeight: 7});
 
         // Other sprites
         this.load.setPath('assets/sprites/other');

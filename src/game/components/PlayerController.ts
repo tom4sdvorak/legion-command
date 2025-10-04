@@ -185,9 +185,9 @@ export class PlayerController {
                 unit = pool.get();
                 unit.setBodySize(64, 128, true);
                 break;
-            case 'healer':
-                pool = this.objectPool.units.healers;
-                projectilePool = null;
+            case 'wizard':
+                pool = this.objectPool.units.wizards;
+                projectilePool = this.objectPool.projectiles.purpleBalls;
                 unit = pool.get();
                 break;
             case 'fireWorm':

@@ -2,11 +2,12 @@ import { UnitProps } from "../helpers/UnitProps";
 import { UnitStates } from "../helpers/UnitStates";
 import { PlayerBase } from "../PlayerBase";
 import { Game } from "../scenes/Game";
+import { RangedUnit } from "./RangedUnit";
 import { Unit } from "./Unit";
 
-export class SupportUnit extends Unit {
+export class SupportUnit extends RangedUnit {
 
-    proximityZone: Phaser.GameObjects.Zone;
+    supportZone: Phaser.GameObjects.Zone;
     public alliesInRange: Unit[] = [];
     supportTimer: Phaser.Time.TimerEvent | null = null;
 
@@ -14,35 +15,35 @@ export class SupportUnit extends Unit {
         super(scene, texture);
 
         // Create proximity zone for finding allies
-        this.proximityZone = this.scene.add.zone(0, 0, 0, 0);
-        this.proximityZone.setOrigin(0.5, 1);
-        this.scene.physics.add.existing(this.proximityZone);
-        (this.proximityZone.body as Phaser.Physics.Arcade.Body).pushable = false;
-        (this.proximityZone.body as Phaser.Physics.Arcade.Body).allowGravity = false;
+        this.supportZone = this.scene.add.zone(0, 0, 0, 0);
+        this.supportZone.setOrigin(0.5, 1);
+        this.scene.physics.add.existing(this.supportZone);
+        (this.supportZone.body as Phaser.Physics.Arcade.Body).pushable = false;
+        (this.supportZone.body as Phaser.Physics.Arcade.Body).allowGravity = false;
     }
 
-    spawn(unitProps: UnitProps, unitGroup: Phaser.Physics.Arcade.Group, unitPool: Phaser.Physics.Arcade.Group, enemyGroup: Phaser.Physics.Arcade.Group, baseGroup: Phaser.GameObjects.Group, projectiles: Phaser.Physics.Arcade.Group, projectilePool: Phaser.Physics.Arcade.Group | null):void{
+    spawn(unitProps: UnitProps, unitGroup: Phaser.Physics.Arcade.Group, unitPool: Phaser.Physics.Arcade.Group, enemyGroup: Phaser.Physics.Arcade.Group, baseGroup: Phaser.GameObjects.Group, projectiles: Phaser.Physics.Arcade.Group, projectilePool: Phaser.Physics.Arcade.Group):void{
         super.spawn(unitProps, unitGroup, unitPool, enemyGroup, baseGroup, projectiles, projectilePool);
         this.alliesInRange = [];
         this.meleeTarget = null;
         
         // Reinitialize proximity zone
-        this.proximityZone.setPosition(this.x, this.y);
-        this.proximityZone.setSize(this.unitProps.specialRange*2,this.height);
-        (this.proximityZone.body as Phaser.Physics.Arcade.Body).setSize(this.unitProps.specialRange*2, this.height);
-        this.proximityZone.setActive(true);
-        this.proximityZone.setVisible(true);
-        (this.proximityZone.body as Phaser.Physics.Arcade.Body).enable = true;
-        (this.proximityZone.body as Phaser.Physics.Arcade.Body).reset(this.x, this.y);
+        this.supportZone.setPosition(this.x, this.y);
+        this.supportZone.setSize(this.unitProps.specialRange*2,this.height);
+        (this.supportZone.body as Phaser.Physics.Arcade.Body).setSize(this.unitProps.specialRange*2, this.height);
+        this.supportZone.setActive(true);
+        this.supportZone.setVisible(true);
+        (this.supportZone.body as Phaser.Physics.Arcade.Body).enable = true;
+        (this.supportZone.body as Phaser.Physics.Arcade.Body).reset(this.x, this.y);
 
     }
 
     die() {        
         // Deactivate proximity zone
-        this.proximityZone.setActive(false);
-        this.proximityZone.setVisible(false);
-        (this.proximityZone.body as Phaser.Physics.Arcade.Body).enable = false;
-        (this.proximityZone.body as Phaser.Physics.Arcade.Body).reset(0, 0);
+        this.supportZone.setActive(false);
+        this.supportZone.setVisible(false);
+        (this.supportZone.body as Phaser.Physics.Arcade.Body).enable = false;
+        (this.supportZone.body as Phaser.Physics.Arcade.Body).reset(0, 0);
         
         // Null all temporary information
         if(this.supportTimer) this.supportTimer.remove();
@@ -59,7 +60,7 @@ export class SupportUnit extends Unit {
         }
         
         // Move proximity zone with unit
-        this.proximityZone.setPosition(this.x, this.y);
+        this.supportZone.setPosition(this.x, this.y);
 
         this.checkForAllies();
 
@@ -97,7 +98,7 @@ export class SupportUnit extends Unit {
         
         if (!this.unitGroup) return;
         this.alliesInRange = [];
-        this.scene.physics.overlap(this.proximityZone, this.unitGroup, (object1, object2) => {
+        this.scene.physics.overlap(this.supportZone, this.unitGroup, (object1, object2) => {
             if (object2 instanceof Unit && object2.active && !this.alliesInRange.includes(object2)) {
                 this.alliesInRange.push(object2);
             }

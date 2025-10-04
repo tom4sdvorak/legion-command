@@ -9,7 +9,7 @@
     "specialDamage": 10,
     "specialRange": 100,
     "specialSpeed": 1000,
-    "spawnTime": 2000,
+    "spawnTime": 1000,
     "scale": 1,
     "projectileOffsetY": 0,
     "bodyWidth": 64,
@@ -62,11 +62,11 @@
       "tags": ["archer", "dps"]
     },
 
-    "healer": {
+    "wizard": {
       "extends": "supportUnit",
       "cost": 30,
       "scale": 0.8,
-      "tags": ["healer"]
+      "tags": ["wizard"]
     },
 
     "fireWorm": {

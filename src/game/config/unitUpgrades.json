@@ -60,21 +60,21 @@
     ]
   },
   {
-    "id": "healer_support_value_flat",
+    "id": "wizard_support_value_flat",
     "name": "Soothing Herbs",
     "description": "Increases healing power by 10.",
     "rarity": "common",
-    "tags": ["supportValue", "healer"],
+    "tags": ["supportValue", "wizard"],
     "effects": [
       { "stat": "specialDamage", "type": "flat", "value": 10 }
     ]
   },
   {
-    "id": "healer_support_speed_percent",
+    "id": "wizard_support_speed_percent",
     "name": "Rapid Recovery",
     "description": "Increases healing speed by 10%.",
     "rarity": "common",
-    "tags": ["supportSpeed", "healer"],
+    "tags": ["supportSpeed", "wizard"],
     "effects": [
       { "stat": "specialSpeed", "type": "percent", "value": -0.10 }
     ]

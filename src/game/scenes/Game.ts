@@ -8,7 +8,6 @@ import { ObjectPool } from '../helpers/ObjectPool';
 import { PlayerBase } from '../PlayerBase';
 import { Archer } from '../units/Archer';
 import { Warrior } from '../units/Warrior';
-import { Healer } from '../units/Healer';
 import { UnitConfigLoader } from '../helpers/UnitConfigLoader';
 import { AIController } from '../components/AIController';
 import { devConfig } from '../helpers/DevConfig';
@@ -17,6 +16,9 @@ import { Fireball } from '../projectiles/Fireball';
 import { AIPlayer } from '../AIPlayer';
 import { Gorgon } from '../units/Gorgon';
 import { UnitUpgrade } from '../helpers/UnitUpgrade';
+import { FireArrow } from '../projectiles/FireArrow';
+import { PurpleBall } from '../projectiles/PurpleBall';
+import { Wizard } from '../units/Wizard';
 
 export class Game extends Scene
 {
@@ -105,7 +107,6 @@ export class Game extends Scene
         this.baseBlue = new PlayerBase(this, 'blue', bluePos, this.redUnitsPhysics, this.blueProjectiles);
         this.playerBlue = new AIPlayer(this, this.baseBlue, bluePos, this.blueUnitsPhysics, this.redUnitsPhysics, this.blueProjectiles, this.objectPool, this.baseGroup, this.blueConfigLoader);
         this.playerBlue.changePassiveIncome(1, true);
-        this.playerBlue.addMoney(100);
         if(devConfig.AI) this.AIController = new AIController(this.playerBlue, this.playerRed, 'EASY');
 
         this.baseGroup.add(this.baseRed);
@@ -226,8 +227,8 @@ export class Game extends Scene
                     maxSize: 50,
                     runChildUpdate: true
                 }),
-                healers: this.physics.add.group({
-                    classType: Healer,
+                wizards: this.physics.add.group({
+                    classType: Wizard,
                     maxSize: 50,
                     runChildUpdate: true
                 }),
@@ -248,8 +249,18 @@ export class Game extends Scene
                     maxSize: 50,
                     runChildUpdate: true
                 }),
+                fireArrows: this.physics.add.group({
+                    classType: FireArrow,
+                    maxSize: 50,
+                    runChildUpdate: true
+                }),
                 fireballs: this.physics.add.group({
                     classType: Fireball,
+                    maxSize: 50,
+                    runChildUpdate: true
+                }),
+                purpleBalls: this.physics.add.group({
+                    classType: PurpleBall,
                     maxSize: 50,
                     runChildUpdate: true
                 }),

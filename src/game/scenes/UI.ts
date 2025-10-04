@@ -305,7 +305,7 @@ export class UI extends Scene
         });
         
         
-
+        /*
         this.button = this.add.circle(500, 500, 40, 0x000000)
             .setStrokeStyle(2, 0xffffff)
             .setInteractive()
@@ -332,12 +332,12 @@ export class UI extends Scene
             .setStrokeStyle(2, 0xffffff)
             .setInteractive()
             .on('pointerup', () => {
-                eventsCenter.emit('spawn-blue-unit', 'healer');
+                eventsCenter.emit('spawn-blue-unit', 'wizard');
             });
-        const image2c = this.add.image(500, 300, 'healer');
+        const image2c = this.add.image(500, 300, 'wizard');
         Phaser.Display.Align.In.Center(image2c, this.button); // Center the image within the button.
         this.button.setData('parent', image2c);
-        image2c.setData('parent', this.button);
+        image2c.setData('parent', this.button);*/
     }
 
     /**

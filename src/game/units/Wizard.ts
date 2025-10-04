@@ -2,11 +2,11 @@ import { Game } from "../scenes/Game";
 import { SupportUnit } from "./SupportUnit";
 import { Unit } from "./Unit";
 
-export class Healer extends SupportUnit {
+export class Wizard extends SupportUnit {
     
 
     constructor(scene: Game) {
-        super(scene, "healer");
+        super(scene, "wizard");
     }
 
     update(time: any, delta: number) {

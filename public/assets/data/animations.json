@@ -95,9 +95,9 @@
       "repeat": 0
     }
   },
-  "healer": {
+  "wizard": {
     "idle": {
-      "key": "healer_idle",
+      "key": "wizard_idle",
       "frames": {
         "start": 0,
         "count": 6
@@ -107,7 +107,7 @@
       "yoyo": true
     },
     "run": {
-      "key": "healer_run",
+      "key": "wizard_run",
       "frames": {
         "start": 8,
         "count": 8
@@ -116,7 +116,7 @@
       "repeat": -1
     },
     "support": {
-      "key": "healer_support",
+      "key": "wizard_support",
       "frames": {
         "start": 16,
         "count": 8
@@ -125,7 +125,7 @@
       "repeat": -1
     },
     "attack": {
-      "key": "healer_attack",
+      "key": "wizard_attack",
       "frames": {
         "start": 24,
         "count": 8
@@ -134,7 +134,7 @@
       "repeat": -1
     },
     "hit": {
-      "key": "healer_hit",
+      "key": "wizard_hit",
       "frames": {
         "start": 32,
         "count": 4
@@ -143,7 +143,7 @@
       "repeat": -1
     },
     "death": {
-      "key": "healer_death",
+      "key": "wizard_death",
       "frames": {
         "start": 40,
         "count": 7
@@ -269,6 +269,26 @@
     },
     "explode": {
       "key": "fireball_explode",
+      "frames": {
+        "start": 7,
+        "count": 7
+      },
+      "frameRate": 10,
+      "repeat": 0
+    }
+  },
+  "purpleBall": {
+    "move": {
+      "key": "purpleBall_move",
+      "frames": {
+        "start": 0,
+        "count": 4
+      },
+      "frameRate": 10,
+      "repeat": -1
+    },
+    "explode": {
+      "key": "purpleBall_explode",
       "frames": {
         "start": 7,
         "count": 7

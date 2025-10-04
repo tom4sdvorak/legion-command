@@ -27,6 +27,7 @@ export class PlayerBase extends Phaser.Physics.Arcade.Sprite{
     shootingSprite: Phaser.GameObjects.Sprite;
     watchtowerEnabled: boolean = false;
     spawnPosition: Phaser.Math.Vector2;
+    watchTowerProjectileSpawnPoint: Phaser.Math.Vector2;
 
     constructor(scene: Game, faction: 'red' | 'blue', spawnPosition: Phaser.Math.Vector2, enemyUnitsPhysics: Phaser.Physics.Arcade.Group, projectiles: Phaser.Physics.Arcade.Group) {
         super(scene, spawnPosition.x, spawnPosition.y, 'single_pixel');
@@ -114,9 +115,11 @@ export class PlayerBase extends Phaser.Physics.Arcade.Sprite{
         this.projectilePool = projectilePool;
         this.damage = dmg;
         this.range = range;
+        this.watchTowerProjectileSpawnPoint = new Phaser.Math.Vector2(60, this.spawnPosition.y-165-60);
+
         
         this.scene.add.sprite(10, this.spawnPosition.y-15, 'tower').setOrigin(0,1).setScale(0.8).setDepth(2);
-        this.shootingSprite = this.scene.add.sprite(-15, this.spawnPosition.y-165, 'archer').setOrigin(0,1).setDepth(2);
+        this.shootingSprite = this.scene.add.sprite(0, this.spawnPosition.y-185, 'archer').setDepth(2).setAngle(10).setOrigin(0,1);
         this.scene.add.sprite(10, this.spawnPosition.y-15, 'tower_frontlayer').setOrigin(0,1).setScale(0.8).setDepth(2);
         this.shootingSprite.play(`${this.shootingSprite.texture.key}_idle`);
 
@@ -189,16 +192,16 @@ export class PlayerBase extends Phaser.Physics.Arcade.Sprite{
     private fireProjectile(target: Unit): void {
         
         if(!this.projectiles || !this.projectilePool) return;
-        const projectile = this.projectilePool.get(this.x, this.y);
+        const projectile = this.projectilePool.get(this.watchTowerProjectileSpawnPoint.x, this.watchTowerProjectileSpawnPoint.y);
         if (!projectile) return;
         if(projectile instanceof Projectile){
             projectile.damage = this.damage;
             projectile.spawn(this.projectiles, this.projectilePool);
         }
         // Calculate projectile angle and launch it
-        const projectileAngle = Phaser.Math.Angle.Between(this.x, this.y, target.x, target.y-target.height/2);
+        const projectileAngle = Phaser.Math.Angle.Between(this.watchTowerProjectileSpawnPoint.x, this.watchTowerProjectileSpawnPoint.y, target.x, target.y-target.height/2);
         projectile.rotation = projectileAngle;
-        projectile.enableBody(true, this.x, this.y, true, true);
+        projectile.enableBody(true, this.watchTowerProjectileSpawnPoint.x, this.watchTowerProjectileSpawnPoint.y, true, true);
         this.scene.physics.moveTo(projectile, target.x, target.y-target.body!.height/2, 300);
     }
     

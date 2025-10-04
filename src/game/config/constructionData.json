@@ -21,7 +21,7 @@
     "effects": [
       { "stat": "baseDamage", "type": "flat", "value": 20 },
       { "stat": "baseRange", "type": "flat", "value": 100 },
-      { "stat": "baseProjectiles", "type": "fireballs", "value": -1 }
+      { "stat": "baseProjectiles", "type": "fireArrows", "value": -1 }
     ],
     "prerequisites": ["watchtower_1"]
   },
