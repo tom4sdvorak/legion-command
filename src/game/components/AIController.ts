@@ -190,7 +190,6 @@ export class AIController {
         }
         const bestUnit = this.getBestUnitByStat('damage', true, units);
         this.player.canAfford(bestUnit.unitConfig.cost) && this.player.addUnitToQueue(bestUnit.unitType);
-        console.log("Found units", bestUnit);
     }
 
     defend(){ // Defensive strategy - prioritize stalling

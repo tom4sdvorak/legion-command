@@ -32,7 +32,7 @@ export class PlayerBase extends Phaser.Physics.Arcade.Sprite{
     constructor(scene: Game, faction: 'red' | 'blue', spawnPosition: Phaser.Math.Vector2, enemyUnitsPhysics: Phaser.Physics.Arcade.Group, projectiles: Phaser.Physics.Arcade.Group) {
         super(scene, spawnPosition.x, spawnPosition.y, 'single_pixel');
         this.spawnPosition = spawnPosition;
-        const offsetX = (faction === 'blue') ? spawnPosition.x-this.sizeW : spawnPosition.x+100;
+        const offsetX = (faction === 'blue') ? spawnPosition.x-this.sizeW-48 : spawnPosition.x+48;
         this.setPosition(offsetX, spawnPosition.y-this.sizeH/2);
         this.setOrigin(0, 1);
         this.enemyUnitsPhysics = enemyUnitsPhysics;

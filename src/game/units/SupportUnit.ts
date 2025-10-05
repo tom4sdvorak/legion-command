@@ -9,7 +9,7 @@ export class SupportUnit extends RangedUnit {
 
     supportZone: Phaser.GameObjects.Zone;
     public alliesInRange: Unit[] = [];
-    supportTimer: Phaser.Time.TimerEvent | null = null;
+    buffedAllies: Unit[] = []; 
 
     constructor(scene: Game, texture: string) {
         super(scene, texture);
@@ -26,6 +26,7 @@ export class SupportUnit extends RangedUnit {
         super.spawn(unitProps, unitGroup, unitPool, enemyGroup, baseGroup, projectiles, projectilePool);
         this.alliesInRange = [];
         this.meleeTarget = null;
+        this.buffedAllies = [];
         
         // Reinitialize proximity zone
         this.supportZone.setPosition(this.x, this.y);
@@ -46,8 +47,6 @@ export class SupportUnit extends RangedUnit {
         (this.supportZone.body as Phaser.Physics.Arcade.Body).reset(0, 0);
         
         // Null all temporary information
-        if(this.supportTimer) this.supportTimer.remove();
-        this.supportTimer = null;
         this.meleeTarget = null;
         this.alliesInRange = [];
         super.die();
@@ -72,7 +71,7 @@ export class SupportUnit extends RangedUnit {
 
     handleState(): void {
         if(this.state === UnitStates.WALKING || this.state === UnitStates.IDLE){
-            if (this.alliesInRange.length > 0) {
+            if (this.alliesInRange.length > 0 && this.specialCooldown >= this.unitProps.specialCooldown) {
                 this.changeState(UnitStates.SUPPORTING);
             }
         }
@@ -84,14 +83,33 @@ export class SupportUnit extends RangedUnit {
         super.handleState();
     }
 
-    startSupporting() {
+    /* Perform unit specific support action for every ally in range*/
+    public startSupporting(): void {
+        this.anims.timeScale = this.anims.duration / this.unitProps.actionSpeed;
+        this.alliesInRange.forEach(ally => {
+            if (ally.isAlive()) {
+                this.support(ally);
+            }
+        });
+    }
+
+    support(target: Unit) {
+        // Do nothing here
     }
 
     stopSupporting() {
-        if (this.supportTimer) {
-            this.supportTimer.remove();
-            this.supportTimer = null;
-        }
+        this.buffedAllies.forEach(ally => {
+            // Check if the ally is still alive before trying to remove the buff
+            if (ally.isAlive()) { 
+                this.unsupport(ally);
+            }
+        });
+        this.specialCooldown = 0;
+        this.buffedAllies = [];
+    }
+
+    unsupport(ally: Unit) {
+        // Do nothing here
     }
 
     public checkForAllies(): void {

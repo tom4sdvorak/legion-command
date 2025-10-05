@@ -7,6 +7,8 @@
     "damage": 10,
     "actionSpeed": 1000,
     "specialRange": 100,
+    "specialCooldown": 10000,
+    "specialEnabled": true,
     "spawnTime": 1000,
     "scale": 1,
     "projectileOffsetY": 0,
@@ -63,7 +65,9 @@
     "wizard": {
       "extends": "supportUnit",
       "cost": 30,
-      "scale": 0.8,
+      "projectileOffsetY": -62,
+      "projectileVelocity": 50,
+      "scale": 0.9,
       "tags": ["wizard"]
     },
 
@@ -74,6 +78,7 @@
       "bodyHeight": 96,
       "projectileOffsetY": -19,
       "projectileVelocity": 300,
+      "specialCooldown": 999999,
       "tags": ["fireWorm", "dps"]
     },
 

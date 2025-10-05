@@ -14,7 +14,6 @@ export class RangedUnit extends Unit {
     projectilePool: Phaser.Physics.Arcade.Group | null = null;
     protected enemyGroup: Phaser.Physics.Arcade.Group | null = null;
     protected baseGroup: Phaser.GameObjects.Group | null = null;
-    shootingTimer: Phaser.Time.TimerEvent | null = null;
 
     constructor(scene: Game, texture: string) {
         super(scene, texture);
@@ -45,7 +44,6 @@ export class RangedUnit extends Unit {
         this.proximityZone.setVisible(true);
         (this.proximityZone.body as Phaser.Physics.Arcade.Body).enable = true;
         (this.proximityZone.body as Phaser.Physics.Arcade.Body).reset(zoneXOffset, 0);
-
     }
 
     die() {
@@ -56,8 +54,6 @@ export class RangedUnit extends Unit {
         (this.proximityZone.body as Phaser.Physics.Arcade.Body).reset(0, 0);
         
         // Null all temporary information
-        if(this.shootingTimer) this.shootingTimer.remove();
-        this.shootingTimer = null;
         this.projectiles = null;
         this.projectilePool = null;
         this.enemiesInRange = [];
@@ -94,7 +90,15 @@ export class RangedUnit extends Unit {
             });
         }
 
-        this.handleState();      
+        if(this.state === UnitStates.SHOOTING){
+            if(this.actionCooldown >= this.unitProps.actionSpeed){
+                this.shootTarget();
+                console.log("Shooting on CD " + this.actionCooldown);
+                this.actionCooldown -= this.unitProps.actionSpeed;
+            }
+        }
+
+        //this.handleState();      
     }
 
     handleState(): void {
@@ -131,7 +135,26 @@ export class RangedUnit extends Unit {
         }, undefined, this);
     }
 
-    public startShooting(): void {
+    public shootTarget(): void {
+        if (!this.active) {
+            return;
+        }
+        this.anims.timeScale = (this.anims?.currentAnim?.duration ?? 1) / (this.unitProps.actionSpeed + 100);
+
+        if (this.baseInRange instanceof PlayerBase && this.baseInRange.active) {
+            this.fireProjectile(this.baseInRange);
+        }
+        else if (this.enemiesInRange.length > 0 && this.enemiesInRange[0] instanceof Unit && this.enemiesInRange[0].active && this.enemiesInRange[0].isAlive()) { 
+            this.fireProjectile(this.enemiesInRange[0]);
+        }
+        else{
+            this.stopShooting();
+            return;
+        }
+        
+    }
+
+    /*public startShooting(): void {
         if (this.shootingTimer) return;
         this.shootingTimer = this.scene.time.addEvent({
                 delay: this.unitProps.actionSpeed,
@@ -140,6 +163,7 @@ export class RangedUnit extends Unit {
                         this.stopShooting();
                         return;
                     }
+                    this.anims.timeScale = (this.anims?.currentAnim?.duration ?? 1) / (this.unitProps.actionSpeed + 100);
                     let target: Unit | PlayerBase | null = null;
                     if (this.baseInRange) { // Attack base in range ignoring any targets
                         target = this.baseInRange;
@@ -159,15 +183,16 @@ export class RangedUnit extends Unit {
                 loop: true
         });
         
-    }
+    }*/
     
 
 
     private fireProjectile(target: Unit | PlayerBase): void {
         // Calculate Y position of sprite from which projectile should originate
-        let yPos = this.y+this.unitProps.projectileOffsetY;
+        let yPos = this.y+this.unitProps.projectileOffsetY*this.unitProps.scale;
+        let xPos = this.x+this.unitProps.bodyWidth/2;
         if(!this.projectiles || !this.projectilePool || !this.unitGroup) return;
-        const projectile = this.projectilePool.get(this.x, yPos) as Projectile;
+        const projectile = this.projectilePool.get(xPos, yPos) as Projectile;
         projectile.setFlipX(this.direction === -1);
         if (!projectile) return;
         if(projectile instanceof Projectile){
@@ -177,17 +202,14 @@ export class RangedUnit extends Unit {
         // Calculate projectile angle and launch it
         //const projectileAngle = Phaser.Math.Angle.Between(this.x, yPos, target.x, yPos);
         //projectile.rotation = projectileAngle;
-        projectile.enableBody(true, this.x, yPos, true, true);
+        projectile.enableBody(true, xPos, yPos, true, true);
         projectile.setVelocityX(this.unitProps.projectileVelocity * this.direction);
-        projectile.setVelocityY(10);
+        //projectile.setVelocityY(10);
         //this.scene.physics.moveTo(projectile, target.x, yPos, 300);
     }
 
     public stopShooting(): void {
-        if (this.shootingTimer) {
-            this.shootingTimer.remove();
-            this.shootingTimer = null;
-        }
+        this.actionCooldown = 0;
     }
 
 }

@@ -115,14 +115,23 @@
       "frameRate": 10,
       "repeat": -1
     },
-    "support": {
-      "key": "wizard_support",
+    "support_start": {
+      "key": "wizard_support_start",
       "frames": {
         "start": 16,
-        "count": 8
+        "count": 6
       },
       "frameRate": 10,
-      "repeat": -1
+      "repeat": 0
+    },
+    "support_end": {
+      "key": "wizard_support_end",
+      "frames": {
+        "start": 22,
+        "count": 2
+      },
+      "frameRate": 10,
+      "repeat": 0
     },
     "attack": {
       "key": "wizard_attack",

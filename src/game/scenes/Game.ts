@@ -220,49 +220,49 @@ export class Game extends Scene
                 archers: this.physics.add.group({
                     classType: Archer,
                     maxSize: 50,
-                    runChildUpdate: true
+                    runChildUpdate: false
                 }),
                 warriors: this.physics.add.group({
                     classType: Warrior,
                     maxSize: 50,
-                    runChildUpdate: true
+                    runChildUpdate: false
                 }),
                 wizards: this.physics.add.group({
                     classType: Wizard,
                     maxSize: 50,
-                    runChildUpdate: true
+                    runChildUpdate: false
                 }),
                 fireWorms: this.physics.add.group({
                     classType: FireWorm,
                     maxSize: 50,
-                    runChildUpdate: true
+                    runChildUpdate: false
                 }),
                 gorgons: this.physics.add.group({
                     classType: Gorgon,
                     maxSize: 50,
-                    runChildUpdate: true
+                    runChildUpdate: false
                 }),
             },
             projectiles: {// Projectile pools
                 arrows: this.physics.add.group({
                     classType: Arrow,
                     maxSize: 50,
-                    runChildUpdate: true
+                    runChildUpdate: false
                 }),
                 fireArrows: this.physics.add.group({
                     classType: FireArrow,
                     maxSize: 50,
-                    runChildUpdate: true
+                    runChildUpdate: false
                 }),
                 fireballs: this.physics.add.group({
                     classType: Fireball,
                     maxSize: 50,
-                    runChildUpdate: true
+                    runChildUpdate: false
                 }),
                 purpleBalls: this.physics.add.group({
                     classType: PurpleBall,
                     maxSize: 50,
-                    runChildUpdate: true
+                    runChildUpdate: false
                 }),
             }
         }

@@ -9,6 +9,8 @@ export interface UnitProps {
     actionSpeed: number;
     attackRange: number;
     specialRange: number;
+    specialCooldown: number;
+    specialEnabled: boolean;
     faction: 'red' | 'blue';
     unitID: number;
     spawnTime: number;

@@ -9,7 +9,8 @@ import eventsCenter from "../EventsCenter";
 export class Unit extends Phaser.Physics.Arcade.Sprite {
     unitProps: UnitProps;
     state: string = UnitStates.WAITING;
-    attackingTimer: Phaser.Time.TimerEvent | null = null;
+    actionCooldown: number = 0;
+    specialCooldown: number = 0;
     direction: number = 1;
     unitType: string;
     unitGroup: Phaser.Physics.Arcade.Group | null = null;
@@ -22,6 +23,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
     actionDisabled: boolean = false;
     burningDebuff : {timer: Phaser.Time.TimerEvent | null, ticks: number, damage: number} | null = null;
     petrifyDebuff : {timer: Phaser.Time.TimerEvent | null, duration: number} | null = null;
+    buffList: {buff: string, source: number}[] = [];
 
     constructor(scene: Game, unitType: string) {
         super(scene, -500, -500, unitType);
@@ -48,6 +50,9 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         this.state = UnitStates.WAITING;
         this.colorMatrix.reset();
         this.actionDisabled = false;
+        this.actionCooldown = 0;
+        this.buffList = [];
+        this.specialCooldown = this.unitProps.specialCooldown; // Reset special cooldown so special is available instantly
         // Reinitialize the sprite's body
         this.setScale(unitProps.scale);
         
@@ -97,8 +102,6 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         this.stopSupporting();
         this.stopShooting();
         this.changeState(UnitStates.WAITING);
-        if(this.attackingTimer) this.attackingTimer.remove();
-        this.attackingTimer = null;
     }
 
     die(): void {
@@ -139,16 +142,28 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         if (!this.active) {
             return;
         }
-        super.update(time, delta);
+        //super.update(time, delta);
         // Keep unit moving when not blocked
         if (this.state !== UnitStates.DEAD) {
             if (this.state !== UnitStates.SHOOTING && !this.isBlocked()[0]) {
                 this.moveForward();
             }
         }
+
+        if(this.state === UnitStates.ATTACKING || this.state === UnitStates.SHOOTING){
+            this.actionCooldown += delta;
+        }
+
+        if(this.state === UnitStates.ATTACKING && this.meleeTarget){
+            if(this.actionCooldown >= this.unitProps.actionSpeed){
+                this.attackTarget();
+                this.actionCooldown -= this.unitProps.actionSpeed; 
+            }
+        }
+        // Only bother counting special cooldown up to 100s => Any unit with special of cooldown more than 100s means to use it just once
+        if(this.specialCooldown <= 100000) this.specialCooldown += delta;
         this.healthComponent.update();
         this.handleState();
-        
         
     }
 
@@ -159,6 +174,36 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         this.setTintFill(0xffffff);
         const damageToTake = Math.round(damage * (1 - this.unitProps.armor / 100.0));
         this.healthComponent.takeDamage(damageToTake);
+    }
+
+    public applyBuff(buff: string, source: number) : void {
+        const buffExists = this.buffList.some(item => 
+            item.buff === buff && item.source === source
+        );
+        switch(buff){
+            case 'speed':
+                if(buffExists) return;
+                this.unitProps.speed *= 2;
+                this.unitProps.actionSpeed /= 2;
+                this.buffList.push({buff: buff, source: source});
+                break;
+        }
+    }
+
+    public removeBuff(buff: string, source: number) : void {
+        const buffExists = this.buffList.some(item => 
+            item.buff === buff && item.source === source
+        );
+        switch(buff){
+            case 'speed':
+                if(!buffExists) return;
+                this.unitProps.speed /= 2;
+                this.unitProps.actionSpeed *= 2;
+                this.buffList = this.buffList.filter(item => {
+                    return item.buff !== buff || item.source !== source;
+                });
+                break;
+        }
     }
 
     public applyDebuff(debuff: string) : void {
@@ -253,7 +298,25 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         }
     }
 
-    public startAttackingTarget(): void {
+    public attackTarget(): void {
+        if (!this.active || this.state === UnitStates.DEAD || this.state === UnitStates.WAITING) {
+            return;
+        }
+        this.anims.timeScale = (this.anims?.currentAnim?.duration ?? 1) / (this.unitProps.actionSpeed + 100);
+        if(this.meleeTarget instanceof Unit && this.meleeTarget.active && this.meleeTarget.isAlive()){
+            this.meleeTarget.takeDamage(this.unitProps.damage);
+        }
+        else if(this.meleeTarget instanceof PlayerBase && this.meleeTarget.active){
+            this.meleeTarget.takeDamage(this.unitProps.damage);
+        }
+        else{
+            this.meleeTarget = null;
+            this.stopAttacking();
+            return;
+        }
+    }
+
+    /*public startAttackingTarget(): void {
         if (this.attackingTimer) return;
         if (!this.meleeTarget) return;
 
@@ -279,7 +342,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
             callbackScope: this,
             loop: true
         });
-    }
+    }*/
 
     /* General unit state handling
         IDLE, it plays an idle animation and transitions to WALKING if it's not blocked.
@@ -318,24 +381,45 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         if(this.state === UnitStates.DEAD) return;
         if(this.actionDisabled) return;
         console.log("Changing state from " + this.state + " to " + newState);
+
+        // Handle state changes based on previous
+        switch (this.state){
+            case UnitStates.SUPPORTING:
+                if(this.scene.anims.exists(`${this.unitType}_support_end`)){
+                    this.play(`${this.unitType}_support_end`, true);
+                }
+                break;
+            default:
+                break;
+        }
+
         this.state = newState;
 
+        // Handle state changes based on new
         switch (newState) {
             case UnitStates.SUPPORTING:
                 this.startSupporting();
-                this.play(`${this.unitType}_support`, true);
-                this.anims.timeScale = (this.anims?.currentAnim?.duration ?? 1) / this.unitProps.actionSpeed;
+                if(this.scene.anims.exists(`${this.unitType}_support_start`)){
+                    this.play(`${this.unitType}_support_start`, true);
+                }
+                else{
+                    this.play(`${this.unitType}_support`, true);
+                }
+                
+                this.anims.timeScale = (this.anims?.currentAnim?.duration ?? 1) / (this.unitProps.actionSpeed + 100);
                 break;
             case UnitStates.SHOOTING:
+                this.actionCooldown = 0;
                 this.stopMoving();
-                this.startShooting();
+                //this.startShooting();
                 this.play(`${this.unitType}_shoot`, true);
-                this.anims.timeScale = (this.anims?.currentAnim?.duration ?? 1) / this.unitProps.actionSpeed;
+                this.anims.timeScale = (this.anims?.currentAnim?.duration ?? 1) / (this.unitProps.actionSpeed + 100);
                 break;
             case UnitStates.ATTACKING:
+                this.actionCooldown = 0;
                 this.stopSupporting();
-                this.stopShooting();
-                this.startAttackingTarget();
+                //this.stopShooting();
+                //this.startAttackingTarget();
                 this.play(`${this.unitType}_attack`, true);
                 this.anims.timeScale = (this.anims?.currentAnim?.duration ?? 1) / (this.unitProps.actionSpeed + 100);
                 break;
@@ -403,10 +487,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
     }
 
     public stopAttacking(): void {
-        if (this.attackingTimer) {
-            this.attackingTimer.remove();
-            this.attackingTimer = null;
-        }
+        this.actionCooldown = 0;
         this.changeState(UnitStates.IDLE);
     }
 

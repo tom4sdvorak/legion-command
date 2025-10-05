@@ -32,53 +32,87 @@ interface UnitConfig {
 export class UnitConfigLoader {
     private config: UnitConfig;
 
-    /**
-     * Initializes the loader with the raw JSON configuration.
-     * @param rawConfig The raw JSON object parsed from the configuration file.
-     */
     constructor(rawConfig: any) {
         this.config = rawConfig as UnitConfig;
     }
 
     /**
-     * Retrieves the fully merged properties for a specific unit type.
-     * This method correctly handles the inheritance chain from base unit to specific unit type
-     * and correctly merges array properties like 'tags'.
+     * Public entry point to retrieve the fully merged properties for a specific unit type.
      * @param unitType The string identifier for the unit (e.g., "warrior", "archer").
      * @returns The fully merged UnitProps object.
      */
     public getUnitProps(unitType: string): UnitProps {
-        const unit: RawUnitConfig = this.config.unitTypes[unitType];
+        const unitData = this.config.unitTypes[unitType];
 
-        if (!unit) {
-            console.error(`Error: Unit type '${unitType}' not found in configuration.`);
+        if (!unitData) {
+            console.error(`Error: Unit type '${unitType}' not found.`);
             return {} as UnitProps;
         }
 
-        const parentClass: RawUnitConfig = this.config.unitClasses[unit.extends!];
+        // Start the recursive merge process.
+        const mergedRawProps = this.recursiveMerge(unitData, 'unitTypes');
 
-        // Step 1: Perform the shallow merge for all properties.
-        // This will correctly override numbers, strings, etc., but will overwrite arrays.
-        let finalProps: UnitProps = {
-            ...this.config.baseUnit,
-            ...(parentClass || {}),
-            ...unit,
-        };
+        // Clean up the final object and ensure all required UnitProps fields exist.
+        delete (mergedRawProps as any).extends;
 
-        // Step 2: Manually merge the 'tags' array to combine them instead of overwriting.
-        const baseTags = this.config.baseUnit.tags || [];
-        const classTags = parentClass?.tags || [];
-        const unitTags = unit.tags || [];
+        return mergedRawProps as UnitProps;
+    }
 
-        // Combine all tags and use a Set to automatically handle duplicates.
-        const combinedTags = [...new Set([...baseTags, ...classTags, ...unitTags])];
+    /**
+     * Recursively walks the inheritance chain, merging properties from parent to child.
+     * @param childConfig The config object of the current level (e.g., "wizard").
+     * @param containerKey The key of the container where the child resides ('unitTypes' or 'unitClasses').
+     * @returns The merged RawUnitConfig object.
+     */
+    private recursiveMerge(childConfig: RawUnitConfig, containerKey: 'unitTypes' | 'unitClasses'): RawUnitConfig {
+        const parentKey = childConfig.extends;
+        let mergedProps: RawUnitConfig = { ...childConfig };
+        let parentConfig: RawUnitConfig | null = null;
         
-        // Assign the correctly merged array to the final properties.
-        finalProps.tags = combinedTags;
+        // --- 1. Identify Parent Config ---
+        if (parentKey === 'baseUnit') {
+            parentConfig = this.config.baseUnit as RawUnitConfig;
+        } else if (parentKey) {
+            if (this.config.unitClasses[parentKey]) {
+                parentConfig = this.config.unitClasses[parentKey];
+            } else if (this.config.unitTypes[parentKey] && containerKey === 'unitTypes') {
+                 parentConfig = this.config.unitTypes[parentKey];
+            }
+        }
+        
+        // --- 2. Recursive Merge for Shallow Properties ---
+        if (!parentKey || !parentConfig) {
+            // Base Case: Merge with the actual baseUnit structure
+            mergedProps = { ...this.config.baseUnit, ...mergedProps };
+        } else {
+            // Get the fully resolved parent properties recursively
+            const resolvedParent = this.recursiveMerge(parentConfig, 'unitClasses');
 
-        // Step 3: Clean up the final object by removing the `extends` property.
-        delete (finalProps as any).extends;
+            // Shallow merge: Child properties overwrite parent properties
+            mergedProps = { ...resolvedParent, ...mergedProps };
+        }
+        
+        // --- 3. CORRECT ARRAY MERGE FOR TAGS ---
+        
+        // At this point, mergedProps.tags contains the fully resolved tags 
+        // from the entire inheritance chain up to (and including) the resolved parent,
+        // OR the tags from the 'childConfig' if they were explicitly defined 
+        // and overwrote the parent's (due to the shallow merge). 
+        
+        // To fix this, we need to take the parent's *resolved* tags and add the child's *explicit* tags.
+        
+        // Get the tags that came from the resolved parent (or base unit)
+        const parentTags = (parentConfig ? (this.recursiveMerge(parentConfig, 'unitClasses')).tags : this.config.baseUnit.tags) || [];
+        
+        // Get the tags explicitly defined on the current child
+        const childExplicitTags = childConfig.tags || [];
 
-        return finalProps;
+        // Combine them all and de-duplicate
+        const combinedTags = [...parentTags, ...childExplicitTags];
+        
+        // Use a Set to ensure unique tags
+        mergedProps.tags = [...new Set(combinedTags)];
+
+        return mergedProps;
     }
 }
