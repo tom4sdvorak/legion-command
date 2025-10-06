@@ -23,6 +23,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
     actionDisabled: boolean = false;
     burningDebuff : {timer: Phaser.Time.TimerEvent | null, ticks: number, damage: number} | null = null;
     petrifyDebuff : {timer: Phaser.Time.TimerEvent | null, duration: number} | null = null;
+    speedBuffGlow: Phaser.FX.Glow | null = null;
     buffList: {buff: string, source: number}[] = [];
 
     constructor(scene: Game, unitType: string) {
@@ -31,7 +32,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         this.unitType = unitType;
         this.setOrigin(0.5, 1);
         this.healthComponent = new HealthComponent(this, 100, true,32, 5, scene.cameras.main.height+this.scene.getGlobalOffset().y+10); // parent, maxHealth, visible?, width, height, yOffset, 
-        
+
         // Listen to call of unit's death
         this.on('death', this.die, this);
     }
@@ -49,7 +50,6 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         this.actionDisabled = false;
         this.state = UnitStates.WAITING;
         this.colorMatrix.reset();
-        this.actionDisabled = false;
         this.actionCooldown = 0;
         this.buffList = [];
         this.specialCooldown = this.unitProps.specialCooldown; // Reset special cooldown so special is available instantly
@@ -115,6 +115,10 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         this.burningDebuff = null;
         this.petrifyDebuff?.timer?.remove();
         this.petrifyDebuff = null;
+        if(this.speedBuffGlow !== null) {
+            this.postFX.remove(this.speedBuffGlow);
+            this.speedBuffGlow = null;
+        }
         
         this.setDepth(1);
         if(this.unitProps.faction === 'red') this.scene.rewardPlayer('blue', 10);
@@ -144,10 +148,9 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         }
         //super.update(time, delta);
         // Keep unit moving when not blocked
-        if (this.state !== UnitStates.DEAD) {
-            if (this.state !== UnitStates.SHOOTING && !this.isBlocked()[0]) {
-                this.moveForward();
-            }
+        if (this.state !== UnitStates.DEAD && this.state !== UnitStates.WALKING && !this.isBlocked()[0]) {
+            this.changeState(UnitStates.WALKING);
+            //this.moveForward();
         }
 
         if(this.state === UnitStates.ATTACKING || this.state === UnitStates.SHOOTING){
@@ -177,31 +180,52 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
     }
 
     public applyBuff(buff: string, source: number) : void {
-        const buffExists = this.buffList.some(item => 
+        const buffExistsFromSource = this.buffList.some(item => 
             item.buff === buff && item.source === source
         );
+        const buffExistsAtAll = this.buffList.some(item => 
+            item.buff === buff
+        );
+
+        
+        if(buffExistsFromSource) return; // Do nothing if source already applied equal buff
+
         switch(buff){
             case 'speed':
-                if(buffExists) return;
+                this.buffList.push({buff: buff, source: source});
+                if(buffExistsAtAll) return; // Skip rest if any instance of the buff exists
+                if(this.speedBuffGlow === null) this.speedBuffGlow = this.postFX.addGlow(0x976EFF, 10, 0, false);
                 this.unitProps.speed *= 2;
                 this.unitProps.actionSpeed /= 2;
-                this.buffList.push({buff: buff, source: source});
                 break;
         }
     }
 
+    /**
+     * 
+     * @param buff String name of buff
+     * @param source ID of the unit trying to remove its applied buff
+     */
     public removeBuff(buff: string, source: number) : void {
-        const buffExists = this.buffList.some(item => 
+        const buffIndex = this.buffList.findIndex(item => 
             item.buff === buff && item.source === source
         );
+
+        if (buffIndex === -1) return; // Do nothing if source target doesnt even have this buff from this source
+        this.buffList.splice(buffIndex, 1); // Remove buff from list
+
+        // Check if there are still instances of the buff from other sources and do nothing if yes
+        const buffStillExists = this.buffList.some(item => item.buff === buff);
+        if(buffStillExists) return;
+
         switch(buff){
             case 'speed':
-                if(!buffExists) return;
                 this.unitProps.speed /= 2;
                 this.unitProps.actionSpeed *= 2;
-                this.buffList = this.buffList.filter(item => {
-                    return item.buff !== buff || item.source !== source;
-                });
+                if(this.speedBuffGlow !== null) {
+                    this.postFX.remove(this.speedBuffGlow);
+                    this.speedBuffGlow = null;
+                }
                 break;
         }
     }
@@ -216,7 +240,16 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
                 this.unitProps.armor = -100;
                 // set it to unable to move or attack
                 this.changeState(UnitStates.WAITING);
-                this.stop();
+                // Slow current animation considerably
+                this.stopAfterRepeat();
+                this.scene.tweens.add({
+                    targets: this.anims,
+                    timeScale: 0.01,
+                    duration: 500,      // Time to complete the slow-down (in ms)
+                    ease: 'Sine.easeOut',
+                    callbackScope: this
+                });
+
                 this.actionDisabled = true;
                 // add timer to remove petrification
                 if(this.petrifyDebuff?.timer) this.petrifyDebuff.timer.remove();
@@ -227,6 +260,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
                         if (!this.active) {
                             return;
                         }
+                        this.anims.timeScale = 1; 
                         this.actionDisabled = false;
                         this.colorMatrix.grayscale(0);
                         this.changeState(UnitStates.IDLE);
@@ -353,17 +387,17 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
     public handleState(): void {
         switch (this.state) {
             case UnitStates.IDLE:
-                let blockingSituation : [boolean, Unit | null] = this.isBlocked();
+                let blockingSituation : [boolean, Unit | PlayerBase | null] = this.isBlocked();
                 // Try to walk if not blocked
                 if(!blockingSituation[0]){
                     this.changeState(UnitStates.WALKING);
                 }
-                else{
+                /*else{
                     // If blocked, check if its enemy and trigger collision
                     if(blockingSituation[1] instanceof Unit && blockingSituation[1].unitProps.faction !== this.unitProps.faction){
                         this.handleCollision(blockingSituation[1]);
                     }
-                }
+                }*/
                 break;
             case UnitStates.ATTACKING:                              
                 if(!this.meleeTarget || !this.meleeTarget.active){
@@ -388,6 +422,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
                 if(this.scene.anims.exists(`${this.unitType}_support_end`)){
                     this.play(`${this.unitType}_support_end`, true);
                 }
+                this.stopSupporting();
                 break;
             default:
                 break;
@@ -399,37 +434,32 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         switch (newState) {
             case UnitStates.SUPPORTING:
                 this.startSupporting();
+                //this.stopMoving();
                 if(this.scene.anims.exists(`${this.unitType}_support_start`)){
                     this.play(`${this.unitType}_support_start`, true);
                 }
                 else{
                     this.play(`${this.unitType}_support`, true);
                 }
-                
                 this.anims.timeScale = (this.anims?.currentAnim?.duration ?? 1) / (this.unitProps.actionSpeed + 100);
                 break;
             case UnitStates.SHOOTING:
                 this.actionCooldown = 0;
-                this.stopMoving();
-                //this.startShooting();
+                //this.stopMoving();
                 this.play(`${this.unitType}_shoot`, true);
                 this.anims.timeScale = (this.anims?.currentAnim?.duration ?? 1) / (this.unitProps.actionSpeed + 100);
                 break;
             case UnitStates.ATTACKING:
                 this.actionCooldown = 0;
-                this.stopSupporting();
-                //this.stopShooting();
-                //this.startAttackingTarget();
                 this.play(`${this.unitType}_attack`, true);
                 this.anims.timeScale = (this.anims?.currentAnim?.duration ?? 1) / (this.unitProps.actionSpeed + 100);
                 break;
-            case UnitStates.IDLE:
-                this.stopShooting();
-                this.stopSupporting();
+            case UnitStates.IDLE:  
                 this.play(`${this.unitType}_idle`, true);
                 this.anims.timeScale = 1;
                 break;
             case UnitStates.WALKING:
+                this.moveForward();
                 this.play(`${this.unitType}_run`, true);
                 this.anims.timeScale = 1;
                 break;
@@ -458,30 +488,33 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         return;
     }
 
-    isBlocked(): [boolean, Unit | null] {
-        const detectionRectWidth = 20;
-        if(this.body){
-            const xOffset = (this.body.width * 0.5 + 1) * this.direction;
-            const yOffset = -this.body.height * 0.5;
-            // Use a physics overlap check to find a blocking unit in front
-            let overlap = this.scene.physics.overlapRect(this.x + xOffset, this.y + yOffset, detectionRectWidth * this.direction, this.body.height);
+    isBlocked(): [boolean, Unit | PlayerBase | null] {
+        if (!this.body) return [false, null];
 
-            // Should really find at most 2 things but loop just in case
-            for (const object of overlap) {
-                if (object.gameObject) {
-                    const gameObject = object.gameObject;
-                    if (gameObject instanceof Unit && gameObject !== this && gameObject.isAlive()) {
-                        return [true, gameObject];
-                    }
+        const detectionRectWidth = 20;
+        const xOffset = (this.body.width * 0.5 + 1) * this.direction;
+        const yOffset = -this.body.height * 0.5;
+        // Use a physics overlap check to find a blocking unit in front
+        let overlap = this.scene.physics.overlapRect(this.x + xOffset, this.y + yOffset, detectionRectWidth * this.direction, this.body.height, true, true);
+
+        // Should really find at most 2 things but loop just in case
+        for (const object of overlap) {
+            if (object.gameObject) {
+                const gameObject = object.gameObject;
+                if (gameObject instanceof Unit && gameObject !== this && gameObject.isAlive()) {
+                    return [true, gameObject];
+                }
+                else if (gameObject instanceof PlayerBase && gameObject.faction !== this.unitProps.faction) {
+                    return [true, gameObject];
                 }
             }
+        }
             /*return overlap.some(object => {
                 if (object.gameObject instanceof Unit && object.gameObject.isAlive()) {
                     return [true, object.gameObject];
                 }
                 return [false, null];
             });*/
-        }
         return [false, null];
         
     }

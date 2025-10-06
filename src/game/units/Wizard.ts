@@ -1,3 +1,4 @@
+import { UnitStates } from "../helpers/UnitStates";
 import { Game } from "../scenes/Game";
 import { SupportUnit } from "./SupportUnit";
 import { Unit } from "./Unit";
@@ -17,6 +18,14 @@ export class Wizard extends SupportUnit {
 
         // Clear dead allies from range list
         this.alliesInRange = this.alliesInRange.filter(ally => ally.isAlive());
+
+        // Check if there is any ally that is actually attacking or shooting, emptying the list if not so to not waste support cooldown
+        const isAnyoneAttacking = this.alliesInRange.some(ally => ally.state === UnitStates.ATTACKING || ally.state === UnitStates.SHOOTING
+        );
+        if (!isAnyoneAttacking) {
+            this.alliesInRange = [];
+        }
+        
 
         this.handleState();
     }

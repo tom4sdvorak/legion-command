@@ -52,6 +52,7 @@
       "extends": "meleeUnit",
       "cost": 10,
       "scale": 0.9,
+      "bodyWidth": 48,
       "tags": ["warrior", "tank"]
     },
 
@@ -67,7 +68,8 @@
       "cost": 30,
       "projectileOffsetY": -62,
       "projectileVelocity": 50,
-      "scale": 0.9,
+      "bodyWidth": 96,
+      "scale": 0.8,
       "tags": ["wizard"]
     },
 
@@ -75,7 +77,7 @@
       "extends": "rangedUnit",
       "cost": 15,
       "scale": 1.4,
-      "bodyHeight": 96,
+      "bodyHeight": 80,
       "projectileOffsetY": -19,
       "projectileVelocity": 300,
       "specialCooldown": 999999,

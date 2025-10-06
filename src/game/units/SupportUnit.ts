@@ -70,7 +70,7 @@ export class SupportUnit extends RangedUnit {
     }
 
     handleState(): void {
-        if(this.state === UnitStates.WALKING || this.state === UnitStates.IDLE){
+        if(this.state === UnitStates.IDLE){
             if (this.alliesInRange.length > 0 && this.specialCooldown >= this.unitProps.specialCooldown) {
                 this.changeState(UnitStates.SUPPORTING);
             }

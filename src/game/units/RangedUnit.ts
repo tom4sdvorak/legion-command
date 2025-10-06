@@ -102,7 +102,7 @@ export class RangedUnit extends Unit {
     }
 
     handleState(): void {
-        if(this.state === UnitStates.WALKING || this.state === UnitStates.IDLE){
+        if(this.state === UnitStates.IDLE){
             if (this.baseInRange || this.enemiesInRange.length > 0) {
                 this.changeState(UnitStates.SHOOTING);
             }
