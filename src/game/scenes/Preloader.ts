@@ -100,6 +100,7 @@ export class Preloader extends Scene
         this.load.spritesheet('campfire', 'campfire/sprite_sheet.png',{frameWidth: 32, frameHeight: 32});
         this.load.spritesheet('alchemist', 'alchemist/sprite_sheet.png',{frameWidth: 64, frameHeight: 64});
         this.load.spritesheet('sawmill', 'sawmill/sprite_sheet.png',{frameWidth: 64, frameHeight: 64});
+        this.load.spritesheet('magma', 'magma/sprite_sheet.png',{frameWidth: 381, frameHeight: 186});
         
     }
 

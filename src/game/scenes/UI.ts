@@ -136,14 +136,15 @@ export class UI extends Scene
 
         // Display settings/pause menu
         this.settingsImage = this.add.image(this.cameras.main.width/4*3+50, this.cameras.main.height - 96, 'cog').setOrigin(0, 0.5).setDisplaySize(64, 64).setInteractive();
-        this.settingsImage.postFX.addGlow(0xA8A9AD, 1, 1, false, 1, 5);
+        let settingsImageGlow = this.settingsImage.postFX.addGlow(0xA8A9AD, 10, 1, false, 1, 1);
         this.settingsImage.on('pointerup', () => {
             this.onPause()
         }).on('pointerover', () => {
-            this.settingsImage.postFX.addGlow(0xffffff, 4, 1, false, 1, 5);
+            this.settingsImage.postFX.remove(settingsImageGlow);
+            this.settingsImage.postFX.addGlow(0xffffff, 10, 0, false, 1, 1);
         }).on('pointerout', () => {
             this.settingsImage.postFX.clear();
-            this.settingsImage.postFX.addGlow(0xA8A9AD, 1, 1, false, 1, 5);
+            settingsImageGlow = this.settingsImage.postFX.addGlow(0xA8A9AD, 10, 1, false, 1, 1);
         })
 
         // Display elapsed time
@@ -183,7 +184,7 @@ export class UI extends Scene
             }
             unitSprite.setDisplaySize(newWidth,newHeight);
             let currentGlow : any;
-            unitSprite.postFX.addGlow(0x000000, 1, 0, false);
+            unitSprite.postFX.addGlow(0x000000, 2, 0, false, 1, 5);
             const unitLoadingBar = this.add.rectangle(0, innerButtonHeight/2, innerButtonWidth, innerButtonHeight, 0xffffff).setAlpha(0.5).setOrigin(0.5,1);
             unitLoadingBar.scaleY = 0;
             const spawnButtonContainer = this.add.container(x, y);
@@ -195,7 +196,7 @@ export class UI extends Scene
                 .on('pointerover', () => {
                     let buttonBorder : Phaser.GameObjects.NineSlice = spawnButtonUI.list[2] as Phaser.GameObjects.NineSlice;
                     if(currentGlow) buttonBorder.postFX.remove(currentGlow);
-                    currentGlow = buttonBorder.postFX.addGlow(0xffffff, 4, 0, false, 1, 5);
+                    currentGlow = buttonBorder.postFX.addGlow(0xffffff, 10, 0, false, 1, 1);
                 })
                 .on('pointerout', () => {
                     let buttonBorder : Phaser.GameObjects.NineSlice = spawnButtonUI.list[2] as Phaser.GameObjects.NineSlice;

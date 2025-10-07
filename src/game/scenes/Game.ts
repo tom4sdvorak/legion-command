@@ -107,6 +107,7 @@ export class Game extends Scene
         this.baseBlue = new PlayerBase(this, 'blue', bluePos, this.redUnitsPhysics, this.blueProjectiles);
         this.playerBlue = new AIPlayer(this, this.baseBlue, bluePos, this.blueUnitsPhysics, this.redUnitsPhysics, this.blueProjectiles, this.objectPool, this.baseGroup, this.blueConfigLoader);
         this.playerBlue.changePassiveIncome(1, true);
+        this.playerBlue.addMoney(999);
         if(devConfig.AI) this.AIController = new AIController(this.playerBlue, this.playerRed, 'EASY');
 
         this.baseGroup.add(this.baseRed);
@@ -201,13 +202,17 @@ export class Game extends Scene
     }
 
     beforeRedProjectileHit(target: Unit | PlayerBase, projectile: Projectile) : boolean{
-        if(projectile.x+projectile.width/2 < target.x) return false;
-        return true;     
+        if(projectile.body && target.body){
+            if(projectile.body.left < target.body.left) return false;
+        }
+        return true;
     }
 
     beforeBlueProjectileHit(target: Unit | PlayerBase, projectile: Projectile) : boolean{
-        if(projectile.x-projectile.width/2 > target.x) return false;
-        return true;     
+        if(projectile.body && target.body){
+            if(projectile.body.right > target.body.right) return false;
+        }
+        return true;    
     }
 
     onProjectileHit(target: Unit | PlayerBase, projectile: Projectile) : void{

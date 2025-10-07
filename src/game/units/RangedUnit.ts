@@ -93,7 +93,6 @@ export class RangedUnit extends Unit {
         if(this.state === UnitStates.SHOOTING){
             if(this.actionCooldown >= this.unitProps.actionSpeed){
                 this.shootTarget();
-                console.log("Shooting on CD " + this.actionCooldown);
                 this.actionCooldown -= this.unitProps.actionSpeed;
             }
         }

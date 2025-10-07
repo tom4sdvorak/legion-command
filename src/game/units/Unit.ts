@@ -34,7 +34,9 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         this.healthComponent = new HealthComponent(this, 100, true,32, 5, scene.cameras.main.height+this.scene.getGlobalOffset().y+10); // parent, maxHealth, visible?, width, height, yOffset, 
 
         // Listen to call of unit's death
-        this.on('death', this.die, this);
+        this.on('death', () => {
+            this.onKilled(); 
+        }, this);
     }
 
     // Reinitializes the unit like a constructor would
@@ -56,7 +58,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         // Reinitialize the sprite's body
         this.setScale(unitProps.scale);
         
-        this.glow = this.postFX?.addGlow(0x000000, 1, 0, false);
+        this.glow = this.postFX?.addGlow(0x000000, 2, 0, false, 1, 10);
         
         this.setActive(true);
         this.setVisible(true);
@@ -71,7 +73,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         (this.body as Phaser.Physics.Arcade.Body).enable = true;
         (this.body as Phaser.Physics.Arcade.Body).reset(newPositionX, unitProps.y);
         (this.body as Phaser.Physics.Arcade.Body).pushable = false;
-        console.log("Unit spawned at: " + this.x + " " + this.y);
+        //console.log("Unit spawned at: " + this.x + " " + this.y);
         if(this.body){
             this.setBodySize(unitProps.bodyWidth/unitProps.scale, unitProps.bodyHeight/unitProps.scale, true);
 
@@ -90,8 +92,10 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
             this.glow = this.postFX.addGlow(0xffff00, 10, 0, false, 1, 1);
         }).on('pointerout', () => {
             this.postFX.remove(this.glow);
-            this.glow = this.postFX?.addGlow(0x000000, 1, 0, false);
+            this.glow = this.postFX?.addGlow(0x000000, 2, 0, false, 1, 10);
         }).on('pointerup', () => {
+            console.log("%c ", "color:green", "Clicked unit:");
+            console.log(this.state);
             console.log(this.unitProps);
         })
         this.changeState(UnitStates.WALKING);
@@ -104,7 +108,23 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         this.changeState(UnitStates.WAITING);
     }
 
-    die(): void {
+    onKilled(skipDeathAnimation: boolean = false): void { 
+        // Play death animation
+        if(!skipDeathAnimation){
+            this.play(`${this.unitType}_death`, true)
+        }
+        
+        // Reward player
+        if(this.unitProps.faction === 'red') this.scene.rewardPlayer('blue', 1);
+        else this.scene.rewardPlayer('red', this.unitProps.cost);
+        eventsCenter.emit('unit-died', this.unitProps.faction);
+
+        this.die();
+    }
+
+
+
+    die(): void { 
         this.stopEverything();
         this.changeState(UnitStates.DEAD);
         this.actionDisabled = true;
@@ -121,14 +141,9 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         }
         
         this.setDepth(1);
-        if(this.unitProps.faction === 'red') this.scene.rewardPlayer('blue', 10);
-        else this.scene.rewardPlayer('red', this.unitProps.cost);
         if(this.unitGroup) this.unitGroup.remove(this);
-        this.play(`${this.unitType}_death`, true);
         this.anims.timeScale = 1;
-        eventsCenter.emit('unit-died', this.unitProps.faction);
         
-        //this.disableBody();
        // (this.body as Phaser.Physics.Arcade.Body).setEnable(false);
         this.scene.time.delayedCall(5000, () => {
             this.healthComponent.deactivate();
@@ -392,12 +407,15 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
                 if(!blockingSituation[0]){
                     this.changeState(UnitStates.WALKING);
                 }
-                /*else{
+                else{
                     // If blocked, check if its enemy and trigger collision
                     if(blockingSituation[1] instanceof Unit && blockingSituation[1].unitProps.faction !== this.unitProps.faction){
                         this.handleCollision(blockingSituation[1]);
                     }
-                }*/
+                    else if(blockingSituation[1] instanceof PlayerBase && blockingSituation[1].faction !== this.unitProps.faction){
+                        this.handleCollision(blockingSituation[1]);
+                    }
+                }
                 break;
             case UnitStates.ATTACKING:                              
                 if(!this.meleeTarget || !this.meleeTarget.active){
@@ -414,7 +432,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         if(newState === this.state) return;
         if(this.state === UnitStates.DEAD) return;
         if(this.actionDisabled) return;
-        console.log("Changing state from " + this.state + " to " + newState);
+        //console.log("Changing state from " + this.state + " to " + newState);
 
         // Handle state changes based on previous
         switch (this.state){

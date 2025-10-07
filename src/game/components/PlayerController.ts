@@ -42,7 +42,7 @@ export class PlayerController {
         this.objectPool = objectPool;
         this.baseGroup = baseGroup;
         this.playerBase = playerBase;
-        this.resourceComponent = new ResourceComponent(this);       
+        this.resourceComponent = new ResourceComponent(this);
     }
 
     destroy() {
@@ -68,9 +68,7 @@ export class PlayerController {
 
     public deduceMoney(amount: number) {
         this.resourceComponent.removeMoney(amount);
-    }
-
-    
+    }    
 
     public getUnitStats(unitType: string) {
         // Get base stats of the chosen unit
@@ -86,9 +84,22 @@ export class PlayerController {
         const unitUpgrades = this.unitsUpgrades.find(unitUpgrades => unitUpgrades.unitType === unitType)?.upgrades || [];
         const allUpgradeEffects = unitUpgrades.flatMap((upgrade: UnitUpgrade) => upgrade.effects);
 
+        // 💡 DEBUGGING CODE: Add this block temporarily
+        for (let i = 0; i < allUpgradeEffects.length; i++) {
+            const effect = allUpgradeEffects[i];
+            if (effect === null || effect === undefined) {
+                // This will print the exact location of the invalid data
+                console.error(`ERROR: Null/Undefined found at index ${i} in allUpgradeEffects!`);
+                console.log("Full array for context:", allUpgradeEffects);
+                // You can also add a debugger breakpoint here:
+                // debugger; 
+            }
+        }
+        // 💡 END DEBUGGING CODE
+
         //Split extracted effects to flat bonuses and percentage bonuses
-        const flatUpgrades : UnitModifier[]  = allUpgradeEffects.filter((effect: { stat: string; type: string; value: number; }) => effect.type === 'flat') as UnitModifier[]; 
-        const percentUpgrades : UnitModifier[] = allUpgradeEffects.filter((effect: { stat: string; type: string; value: number; }) => effect.type === 'percent') as UnitModifier[];
+        const flatUpgrades : UnitModifier[]  = allUpgradeEffects.filter((effect: { stat: string; type: string; value: number; }) => effect && effect.type === 'flat') as UnitModifier[]; 
+        const percentUpgrades : UnitModifier[] = allUpgradeEffects.filter((effect: { stat: string; type: string; value: number; }) => effect && effect.type === 'percent') as UnitModifier[];
 
         // Calculate new stats starting with base stats and increasing them directly by flat upgrades
         const newStats = flatUpgrades.reduce((acc, modifier : UnitModifier) => {

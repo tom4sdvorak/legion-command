@@ -88,13 +88,13 @@ export class PreGame extends Scene
                     }
                 });
             });
-            let glow = mySprite.postFX?.addGlow(0x000000, 1, 0, false);
+            let glow = mySprite.postFX?.addGlow(0x000000, 2, 0, false, 1, 10);
             mySprite.on('pointerover', () => {
                 mySprite.postFX.remove(glow);
                 glow = mySprite.postFX.addGlow(0xffff00, 10, 0, false, 1, 1);
             }).on('pointerout', () => {
                 mySprite.postFX.remove(glow);
-                glow = mySprite.postFX?.addGlow(0x000000, 1, 0, false);
+                glow = mySprite.postFX?.addGlow(0x000000, 2, 0, false, 1, 10);
             });
 
             mySprite.play(`${unit}_idle`);
@@ -107,6 +107,15 @@ export class PreGame extends Scene
             this.showConstructionMenu();
             this.overlay.setVisible(true);
         });
+        let sawmillGlow = sawmill.postFX?.addGlow(0x000000, 2, 0, false, 1, 10);
+        sawmill.on('pointerover', () => {
+            sawmill.postFX.remove(sawmillGlow);
+            sawmillGlow = sawmill.postFX.addGlow(0x00FFFF, 10, 0, false, 1, 1);
+        }).on('pointerout', () => {
+            sawmill.postFX.remove(sawmillGlow);
+            sawmillGlow = sawmill.postFX?.addGlow(0x000000, 2, 0, false, 1, 10);
+        });
+
         this.add.sprite(this.gameWidth/2, this.gameHeight/2, 'campfire').play('campfire_burning').setDisplaySize(64,64);
 
         this.overlay = this.add.rectangle(0, 0, this.cameras.main.width, this.cameras.main.height, 0x000000).setOrigin(0, 0).setAlpha(0.5).setInteractive().setDepth(1000).setVisible(false);
@@ -232,6 +241,15 @@ export class PreGame extends Scene
             alchemist.playAfterRepeat('alchemist_idleToDialog');
             this.potionsMenu.setVisible(true);
             this.overlay.setVisible(true);
+        });
+
+        let glow = alchemist.postFX?.addGlow(0x000000, 2, 0, false, 1, 10);
+        alchemist.on('pointerover', () => {
+            alchemist.postFX.remove(glow);
+            glow = alchemist.postFX.addGlow(0x00FFFF, 10, 0, false, 1, 1);
+        }).on('pointerout', () => {
+            alchemist.postFX.remove(glow);
+            glow = alchemist.postFX?.addGlow(0x000000, 2, 0, false, 1, 10);
         });
 
         alchemist.on('animationcomplete', (anim : Phaser.Animations.Animation, frame : Phaser.Animations.AnimationFrame) => {
