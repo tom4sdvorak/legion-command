@@ -152,4 +152,12 @@ export default class SaveManager {
         }
         return saves;
     }
+
+    /**
+     * 
+     * @param saveSlot string name of slot to delete
+     */
+    static deleteSave(saveSlot: string) {
+        localStorage.removeItem(saveSlot);
+    }
 }

@@ -106,8 +106,8 @@ export class Game extends Scene
         ];
         this.baseBlue = new PlayerBase(this, 'blue', bluePos, this.redUnitsPhysics, this.blueProjectiles);
         this.playerBlue = new AIPlayer(this, this.baseBlue, bluePos, this.blueUnitsPhysics, this.redUnitsPhysics, this.blueProjectiles, this.objectPool, this.baseGroup, this.blueConfigLoader);
-        this.playerBlue.changePassiveIncome(1, true);
-        this.playerBlue.addMoney(999);
+        this.playerBlue.changePassiveIncome(0, true);
+        this.playerBlue.addMoney(0);
         if(devConfig.AI) this.AIController = new AIController(this.playerBlue, this.playerRed, 'EASY');
 
         this.baseGroup.add(this.baseRed);
@@ -313,6 +313,28 @@ export class Game extends Scene
         return new Phaser.Math.Vector2(this.worldWidth, this.worldHeight);
     }
 
+    bindListeners(){
+        eventsCenter.on('spawn-red-unit', (unitType : string) => {
+            console.log(`%cTrying to spawn red ${unitType}`, "color: red");
+            this.playerRed.addUnitToQueue(unitType);
+            
+        });
+        eventsCenter.on('spawn-blue-unit', (unitType : string) => {
+            console.log(`%cTrying to spawn blue ${unitType}`, "color: blue");
+            this.playerBlue.addUnitToQueue(unitType);
+        });
+        eventsCenter.on('base-destroyed', (faction : string) => {
+            this.gameOver(faction);
+        });
+
+        eventsCenter.on('resume', (gameSpeed : number) => {
+            this.tweens.timeScale = gameSpeed;
+            this.physics.world.timeScale = 1 / gameSpeed;
+            this.time.timeScale = gameSpeed;
+            console.log(this.tweens.timeScale, this.physics.world.timeScale, this.time.timeScale);
+        });
+    }
+
     create ()
     {             
         // Setup the game screen
@@ -365,29 +387,8 @@ export class Game extends Scene
             this.isDragging = false;
         });
 
-        
-        
-        //Listen to events
-        eventsCenter.on('spawn-red-unit', (unitType : string) => {
-            console.log(`%cTrying to spawn red ${unitType}`, "color: red");
-            this.playerRed.addUnitToQueue(unitType);
-            
-        });
-        eventsCenter.on('spawn-blue-unit', (unitType : string) => {
-            console.log(`%cTrying to spawn blue ${unitType}`, "color: blue");
-            this.playerBlue.addUnitToQueue(unitType);
-        });
-        eventsCenter.on('base-destroyed', (faction : string) => {
-            this.gameOver(faction);
-        });
-
-        eventsCenter.on('resume', (gameSpeed : number) => {
-            this.tweens.timeScale = gameSpeed;
-            this.physics.world.timeScale = 1 / gameSpeed;
-            this.time.timeScale = gameSpeed;
-            console.log(this.tweens.timeScale, this.physics.world.timeScale, this.time.timeScale);
-        });
-
+        // Bind event listeners with delay
+        this.time.delayedCall(1, this.bindListeners, [], this);
     }
 
     update(time: any, delta: number){

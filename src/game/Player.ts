@@ -19,7 +19,7 @@ export class Player extends PlayerController {
         let selectedUnits : string[] = this.scene.registry.get('playerUnits');
         const potionBuff = this.scene.registry.get('playerPotion');
         let initialUpgrades : UnitUpgrade[] = [];
-        if(potionBuff !== undefined){
+        if(potionBuff){
             const initialUpgrade : UnitUpgrade = {...potionBuff, rarity: "potion", tags: [] as string[]};
             initialUpgrades.push(initialUpgrade);
         }

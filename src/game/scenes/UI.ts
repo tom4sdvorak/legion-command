@@ -84,10 +84,10 @@ export class UI extends Scene
 
     public updateEnemyHPBar(){
         this.enemyHPBar.clear();
-        let hpRatio = this.player.getHealth(false);
+        let hpRatio = this.enemyPlayer.getHealth(false);
         this.enemyHPBar.fillGradientStyle(0xec8845, 0xec8845, 0xc91c1c, 0xc91c1c, 1);
         this.enemyHPBar.lineStyle(2, 0x000000, 0.5);
-        this.enemyHPBar.fillRect(-this.enemyHPBarWidth/2, -this.enemyHPBarHeight/2, this.enemyHPBarWidth*hpRatio, this.enemyHPBarHeight);
+        this.enemyHPBar.fillRect((-this.enemyHPBarWidth/2)+this.enemyHPBarWidth-this.enemyHPBarWidth * hpRatio, -this.enemyHPBarHeight/2, this.enemyHPBarWidth * hpRatio, this.enemyHPBarHeight);
         this.enemyHPBar.strokeRect(-this.enemyHPBarWidth/2, -this.enemyHPBarHeight/2, this.enemyHPBarWidth, this.enemyHPBarHeight);
     }
 
@@ -196,7 +196,7 @@ export class UI extends Scene
                 .on('pointerover', () => {
                     let buttonBorder : Phaser.GameObjects.NineSlice = spawnButtonUI.list[2] as Phaser.GameObjects.NineSlice;
                     if(currentGlow) buttonBorder.postFX.remove(currentGlow);
-                    currentGlow = buttonBorder.postFX.addGlow(0xffffff, 10, 0, false, 1, 1);
+                    currentGlow = buttonBorder.postFX.addGlow(0xffff00, 10, 0, false, 1, 1);
                 })
                 .on('pointerout', () => {
                     let buttonBorder : Phaser.GameObjects.NineSlice = spawnButtonUI.list[2] as Phaser.GameObjects.NineSlice;
@@ -223,76 +223,6 @@ export class UI extends Scene
             Phaser.Display.Align.In.Center(unitSprite, spawnButtonUI);
         }
 
-        /** Event listener for player's money changes
-         * updates money value in UI, renders UI buttons red if player cannot afford unit
-         */
-        eventsCenter.on('money-changed', (faction: string, amount: number) => {
-            if(faction != this.player.faction) return;
-            this.moneyText.setText(`${amount}`);
-            this.unitSpawnButtons.forEach((button, i) => {
-                let buttonUI : UIComponent= button.list[0] as UIComponent;
-                if(this.player.canAfford(this.player.getUnitCost(playedUnits[i])) === false){
-                    button.setData('canAfford', false);
-                    buttonUI.changeTint(0xff0000, 0xfa756b);
-                }
-                else{
-                    button.setData('canAfford', true);
-                    if(this.isSpawning){
-                        buttonUI.changeTint(0x808080, 0xbfbfbf);
-                    }
-                    else{
-                        buttonUI.changeTint(-1,-1);
-                    }
-                }
-            });
-        });
-
-        // Listens for player's unit spawn event in order to remove the grey tint
-        eventsCenter.on('unit-spawned', (faction: string) => {
-            if(faction != this.player.faction) return;
-            this.isSpawning = false;
-            this.unitSpawnButtons.forEach((button) => {
-                let buttonUI : UIComponent= button.list[0] as UIComponent;
-                if(button.getData('canAfford') === true) buttonUI.changeTint(-1,-1);
-            });
-        });
-
-        // Listeners for abse damage to update each health bars
-        eventsCenter.on('base-take-damage', (faction: string) => {
-            if(faction != this.player.faction) return;
-            this.updateHPBar();
-        });
-
-        eventsCenter.on('base-take-damage', (faction: string) => {
-            if(faction === this.player.faction) return;
-            this.updateEnemyHPBar();
-        });
-
-        // Listener for XP accumulation events to update xp bar
-        eventsCenter.on('xp-changed', (faction: string, amount: number) => {
-            if(faction != this.player.faction) return;
-            this.updateXPBar(amount);
-            this.levelText.setText(`Level ${this.player.getLevel()}`);
-        });
-
-        // Listener for level up events to update level bar
-        eventsCenter.on('level-up', (faction: string) => {
-            if(faction != this.player.faction) return;
-            this.onLevelUp();
-        });
-
-        eventsCenter.on('resume', (gameSpeed : number) => {
-            this.tweens.timeScale = gameSpeed;
-            this.physics.world.timeScale = 1 / gameSpeed;
-            this.time.timeScale = gameSpeed;
-        });
-
-        // Listens to base destroyed event that is fired with losing faction
-        eventsCenter.on('base-destroyed', (faction : string) => {
-            const winner : string = (faction === this.player.faction) ? this.enemyPlayer.faction : this.player.faction;
-            this.gameOver(winner);
-        });
-
         // Keep record of time
         this.timerEvent = this.time.addEvent({
         delay: 1000,
@@ -305,6 +235,8 @@ export class UI extends Scene
         loop: true
         });
         
+        // Bind event listeners with delay
+        this.time.delayedCall(1, this.bindListeners, [], this);
         
         /*
         this.button = this.add.circle(500, 500, 40, 0x000000)
@@ -339,6 +271,75 @@ export class UI extends Scene
         Phaser.Display.Align.In.Center(image2c, this.button); // Center the image within the button.
         this.button.setData('parent', image2c);
         image2c.setData('parent', this.button);*/
+    }
+    bindListeners() {
+        /** Event listener for player's money changes
+         * updates money value in UI, renders UI buttons red if player cannot afford unit
+         */
+        const playedUnits = this.registry.get('playerUnits');
+
+        eventsCenter.on('money-changed', (faction: string, amount: number) => {
+            if(faction != this.player.faction) return;
+            this.moneyText.setText(`${amount}`);
+            this.unitSpawnButtons.forEach((button, i) => {
+                let buttonUI : UIComponent= button.list[0] as UIComponent;
+
+                if(this.player.canAfford(this.player.getUnitCost(playedUnits[i])) === false){
+                    button.setData('canAfford', false);
+                    buttonUI.changeTint(0xbd2222, 0xDE9191);
+                }
+                else{
+                    button.setData('canAfford', true);
+                    if(this.isSpawning){
+                        buttonUI.changeTint(0x808080, 0xbfbfbf);
+                    }
+                    else{
+                        buttonUI.changeTint(-1,-1);
+                    }
+                }
+            });
+        });
+
+        // Listens for player's unit spawn event in order to remove the grey tint
+        eventsCenter.on('unit-spawned', (faction: string) => {
+            if(faction != this.player.faction) return;
+            this.isSpawning = false;
+            this.unitSpawnButtons.forEach((button) => {
+                let buttonUI : UIComponent= button.list[0] as UIComponent;
+                if(button.getData('canAfford') === true) buttonUI.changeTint(-1,-1);
+            });
+        });
+
+        // Listeners for basese damage to update each health bars
+        eventsCenter.on('base-take-damage', (faction: string) => {
+            if(faction != this.player.faction) this.updateEnemyHPBar()
+            else this.updateHPBar();
+        });
+
+        // Listener for XP accumulation events to update xp bar
+        eventsCenter.on('xp-changed', (faction: string, amount: number) => {
+            if(faction != this.player.faction) return;
+            this.updateXPBar(amount);
+            this.levelText.setText(`Level ${this.player.getLevel()}`);
+        });
+
+        // Listener for level up events to update level bar
+        eventsCenter.on('level-up', (faction: string) => {
+            if(faction != this.player.faction) return;
+            this.onLevelUp();
+        });
+
+        eventsCenter.on('resume', (gameSpeed : number) => {
+            this.tweens.timeScale = gameSpeed;
+            this.physics.world.timeScale = 1 / gameSpeed;
+            this.time.timeScale = gameSpeed;
+        });
+
+        // Listens to base destroyed event that is fired with losing faction
+        eventsCenter.on('base-destroyed', (faction : string) => {
+            const winner : string = (faction === this.player.faction) ? this.enemyPlayer.faction : this.player.faction;
+            this.gameOver(winner);
+        });
     }
 
     /**

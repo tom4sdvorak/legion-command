@@ -25,6 +25,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
     petrifyDebuff : {timer: Phaser.Time.TimerEvent | null, duration: number} | null = null;
     speedBuffGlow: Phaser.FX.Glow | null = null;
     buffList: {buff: string, source: number}[] = [];
+    private outlineSprite: Phaser.GameObjects.Sprite | null = null;
 
     constructor(scene: Game, unitType: string) {
         super(scene, -500, -500, unitType);
@@ -58,7 +59,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         // Reinitialize the sprite's body
         this.setScale(unitProps.scale);
         
-        this.glow = this.postFX?.addGlow(0x000000, 2, 0, false, 1, 10);
+        //this.glow = this.postFX?.addGlow(0x000000, 1, 0, false);
         
         this.setActive(true);
         this.setVisible(true);
@@ -85,14 +86,30 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
             this.body.setOffset(this.body.offset.x, bodyOffsetY);
         }
 
+        if (this.outlineSprite) {
+            this.outlineSprite.destroy();
+            this.outlineSprite = null;
+        }
+
+        // Create the permanent outline sprite
+        this.outlineSprite = this.scene.add.sprite(this.x, this.y, this.texture.key, this.frame.name)
+            .setOrigin(0.5, 1) 
+            .setTint(0x000000)
+            .setAlpha(0.5)
+            .setDepth(this.depth - 0.1) 
+            .setScale(this.unitProps.scale * 1.05)
+            .setVisible(true)
+            .setFlipX(this.direction === -1);
+        this.scene.children.add(this.outlineSprite);
+
         // Add mouse/touch interaction
         this.setInteractive();
         this.on('pointerover', () => {
-            this.postFX.remove(this.glow);
+            //this.postFX.remove(this.glow);
             this.glow = this.postFX.addGlow(0xffff00, 10, 0, false, 1, 1);
         }).on('pointerout', () => {
             this.postFX.remove(this.glow);
-            this.glow = this.postFX?.addGlow(0x000000, 2, 0, false, 1, 10);
+            //this.glow = this.postFX?.addGlow(0x000000, 2, 0, false, 1, 10);
         }).on('pointerup', () => {
             console.log("%c ", "color:green", "Clicked unit:");
             console.log(this.state);
@@ -139,6 +156,11 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
             this.postFX.remove(this.speedBuffGlow);
             this.speedBuffGlow = null;
         }
+
+        if (this.outlineSprite) {
+            this.outlineSprite.destroy();
+            this.outlineSprite = null;
+        }
         
         this.setDepth(1);
         if(this.unitGroup) this.unitGroup.remove(this);
@@ -176,6 +198,15 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
             if(this.actionCooldown >= this.unitProps.actionSpeed){
                 this.attackTarget();
                 this.actionCooldown -= this.unitProps.actionSpeed; 
+            }
+        }
+
+        // Sync outline sprite's position and animation
+        if (this.outlineSprite) {
+            this.outlineSprite.setPosition(this.x-this.direction, this.y+2);
+            this.outlineSprite.setFlipX(this.flipX);
+            if (this.anims.isPlaying) {
+                this.outlineSprite.setFrame(this.anims.currentFrame!.frame.name);
             }
         }
         // Only bother counting special cooldown up to 100s => Any unit with special of cooldown more than 100s means to use it just once

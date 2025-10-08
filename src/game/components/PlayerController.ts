@@ -81,7 +81,7 @@ export class PlayerController {
         }
 
         // Get list of upgrades for specified unit then extract just the effect objects from it
-        const unitUpgrades = this.unitsUpgrades.find(unitUpgrades => unitUpgrades.unitType === unitType)?.upgrades || [];
+        const unitUpgrades = this.unitsUpgrades.find(unitUpgrades => unitUpgrades.unitType === unitType).upgrades || [];
         const allUpgradeEffects = unitUpgrades.flatMap((upgrade: UnitUpgrade) => upgrade.effects);
 
         // 💡 DEBUGGING CODE: Add this block temporarily
@@ -91,6 +91,8 @@ export class PlayerController {
                 // This will print the exact location of the invalid data
                 console.error(`ERROR: Null/Undefined found at index ${i} in allUpgradeEffects!`);
                 console.log("Full array for context:", allUpgradeEffects);
+                console.log("Full map for the context:", unitUpgrades);
+                console.log("Current potion for the context:", typeof this.scene.registry.get('playerPotion'));
                 // You can also add a debugger breakpoint here:
                 // debugger; 
             }

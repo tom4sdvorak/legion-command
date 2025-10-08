@@ -131,18 +131,65 @@ export class PreGame extends Scene
     /* Handles ready check window */
     readyCheckLogic(){
         this.readyCheck = new UIComponent(this, this.gameWidth/2, this.gameHeight/2, this.gameWidth/2, this.gameHeight/2, 1);
-        const readyText = this.add.bitmapText(0, 0, 'pixelFont', 'Ready?', 64).setOrigin(0.5, 0.5);
-        const noText = this.add.bitmapText(0, 0, 'pixelFont', 'No', 64).setOrigin(0.5, 0.5).setInteractive().on('pointerup', () => {
-            this.overlay.setVisible(false);
-            this.readyCheck.setVisible(false);
-        });
-        const yesText = this.add.bitmapText(0, 0, 'pixelFont', 'Yes', 64).setOrigin(0.5, 0.5).setInteractive().on('pointerup', () => {
-            this.readyCheck.setVisible(false);
-            this.startGame();
-        });
+        const readyText = this.add.bitmapText(0, 0, 'pixelFont', 'Ready?', 80).setOrigin(0.5, 0.5);
+        let yesNoTween : Phaser.Tweens.Tween | undefined;
+        const noText = this.add.bitmapText(0, 0, 'pixelFont', ' No ', 64).setOrigin(0.5, 0.5).setInteractive()
+            .on('pointerup', () => {
+                this.overlay.setVisible(false);
+                this.readyCheck.setVisible(false);
+            })
+            .on('pointerover', () => {
+                this.tweens.killTweensOf([noText, yesText]);
+                noText.setScale(1.0); 
+                yesNoTween = this.tweens.add({
+                    targets: noText,
+                    ease: 'power2.inOut',
+                    duration: 200,
+                    scaleX: { start: 1.0, to: 1.2 }, 
+                    scaleY: { start: 1.0, to: 1.2 },
+                    yoyo: true,
+                    repeat: -1
+                });
+                this.readyCheck.changeTint(0xbd2222);
+            })
+            .on('pointerout', () => {
+                if (yesNoTween && yesNoTween.isPlaying()) {
+                    yesNoTween.stop();
+                }
+                noText.setScale(1.0);
+                this.readyCheck.changeTint(-1);
+            });
+
+        noText.setDropShadow(1, 1, 0xbd2222, 1);
+        const yesText = this.add.bitmapText(0, 0, 'pixelFont', ' Yes ', 64).setOrigin(0.5, 0.5).setInteractive()
+            .on('pointerup', () => {
+                this.readyCheck.setVisible(false);
+                this.startGame();
+            })
+            .on('pointerover', () => {
+                this.tweens.killTweensOf([noText, yesText]);
+                yesText.setScale(1.0); 
+                yesNoTween = this.tweens.add({
+                    targets: yesText,
+                    ease: 'power2.inOut',
+                    duration: 200,
+                    scaleX: { start: 1.0, to: 1.2 }, 
+                    scaleY: { start: 1.0, to: 1.2 },
+                    yoyo: true,
+                    repeat: -1
+                });
+                this.readyCheck.changeTint(0x39FF14);})
+            .on('pointerout', () => {
+                if (yesNoTween && yesNoTween.isPlaying()) {
+                    yesNoTween.stop();
+                }
+                yesText.setScale(1.0);
+                this.readyCheck.changeTint(-1);
+            });
+        yesText.setDropShadow(1, 1, 0x3C8E3C, 1);
         this.readyCheck.insertElement(readyText);
         this.readyCheck.insertElement([ noText, yesText ]);
-        this.readyCheck.positionElements(['center', 'center'], 16, 16);
+        this.readyCheck.positionElements(['center', 'center'], 32, 16);
         this.add.existing(this.readyCheck);
         this.readyCheck.setVisible(false).setDepth(1001).setInteractive();
     }

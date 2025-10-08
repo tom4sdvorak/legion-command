@@ -62,7 +62,7 @@ export class MainMenu extends Scene
         saves.forEach((saveData, saveSlot) => {
             const saveSlotUIElement = new UIComponent(this, currentPosX+UIElementWidth/2, 0, UIElementWidth, UIElementHeight, 0).setDepth(9999);
             saveSlotUIElement.setSize(UIElementWidth, UIElementHeight);
-            const saveSlotName = this.add.bitmapText(0, (32-UIElementHeight/2), 'pixelFont', saveData.saveName, 32).setOrigin(0.5, 0).setMaxWidth(UIElementWidth-32).setDepth(9999);
+            const saveSlotName = this.add.bitmapText(0, (32-UIElementHeight/2), 'pixelFont', saveData.saveName, 64).setOrigin(0.5, 0).setMaxWidth(UIElementWidth-32).setDepth(9999);
             saveSlotUIElement.insertElement(saveSlotName);
             let isNew = true;
             // Dont show date for empty save slot
@@ -77,22 +77,44 @@ export class MainMenu extends Scene
                     minute: '2-digit',
                 };
                 const dateParsed = date.toLocaleString(undefined, options);
-                const saveSlotText = this.add.bitmapText(0, (-UIElementHeight/4), 'pixelFont', dateParsed, 16).setOrigin(0.5, 0).setMaxWidth(UIElementWidth-32);
+                const saveSlotText = this.add.bitmapText(0, (-UIElementHeight/4), 'pixelFont', dateParsed, 32).setOrigin(0.5, 0).setMaxWidth(UIElementWidth-32);
                 saveSlotUIElement.insertElement(saveSlotText);
+                let saveSlotDeleteButtonTween : Phaser.Tweens.Tween | undefined;
+                const saveSlotDeleteButton = this.add.bitmapText(0, 200, 'pixelFont', 'X', 64).setOrigin(0.5, 0).setInteractive()
+                    .on('pointerup', () => SaveManager.deleteSave(saveSlot))
+                    .on('pointerout', () => {
+                        if (saveSlotDeleteButtonTween && saveSlotDeleteButtonTween.isPlaying()) {
+                            saveSlotDeleteButtonTween.stop();
+                        }
+                        saveSlotDeleteButton.setScale(1.0);
+                        saveSlotUIElement.changeTint(-1, -1);
+                    })
+                    .on('pointerover', () => {
+                        this.tweens.killTweensOf(saveSlotDeleteButton);
+                        saveSlotDeleteButton.setScale(1.0); 
+                        saveSlotDeleteButtonTween = this.tweens.add({
+                            targets: saveSlotDeleteButton,
+                            ease: 'power2.inOut',
+                            duration: 200,
+                            scaleX: { start: 1.0, to: 1.5 }, 
+                            scaleY: { start: 1.0, to: 1.5 },
+                            yoyo: true,
+                            repeat: -1
+                        });
+                        saveSlotUIElement.changeTint(0xbd2222, 0xDE9191);
+                    });
+                saveSlotDeleteButton.setDropShadow(2, 2, 0xbd2222, 1);
+                saveSlotUIElement.insertElement(saveSlotDeleteButton);
             }
-            saveSlotUIElement.positionElements(['center', 'top'], 32, 16);
+            saveSlotUIElement.positionElements(['center', 'center'], 64, 16);
             container.add(saveSlotUIElement);
             currentPosX += UIElementWidth + gap;
-            let currentGlow : any;
             saveSlotUIElement.setInteractive()
                 .on('pointerover', () => {
-                    let buttonBorder : Phaser.GameObjects.NineSlice = saveSlotUIElement.list[2] as Phaser.GameObjects.NineSlice;
-                    if(currentGlow) buttonBorder.postFX.remove(currentGlow);
-                    currentGlow = buttonBorder.postFX.addGlow(0xffffff, 4, 0, false, 1, 5);
+                    saveSlotUIElement.changeTint(0x39FF14, 0xB3FFB3);
                 })
                 .on('pointerout', () => {
-                    let buttonBorder : Phaser.GameObjects.NineSlice = saveSlotUIElement.list[2] as Phaser.GameObjects.NineSlice;
-                    if(currentGlow) buttonBorder.postFX.remove(currentGlow);
+                    saveSlotUIElement.changeTint(-1, -1);
                 })
                 .on('pointerup', () => {
                     this.chooseSaveSlot(saveSlot,isNew);
