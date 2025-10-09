@@ -1,4 +1,8 @@
 export const devConfig = {
-    consoleLog: false,
-    AI: true
+    consoleLog: true,
+    AI: true,
+    negativeColor: 0xbd2222,
+    positiveColor: 0x3C8E3C,
+    negativeColorLight: 0xDE9191,
+    positiveColorLight: 0x8AE98A
 }

@@ -34,8 +34,8 @@ export class OverlayComponent extends Phaser.Events.EventEmitter {
      * */
     public show(blurred: boolean = false, sharpObject: Phaser.GameObjects.GameObject | null= null) {
         const mainCamera = this.scene.cameras.main;
+        this.tintRect.setVisible(true);
         if(!blurred) {
-            this.tintRect.setVisible(true);
             return;
         }
         // Create second camera
@@ -60,10 +60,26 @@ export class OverlayComponent extends Phaser.Events.EventEmitter {
         
     }
 
+    public destroy(): void {
+        this.hide();
+        if (this.tintRect) {
+            this.tintRect.removeAllListeners();
+            this.tintRect.destroy();
+        }
+        this.sharpCamera = null;
+        this.sharpObject = null;
+        super.destroy();
+    }
+
+    public changeDepth(depth: number) {
+        this.overlayDepth = depth;
+        this.tintRect.setDepth(depth);
+    }
+
     // Hide the overlay, remove blur and destroy second camera
     public hide() {
         const mainCamera = this.scene.cameras.main;
-        if (this.blurEffect) {
+        if (mainCamera && mainCamera.postFX && this.blurEffect) {
             mainCamera.postFX.remove(this.blurEffect);
             this.blurEffect = null;
         }
@@ -71,6 +87,12 @@ export class OverlayComponent extends Phaser.Events.EventEmitter {
         if (this.sharpCamera) {
             this.scene.cameras.remove(this.sharpCamera);
             this.sharpCamera = null;
+        }
+
+        // If object to show sharply was given, add it back to main camera
+        if (this.sharpObject) {
+            this.sharpObject.cameraFilter = 0;
+            this.sharpObject = null;
         }
 
         this.tintRect.setVisible(false);

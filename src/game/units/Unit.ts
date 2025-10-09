@@ -18,7 +18,6 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
     healthComponent: HealthComponent;
     declare scene: Game;
     meleeTarget: Unit | PlayerBase | null = null;
-    glow: Phaser.FX.Glow;
     colorMatrix: Phaser.FX.ColorMatrix;
     actionDisabled: boolean = false;
     burningDebuff : {timer: Phaser.Time.TimerEvent | null, ticks: number, damage: number} | null = null;
@@ -57,10 +56,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         this.buffList = [];
         this.specialCooldown = this.unitProps.specialCooldown; // Reset special cooldown so special is available instantly
         // Reinitialize the sprite's body
-        this.setScale(unitProps.scale);
-        
-        //this.glow = this.postFX?.addGlow(0x000000, 1, 0, false);
-        
+        this.setScale(unitProps.scale);        
         this.setActive(true);
         this.setVisible(true);
         // Calculate spawn position of unit based on desired position, moved by offset (how many empty pixels are under feet of the sprite) timed by scale of the unit (which scales the empty pixels too)
@@ -105,11 +101,9 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         // Add mouse/touch interaction
         this.setInteractive();
         this.on('pointerover', () => {
-            //this.postFX.remove(this.glow);
-            this.glow = this.postFX.addGlow(0xffff00, 10, 0, false, 1, 1);
+            this.postFX.addGlow(0xffff00, 10, 0, false, 1, 1);
         }).on('pointerout', () => {
-            this.postFX.remove(this.glow);
-            //this.glow = this.postFX?.addGlow(0x000000, 2, 0, false, 1, 10);
+            this.postFX.clear();
         }).on('pointerup', () => {
             console.log("%c ", "color:green", "Clicked unit:");
             console.log(this.state);
@@ -174,7 +168,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
             this.unitGroup = null;
             this.unitPool = null;
             this.removeInteractive();
-            this.postFX.remove(this.glow);
+            this.postFX.clear();
         }, undefined, this);
         
     }
@@ -373,8 +367,15 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         }
         else if(target instanceof PlayerBase && target.faction !== this.unitProps.faction){
             this.meleeTarget = target;
-            this.changeState(UnitStates.ATTACKING);
-            
+            if(this.unitProps.tags.includes('melee')){
+                this.changeState(UnitStates.ATTACKING); 
+            }
+            else{
+                this.stopMoving();
+                if(this.state === UnitStates.WALKING){
+                    this.changeState(UnitStates.IDLE);
+                }
+            }         
         }
     }
 
@@ -384,7 +385,14 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         }
         this.anims.timeScale = (this.anims?.currentAnim?.duration ?? 1) / (this.unitProps.actionSpeed + 100);
         if(this.meleeTarget instanceof Unit && this.meleeTarget.active && this.meleeTarget.isAlive()){
-            this.meleeTarget.takeDamage(this.unitProps.damage);
+            let damage = 0;
+            if(this.unitProps.tags.includes('melee')){
+                damage = this.unitProps.damage;
+            }
+            else{
+                damage = Math.floor(this.unitProps.damage / 5);
+            }
+            this.meleeTarget.takeDamage(damage);   
         }
         else if(this.meleeTarget instanceof PlayerBase && this.meleeTarget.active){
             this.meleeTarget.takeDamage(this.unitProps.damage);

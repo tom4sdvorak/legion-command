@@ -2,14 +2,13 @@ import { Scene, GameObjects } from 'phaser';
 import { UIComponent } from '../components/UIComponent';
 import SaveManager, { SaveData } from '../helpers/SaveManager';
 import { OverlayComponent } from '../components/OverlayComponent';
+import { devConfig } from '../helpers/DevConfig';
 
 export class MainMenu extends Scene
 {
-    background: GameObjects.Image;
-    logo: GameObjects.Text;
-    title: GameObjects.Text;
     mainMenu: UIComponent;
     overlay: OverlayComponent;
+    saveSlotsContainer: GameObjects.Container;
 
     constructor ()
     {
@@ -19,12 +18,12 @@ export class MainMenu extends Scene
     
     create ()
     {
-
+        this.events.once('shutdown', () => this.shutdown());
         // x, y, width, height, background (0: lighter, 1: darker)
         this.mainMenu = new UIComponent(this, (this.game.config.width as number)/2, (this.game.config.height as number)/2, (this.game.config.width as number)*0.6, (this.game.config.height as number)*0.9, 1); 
         const interactableGroup = this.add.group();
-        this.overlay = new OverlayComponent(this);
-        this.overlay.on('overlay-clicked', () => this.overlay.hide());
+        this.overlay = new OverlayComponent(this, 0x000000, 0.3);
+        this.overlay.on('overlay-clicked', () => this.hideSaveSlots());
         
         // Menu buttons
         const buttonSize = 48;
@@ -49,11 +48,19 @@ export class MainMenu extends Scene
             }, this);
         });
     }
+    shutdown() {
+        this.tweens.killAll();
+        this.hideSaveSlots();
+        this.overlay.destroy();
+    }
 
-    public showSaveSlots() : void {        
+    public showSaveSlots() : void {
+        if (this.saveSlotsContainer) {
+            this.hideSaveSlots(); 
+        }
         // Create UI to show 3 save slots
-        const container = this.add.container((this.game.config.width as number)/2, (this.game.config.height as number)/2);
-        container.setDepth(9999);
+        this.saveSlotsContainer = this.add.container((this.game.config.width as number)/2, (this.game.config.height as number)/2);
+        this.saveSlotsContainer.setDepth(9999);
         const gap = 16;
         let currentPosX = 0;
         const UIElementWidth = (this.game.config.width as number)/4;
@@ -81,7 +88,14 @@ export class MainMenu extends Scene
                 saveSlotUIElement.insertElement(saveSlotText);
                 let saveSlotDeleteButtonTween : Phaser.Tweens.Tween | undefined;
                 const saveSlotDeleteButton = this.add.bitmapText(0, 200, 'pixelFont', 'X', 64).setOrigin(0.5, 0).setInteractive()
-                    .on('pointerup', () => SaveManager.deleteSave(saveSlot))
+                    .on('pointerup', () => {
+                        if (saveSlotDeleteButtonTween && saveSlotDeleteButtonTween.isPlaying()) {
+                            saveSlotDeleteButtonTween.stop();
+                        }
+                        saveSlotDeleteButton.setScale(1.0);
+                        saveSlotUIElement.changeTint(-1, -1);
+                        this.deleteSave(saveSlot, saveData.saveName);             
+                    })
                     .on('pointerout', () => {
                         if (saveSlotDeleteButtonTween && saveSlotDeleteButtonTween.isPlaying()) {
                             saveSlotDeleteButtonTween.stop();
@@ -101,17 +115,17 @@ export class MainMenu extends Scene
                             yoyo: true,
                             repeat: -1
                         });
-                        saveSlotUIElement.changeTint(0xbd2222, 0xDE9191);
+                        saveSlotUIElement.changeTint(devConfig.negativeColor, devConfig.negativeColorLight);
                     });
-                saveSlotDeleteButton.setDropShadow(2, 2, 0xbd2222, 1);
+                saveSlotDeleteButton.setDropShadow(2, 2, devConfig.negativeColor, 1);
                 saveSlotUIElement.insertElement(saveSlotDeleteButton);
             }
             saveSlotUIElement.positionElements(['center', 'center'], 64, 16);
-            container.add(saveSlotUIElement);
+            this.saveSlotsContainer.add(saveSlotUIElement);
             currentPosX += UIElementWidth + gap;
             saveSlotUIElement.setInteractive()
                 .on('pointerover', () => {
-                    saveSlotUIElement.changeTint(0x39FF14, 0xB3FFB3);
+                    saveSlotUIElement.changeTint(devConfig.positiveColor, devConfig.positiveColorLight);
                 })
                 .on('pointerout', () => {
                     saveSlotUIElement.changeTint(-1, -1);
@@ -120,10 +134,99 @@ export class MainMenu extends Scene
                     this.chooseSaveSlot(saveSlot,isNew);
                 });
         });
-        container.x = (this.game.config.width as number) / 2 - (currentPosX - gap) / 2;
-        this.add.existing(container);
-        container.setDepth(1001);
-        this.overlay.show(true,container);
+        this.saveSlotsContainer.x = (this.game.config.width as number) / 2 - (currentPosX - gap) / 2;
+        this.add.existing(this.saveSlotsContainer);
+        this.saveSlotsContainer.setDepth(1001);
+        this.overlay.show(true,this.saveSlotsContainer);
+    }
+
+    hideSaveSlots() {
+        if (this.saveSlotsContainer) {
+            this.saveSlotsContainer.list.forEach(child => {
+                if (child.destroy) {
+                    child.destroy();
+                }
+            });
+            this.saveSlotsContainer.destroy();
+        }
+        if(this.overlay) this.overlay.destroy();
+    }
+    deleteSave(saveSlot: string, saveName: string) {
+        const overlay = new OverlayComponent(this, 0x000000, 0.9);
+        overlay.show(false);
+        overlay.changeDepth(9000);
+        overlay.on('overlay-clicked', () => {
+            this.tweens.killTweensOf([deleteText, cancelText]);
+            overlay.destroy();
+            deleteCheck.destroy();
+        });
+        const deleteCheck = new UIComponent(this, (this.game.config.width as number)/2, (this.game.config.height as number)/2, (this.game.config.width as number)/2, (this.game.config.height as number)/2, 1);
+        const readyText = this.add.bitmapText(0, 0, 'pixelFont', `Delete ${saveName}?`, 64).setOrigin(0.5, 0.5);
+        let yesNoTween : Phaser.Tweens.Tween | undefined;
+        const deleteText = this.add.bitmapText(0, 0, 'pixelFont', ' Delete ', 48).setOrigin(0.5, 0.5).setInteractive()
+            .on('pointerup', () => {
+                SaveManager.deleteSave(saveSlot);
+                this.tweens.killTweensOf([deleteText, cancelText]);
+                overlay.destroy();
+                deleteCheck.destroy();
+                this.showSaveSlots();
+            })
+            .on('pointerover', () => {
+                this.tweens.killTweensOf([deleteText, cancelText]);
+                deleteText.setScale(1.0); 
+                yesNoTween = this.tweens.add({
+                    targets: deleteText,
+                    ease: 'power2.inOut',
+                    duration: 200,
+                    scaleX: { start: 1.0, to: 1.05 }, 
+                    scaleY: { start: 1.0, to: 1.05 },
+                    yoyo: true,
+                    repeat: -1
+                });
+                deleteCheck.changeTint(devConfig.negativeColor);
+            })
+            .on('pointerout', () => {
+                if (yesNoTween && yesNoTween.isPlaying()) {
+                    yesNoTween.stop();
+                }
+                deleteText.setScale(1.0);
+                deleteCheck.changeTint(-1);
+            });
+
+        deleteText.setDropShadow(2, 2, devConfig.negativeColor, 1);
+        const cancelText = this.add.bitmapText(0, 0, 'pixelFont', ' Cancel ', 48).setOrigin(0.5, 0.5).setInteractive()
+            .on('pointerup', () => {
+                this.tweens.killTweensOf([deleteText, cancelText]);
+                overlay.destroy();
+                deleteCheck.destroy();
+            })
+            .on('pointerover', () => {
+                this.tweens.killTweensOf([deleteText, cancelText]);
+                cancelText.setScale(1.0); 
+                yesNoTween = this.tweens.add({
+                    targets: cancelText,
+                    ease: 'power2.inOut',
+                    duration: 200,
+                    scaleX: { start: 1.0, to: 1.1 }, 
+                    scaleY: { start: 1.0, to: 1.1 },
+                    yoyo: true,
+                    repeat: -1
+                });
+                deleteCheck.changeTint(devConfig.positiveColor);})
+            .on('pointerout', () => {
+                if (yesNoTween && yesNoTween.isPlaying()) {
+                    yesNoTween.stop();
+                }
+                cancelText.setScale(1.0);
+                deleteCheck.changeTint(-1);
+            });
+        cancelText.setDropShadow(2, 2, devConfig.positiveColor, 1);
+        deleteCheck.insertElement(readyText);
+        deleteCheck.insertElement([ deleteText, cancelText ]);
+        deleteCheck.positionElements(['center', 'center'], 32, 16);
+        this.add.existing(deleteCheck);
+        deleteCheck.setDepth(9001).setInteractive();
+        overlay.show(true);
     }
 
     chooseSaveSlot(saveSlot: string, isNew: boolean) {

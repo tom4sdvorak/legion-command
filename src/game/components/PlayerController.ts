@@ -229,7 +229,7 @@ export class PlayerController {
             // Spawn unit
             unit.spawn(newUnitProps, this.ownUnitsPhysics, pool, this.enemyUnitsPhysics, this.baseGroup, this.projectiles, projectilePool);
             this.ownUnitsPhysics.add(unit);
-            console.log("%cSpawning unit with  id: " + this.unitCounter, `color: ${this.faction}`);
+            if(devConfig.consoleLog) console.log("%cSpawning unit with  id: " + this.unitCounter, `color: ${this.faction}`);
             this.unitCounter++;
             unit.moveForward();
             return unit;

@@ -1,6 +1,7 @@
 import { Scene, GameObjects } from 'phaser';
 import { UIComponent } from '../components/UIComponent';
 import SaveManager from '../helpers/SaveManager';
+import { devConfig } from '../helpers/DevConfig';
 
 export class PreGame extends Scene
 {
@@ -150,7 +151,7 @@ export class PreGame extends Scene
                     yoyo: true,
                     repeat: -1
                 });
-                this.readyCheck.changeTint(0xbd2222);
+                this.readyCheck.changeTint(devConfig.negativeColor);
             })
             .on('pointerout', () => {
                 if (yesNoTween && yesNoTween.isPlaying()) {
@@ -160,7 +161,7 @@ export class PreGame extends Scene
                 this.readyCheck.changeTint(-1);
             });
 
-        noText.setDropShadow(1, 1, 0xbd2222, 1);
+        noText.setDropShadow(1, 1, devConfig.negativeColor, 1);
         const yesText = this.add.bitmapText(0, 0, 'pixelFont', ' Yes ', 64).setOrigin(0.5, 0.5).setInteractive()
             .on('pointerup', () => {
                 this.readyCheck.setVisible(false);
@@ -178,7 +179,7 @@ export class PreGame extends Scene
                     yoyo: true,
                     repeat: -1
                 });
-                this.readyCheck.changeTint(0x39FF14);})
+                this.readyCheck.changeTint(devConfig.positiveColor);})
             .on('pointerout', () => {
                 if (yesNoTween && yesNoTween.isPlaying()) {
                     yesNoTween.stop();
@@ -186,7 +187,7 @@ export class PreGame extends Scene
                 yesText.setScale(1.0);
                 this.readyCheck.changeTint(-1);
             });
-        yesText.setDropShadow(1, 1, 0x3C8E3C, 1);
+        yesText.setDropShadow(1, 1, devConfig.positiveColor, 1);
         this.readyCheck.insertElement(readyText);
         this.readyCheck.insertElement([ noText, yesText ]);
         this.readyCheck.positionElements(['center', 'center'], 32, 16);

@@ -8,6 +8,7 @@ import { PlayerBase } from "./PlayerBase";
 
 export class Player extends PlayerController {
     private level: number = 0;
+    public unitsKilled: number = 0;
 
     constructor(scene: Phaser.Scene, playerBase: PlayerBase, spawnPosition: Phaser.Math.Vector2, ownUnitsPhysics: Phaser.Physics.Arcade.Group,
                 enemyUnitsPhysics: Phaser.Physics.Arcade.Group, projectiles: Phaser.Physics.Arcade.Group,
@@ -38,7 +39,10 @@ export class Player extends PlayerController {
         this.unitQueueMaxSize = 1;
         // Listener for units dying, awarding human player XP
         eventsCenter.on('unit-died', (unitFaction: string) => {
-            if(unitFaction !== this.faction) this.gainXP(50);
+            if(unitFaction !== this.faction){
+                this.unitsKilled++;
+                this.gainXP(50);
+            }
         }, this);
     }
 

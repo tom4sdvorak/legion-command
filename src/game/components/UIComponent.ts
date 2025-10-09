@@ -51,6 +51,25 @@ export class UIComponent extends Phaser.GameObjects.Container {
         this.add(this.border);        
     }
 
+    public destroy(fromScene?: boolean): void {
+        this.border.destroy(fromScene);
+        this.background.destroy(fromScene);
+        this.borderStroke.destroy(fromScene);
+        for (const item of this.content) {
+            if (Array.isArray(item)) {
+                for (const gameObject of item) {
+                    if (gameObject && gameObject.destroy) {
+                        gameObject.destroy();
+                    }
+                }
+            } else if (item && item.destroy) {
+                item.destroy();
+            }
+        }
+        this.content = [];
+        super.destroy(fromScene);
+    }
+
     public getWidth(): number {
         return this.sizeW;
     }

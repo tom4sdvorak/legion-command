@@ -106,8 +106,8 @@ export class Game extends Scene
         ];
         this.baseBlue = new PlayerBase(this, 'blue', bluePos, this.redUnitsPhysics, this.blueProjectiles);
         this.playerBlue = new AIPlayer(this, this.baseBlue, bluePos, this.blueUnitsPhysics, this.redUnitsPhysics, this.blueProjectiles, this.objectPool, this.baseGroup, this.blueConfigLoader);
-        this.playerBlue.changePassiveIncome(0, true);
-        this.playerBlue.addMoney(0);
+        this.playerBlue.changePassiveIncome(1, true);
+        this.playerBlue.addMoney(10);
         if(devConfig.AI) this.AIController = new AIController(this.playerBlue, this.playerRed, 'EASY');
 
         this.baseGroup.add(this.baseRed);
@@ -295,9 +295,7 @@ export class Game extends Scene
     }
 
     gameOver(faction: string){
-        this.playerRed.destroy();
         this.playerBlue.destroy();
-        this.scene.stop('Game');
     }
 
     rewardPlayer(faction: string, money: number = 0, xp: number = 0){

@@ -3,6 +3,7 @@ import eventsCenter from '../EventsCenter';
 import { Player } from '../Player';
 import { UIComponent } from '../components/UIComponent';
 import { AIPlayer } from '../AIPlayer';
+import { devConfig } from '../helpers/DevConfig';
 
 export class UI extends Scene
 {
@@ -236,7 +237,7 @@ export class UI extends Scene
         });
         
         // Bind event listeners with delay
-        this.time.delayedCall(1, this.bindListeners, [], this);
+        this.time.delayedCall(10, this.bindListeners, [], this);
         
         /*
         this.button = this.add.circle(500, 500, 40, 0x000000)
@@ -286,7 +287,7 @@ export class UI extends Scene
 
                 if(this.player.canAfford(this.player.getUnitCost(playedUnits[i])) === false){
                     button.setData('canAfford', false);
-                    buttonUI.changeTint(0xbd2222, 0xDE9191);
+                    buttonUI.changeTint(devConfig.negativeColor, devConfig.negativeColorLight);
                 }
                 else{
                     button.setData('canAfford', true);
@@ -350,7 +351,9 @@ export class UI extends Scene
         // Save data about the game and player to register
         this.registry.set('playTime', this.registry.get('playTime') + this.elapsedTime);
         if(faction === this.player.faction) this.registry.set('gamesWon', this.registry.get('gamesWon') + 1);
-        this.scene.start('GameOver');
+        this.scene.launch('GameOver', { winner: (faction === this.player.faction), playTime: this.elapsedTime, level: this.player.getLevel(), money: this.player.getMoney(), unitsKilled: this.player.unitsKilled, unitsSpawned: this.player.unitCounter });
+        this.scene.stop('Game');
+        this.scene.stop('UI');
     }
 
     update(time: number, delta: number) {
