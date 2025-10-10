@@ -3,6 +3,7 @@ import { Player } from '../Player';
 import { UIComponent } from '../components/UIComponent';
 import eventsCenter from '../EventsCenter';
 import { UnitUpgrade } from '../helpers/UnitUpgrade';
+import { UpgradeManager } from '../helpers/UpgradeManager';
 
 export class Pause extends Scene {
     player: Player;
@@ -11,13 +12,16 @@ export class Pause extends Scene {
     levelPopUp: UIComponent;
     menu: UIComponent;
     gameSpeed: number = 1;
+    upgradeManager: UpgradeManager;
     constructor() {
         super('Pause');
+
     }
 
     init(data: { player: Player, situation: string }) {
         this.player = data.player;
         this.situation = data.situation;
+        this.upgradeManager = UpgradeManager.getInstance();
     }
 
     public showLevelUp() : void {
@@ -29,14 +33,14 @@ export class Pause extends Scene {
         const UIElementHeight = this.cameras.main.height/2;
 
         /* Will run for each selected unit (1-3) to display random upgrade for it */
-        this.player.selectedUnits.forEach(selectedUnit => {
+        this.player.selectedUnits.forEach((selectedUnit, unitType) => {
             const upgrade : UnitUpgrade = this.getRandomUpgrade(selectedUnit.unitConfig.tags);
             if(upgrade === undefined) return;
             const upgradeUIElement = new UIComponent(this, currentPosX+UIElementWidth/2, 0, UIElementWidth, UIElementHeight, 1);
             upgradeUIElement.setSize(UIElementWidth, UIElementHeight);
             const upgradeName = this.add.bitmapText(0, (32-UIElementHeight/2), 'pixelFont', upgrade.name, 32).setOrigin(0.5, 0).setMaxWidth(UIElementWidth-32);
             const upgradeDescription = this.add.bitmapText(0, (-UIElementHeight/4), 'pixelFont', upgrade.description, 16).setOrigin(0.5, 0).setMaxWidth(UIElementWidth-32);
-            const unitSprite = this.add.sprite(0, UIElementHeight/2, `${selectedUnit.unitType}_static`).setOrigin(0, 1);
+            const unitSprite = this.add.sprite(0, UIElementHeight/2, `${unitType}_static`).setOrigin(0, 1);
             upgradeUIElement.insertElement(unitSprite);
             upgradeUIElement.insertElement(upgradeName);
             upgradeUIElement.insertElement(upgradeDescription);
@@ -56,7 +60,7 @@ export class Pause extends Scene {
                     if(currentGlow) buttonBorder.postFX.remove(currentGlow);
                 })
                 .on('pointerup', () => {
-                    this.levelUp(selectedUnit.unitType, upgrade);
+                    this.levelUp(unitType, upgrade.id);
                 });
         });
 
@@ -65,8 +69,7 @@ export class Pause extends Scene {
         container.setDepth(1001);
     }
 
-    public levelUp(unit: string, upgrade: UnitUpgrade) {
-        console.log("Level up upgrade: " + upgrade.name + " for unit: " + unit);
+    public levelUp(unit: string, upgrade: string) {
         this.scene.resume('Game');
         this.scene.resume('UI');
         this.player.levelUp(unit, upgrade);
@@ -135,14 +138,12 @@ export class Pause extends Scene {
     }
 
     private getRandomUpgrade(tags: string[]) : UnitUpgrade {
-        const unitUpgradesJson = this.cache.json.get('unitUpgrades');
-        const filteredUnitUpgrades = unitUpgradesJson.filter((upgrade : UnitUpgrade) => {
-            return tags.some(tag => upgrade.tags.includes(tag));
-        });
-        const randomUpgradeIndex = Math.floor(Math.random() * filteredUnitUpgrades.length);
-        const randomUpgrade = filteredUnitUpgrades[randomUpgradeIndex];
+        const upgradesByTags = this.upgradeManager.getUnitUpgradesByTags(tags);
+        const randomUpgradeIndex = Math.floor(Math.random() * upgradesByTags.length);
+        const randomUpgrade = upgradesByTags[randomUpgradeIndex];
         return randomUpgrade;
     }
+
 
     create() {
         this.scene.pause('Game');

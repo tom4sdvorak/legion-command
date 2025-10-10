@@ -385,14 +385,8 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         }
         this.anims.timeScale = (this.anims?.currentAnim?.duration ?? 1) / (this.unitProps.actionSpeed + 100);
         if(this.meleeTarget instanceof Unit && this.meleeTarget.active && this.meleeTarget.isAlive()){
-            let damage = 0;
-            if(this.unitProps.tags.includes('melee')){
-                damage = this.unitProps.damage;
-            }
-            else{
-                damage = Math.floor(this.unitProps.damage / 5);
-            }
-            this.meleeTarget.takeDamage(damage);   
+            let damage = this.unitProps.damage * this.unitProps.meleeMultiplier;
+            this.meleeTarget.takeDamage(damage);
         }
         else if(this.meleeTarget instanceof PlayerBase && this.meleeTarget.active){
             this.meleeTarget.takeDamage(this.unitProps.damage);

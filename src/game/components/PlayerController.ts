@@ -7,6 +7,7 @@ import { ResourceComponent } from "./ResourceComponent";
 import eventsCenter from '../EventsCenter';
 import { UnitProps } from "../helpers/UnitProps";
 import { UnitUpgrade } from "../helpers/UnitUpgrade";
+import { TotalEffect, UpgradeManager } from "../helpers/UpgradeManager";
 
 export class PlayerController {   
     public playerBase: PlayerBase;
@@ -27,12 +28,14 @@ export class PlayerController {
     framesSinceSpawn: number = 0;
     configLoader: UnitConfigLoader;
     isSpawning: boolean = false;
-    public selectedUnits: Array<{unitType: string, unitConfig: UnitProps}> = [];
-    public unitsUpgrades: Array<{unitType: string, upgrades: UnitUpgrade[]}> = [];
+    public selectedUnits: Map<string, {unitConfig: UnitProps, upgrades: string[]}> = new Map();
+    upgradeManager: UpgradeManager;
+    potionID: string | undefined = undefined;
+    //public unitsUpgrades: Array<{unitType: string, upgrades: UnitUpgrade[]}> = [];
 
     constructor(scene: Phaser.Scene, playerBase: PlayerBase, spawnPosition: Phaser.Math.Vector2, ownUnitsPhysics: Phaser.Physics.Arcade.Group,
         enemyUnitsPhysics: Phaser.Physics.Arcade.Group, projectiles: Phaser.Physics.Arcade.Group,
-        objectPool: ObjectPool, baseGroup: Phaser.GameObjects.Group, configLoader: UnitConfigLoader) {
+        objectPool: ObjectPool, baseGroup: Phaser.GameObjects.Group, configLoader: UnitConfigLoader, selectedUnits: string[]) {
         this.configLoader = configLoader;
         this.spawnPosition = spawnPosition;
         this.scene = scene;
@@ -43,6 +46,12 @@ export class PlayerController {
         this.baseGroup = baseGroup;
         this.playerBase = playerBase;
         this.resourceComponent = new ResourceComponent(this);
+        this.upgradeManager = UpgradeManager.getInstance();
+
+        /* Save base stats of all selected units */
+        selectedUnits.forEach(unitType => {
+            this.selectedUnits.set(unitType, {unitConfig: this.configLoader.getUnitProps(unitType), upgrades: []});
+        });
     }
 
     destroy() {
@@ -60,7 +69,18 @@ export class PlayerController {
         this.deduceMoney(cost);     
     }
 
-    
+    public addUpgrade(unitType: string, upgrade: string | string[]) {
+        if(unitType === null || unitType === undefined) return;
+        const upgradeIDs = Array.isArray(upgrade) ? upgrade : [upgrade]; // If just one upgradeID, turn it to array of single string
+        if(unitType === 'ALL'){
+            this.selectedUnits.forEach((value, key) => {
+                value.upgrades.push(...upgradeIDs); 
+            });
+        }
+        else{
+            this.selectedUnits.get(unitType)?.upgrades.push(...upgradeIDs);
+        }
+    }
 
     public addMoney(amount: number) {
         this.resourceComponent.addMoney(amount);
@@ -72,16 +92,34 @@ export class PlayerController {
 
     public getUnitStats(unitType: string) {
         // Get base stats of the chosen unit
-        const baseStats : UnitProps = this.selectedUnits.find(unit => unit.unitType === unitType)!.unitConfig;
+        const baseStats : UnitProps = this.selectedUnits.get(unitType)?.unitConfig || this.configLoader.getUnitProps(unitType);
+        // Get all upgrades of the chosen unit
+        const unitUpgrades : Record<string, TotalEffect> = this.upgradeManager.calculateEffects(this.selectedUnits.get(unitType)?.upgrades || [], 'unit', this.potionID);
+        const newStats : UnitProps = {...baseStats};
+        for (const stat in unitUpgrades) {
+            const statEffect = unitUpgrades[stat] ?? { flat: 0, percent: 0, specialValue: undefined };
+            if(stat in newStats && typeof newStats[stat as keyof UnitProps] !== null){
+                if(typeof newStats[stat as keyof UnitProps] === 'number'){
+                    (newStats[stat as keyof UnitProps] as number) = ((newStats[stat as keyof UnitProps] as number) + statEffect.flat) * (1+statEffect.percent);
+                }
+                else if(typeof newStats[stat as keyof UnitProps] === 'boolean'){
+                    if (statEffect.specialValue === 'special') {
+                        (newStats[stat as keyof UnitProps] as boolean) = true;
+                    }
+                }
+            }
+        }
 
-        interface UnitModifier {
+        return newStats;
+
+        /*interface UnitModifier {
             stat: keyof UnitProps; 
             type: 'flat' | 'percent'; 
             value: number;
         }
 
         // Get list of upgrades for specified unit then extract just the effect objects from it
-        const unitUpgrades = this.unitsUpgrades.find(unitUpgrades => unitUpgrades.unitType === unitType).upgrades || [];
+        const unitUpgrades = this.unitsUpgrades.find(unitUpgrades => unitUpgrades.unitType === unitType)?.upgrades || [];
         const allUpgradeEffects = unitUpgrades.flatMap((upgrade: UnitUpgrade) => upgrade.effects);
 
         // 💡 DEBUGGING CODE: Add this block temporarily
@@ -143,13 +181,17 @@ export class PlayerController {
                 }
             }
         }
-        return finalStats;
+        return finalStats;*/
     }
 
     // Sets passive (per second) income to amount (if override is true) or by default it increases income by the amount (if override is false)
     public changePassiveIncome(amount: number, override: boolean = false): void {
         if(override) this.resourceComponent.setPassiveIncome(amount);
         else this.resourceComponent.setPassiveIncome(this.resourceComponent.getPassiveIncome() + amount);
+    }
+
+    public setPotion(potionID: string): void {
+        this.potionID = potionID;
     }
 
     public update(time: any, delta: number): void {

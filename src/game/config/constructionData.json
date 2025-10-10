@@ -1,6 +1,6 @@
 [
   {
-    "id": "watchtower_1",
+    "id": "watchtower_basic_0",
     "name": "Basic Watchtower",
     "description": "Simple watchtower with an archer.",
     "type": "watchtower",
@@ -10,65 +10,512 @@
       { "stat": "baseRange", "type": "flat", "value": 100 },
       { "stat": "baseProjectiles", "type": "arrows", "value": -1 }
     ],
-    "prerequisites": []
+    "prerequisites": [],
+    "level": 1,
+    "target": "player"
   },
   {
-    "id": "watchtower_2",
-    "name": "Flaming Arrow Watchtower",
+    "id": "watchtower_basic_1",
+    "name": "Basic Watchtower +1",
+    "description": "Damage +2",
+    "type": "watchtower",
+    "cost": 1,
+    "effects": [
+      { "stat": "baseDamage", "type": "flat", "value": 2 }
+    ],
+    "prerequisites": ["watchtower_basic_0"],
+    "level": 2,
+    "target": "player"
+  },
+  {
+    "id": "watchtower_basic_2",
+    "name": "Basic Watchtower +2",
+    "description": "Range +10",
+    "type": "watchtower",
+    "cost": 1,
+    "effects": [
+      { "stat": "baseRange", "type": "flat", "value": 10 }
+    ],
+    "prerequisites": ["watchtower_basic_1"],
+    "level": 3,
+    "target": "player"
+  },
+  {
+    "id": "watchtower_basic_3",
+    "name": "Basic Watchtower +3",
+    "description": "Damage +2",
+    "type": "watchtower",
+    "cost": 1,
+    "effects": [
+      { "stat": "baseDamage", "type": "flat", "value": 2 }
+    ],
+    "prerequisites": ["watchtower_basic_2"],
+    "level": 4,
+    "target": "player"
+  },
+  {
+    "id": "watchtower_basic_4",
+    "name": "Basic Watchtower +4",
+    "description": "Range +10",
+    "type": "watchtower",
+    "cost": 1,
+    "effects": [
+      { "stat": "baseRange", "type": "flat", "value": 10 }
+    ],
+    "prerequisites": ["watchtower_basic_3"],
+    "level": 5,
+    "target": "player"
+  },
+  {
+    "id": "watchtower_basic_5",
+    "name": "Basic Watchtower +5",
+    "description": "Damage +2",
+    "type": "watchtower",
+    "cost": 1,
+    "effects": [
+      { "stat": "baseDamage", "type": "flat", "value": 2 }
+    ],
+    "prerequisites": ["watchtower_basic_4"],
+    "level": 6,
+    "target": "player"
+  },
+  {
+    "id": "watchtower_flaming_0",
+    "name": "Flaming Arrows Watchtower",
     "description": "Now with a flaming arrows.",
     "type": "watchtower",
     "cost": 1,
     "effects": [
-      { "stat": "baseDamage", "type": "flat", "value": 20 },
-      { "stat": "baseRange", "type": "flat", "value": 100 },
+      { "stat": "baseDamage", "type": "flat", "value": 10 },
+      { "stat": "baseRange", "type": "flat", "value": 50 },
       { "stat": "baseProjectiles", "type": "fireArrows", "value": -1 }
     ],
-    "prerequisites": ["watchtower_1"]
+    "prerequisites": ["watchtower_basic_5"],
+    "level": 7,
+    "target": "player"
   },
   {
-    "id": "walls_1",
+    "id": "watchtower_flaming_1",
+    "name": "Flaming Watchtower +1",
+    "description": "Damage +3",
+    "type": "watchtower",
+    "cost": 1,
+    "effects": [
+      { "stat": "baseDamage", "type": "flat", "value": 3 }
+    ],
+    "prerequisites": ["watchtower_flaming_0"],
+    "level": 8,
+    "target": "player"
+  },
+  {
+    "id": "watchtower_flaming_2",
+    "name": "Flaming Watchtower +2",
+    "description": "Attack Speed +10%",
+    "type": "watchtower",
+    "cost": 1,
+    "effects": [
+      { "stat": "attackSpeed", "type": "percent", "value": -0.1 }
+    ],
+    "prerequisites": ["watchtower_flaming_1"],
+    "level": 9,
+    "target": "player"
+  },
+  {
+    "id": "watchtower_flaming_3",
+    "name": "Flaming Watchtower +3",
+    "description": "Damage +3",
+    "type": "watchtower",
+    "cost": 1,
+    "effects": [
+      { "stat": "baseDamage", "type": "flat", "value": 3 }
+    ],
+    "prerequisites": ["watchtower_flaming_2"],
+    "level": 10,
+    "target": "player"
+  },
+  {
+    "id": "watchtower_flaming_4",
+    "name": "Flaming Watchtower +4",
+    "description": "Attack Speed +10%",
+    "type": "watchtower",
+    "cost": 1,
+    "effects": [
+      { "stat": "attackSpeed", "type": "percent", "value": -0.1 }
+    ],
+    "prerequisites": ["watchtower_flaming_3"],
+    "level": 11,
+    "target": "player"
+  },
+  {
+    "id": "watchtower_flaming_5",
+    "name": "Flaming Watchtower +5",
+    "description": "Damage +3",
+    "type": "watchtower",
+    "cost": 1,
+    "effects": [
+      { "stat": "baseDamage", "type": "flat", "value": 3 }
+    ],
+    "prerequisites": ["watchtower_flaming_4"],
+    "level": 12,
+    "target": "player"
+  },
+  {
+    "id": "watchtower_TODO_0",
+    "name": "TODO Watchtower",
+    "description": "todo",
+    "type": "watchtower",
+    "cost": 1,
+    "effects": [
+      { "stat": "baseDamage", "type": "flat", "value": 10 },
+      { "stat": "baseRange", "type": "flat", "value": 50 },
+      { "stat": "baseProjectiles", "type": "fireArrows", "value": -1 }
+    ],
+    "prerequisites": ["watchtower_flaming_5"],
+    "level": 13,
+    "target": "player"
+  },
+  {
+    "id": "walls_basic_0",
     "name": "Basic walls",
     "description": "Some walls to last longer.",
     "type": "walls",
     "cost": 1,
     "effects": [
-      { "stat": "baseMaxHealth", "type": "percent", "value": 0.1 }
+      { "stat": "baseMaxHealth", "type": "percent", "value": 0.05 }
     ],
-    "prerequisites": []
+    "prerequisites": [],
+    "level": 1,
+    "target": "player"
   },
   {
-    "id": "walls_2",
-    "name": "Better walls",
+    "id": "walls_basic_1",
+    "name": "Basic Walls +1",
+    "description": "Max Health +1%",
+    "type": "walls",
+    "cost": 1,
+    "effects": [
+      { "stat": "baseMaxHealth", "type": "percent", "value": 0.01 }
+    ],
+    "prerequisites": ["walls_basic_0"],
+    "level": 2,
+    "target": "player"
+  },
+  {
+    "id": "walls_basic_2",
+    "name": "Basic Walls +2",
+    "description": "Max Health +1%",
+    "type": "walls",
+    "cost": 1,
+    "effects": [
+      { "stat": "baseMaxHealth", "type": "percent", "value": 0.01 }
+    ],
+    "prerequisites": ["walls_basic_1"],
+    "level": 3,
+    "target": "player"
+  },
+  {
+    "id": "walls_basic_3",
+    "name": "Basic Walls +3",
+    "description": "Max Health +1%",
+    "type": "walls",
+    "cost": 1,
+    "effects": [
+      { "stat": "baseMaxHealth", "type": "percent", "value": 0.01 }
+    ],
+    "prerequisites": ["walls_basic_2"],
+    "level": 4,
+    "target": "player"
+  },
+  {
+    "id": "walls_basic_4",
+    "name": "Basic Walls +4",
+    "description": "Max Health +1%",
+    "type": "walls",
+    "cost": 1,
+    "effects": [
+      { "stat": "baseMaxHealth", "type": "percent", "value": 0.01 }
+    ],
+    "prerequisites": ["walls_basic_3"],
+    "level": 5,
+    "target": "player"
+  },
+  {
+    "id": "walls_basic_5",
+    "name": "Basic Walls +5",
+    "description": "Max Health +1%",
+    "type": "walls",
+    "cost": 1,
+    "effects": [
+      { "stat": "baseMaxHealth", "type": "percent", "value": 0.01 }
+    ],
+    "prerequisites": ["walls_basic_4"],
+    "level": 6,
+    "target": "player"
+  },
+  {
+    "id": "walls_improved_0",
+    "name": "Improved Walls",
     "description": "Bit better walls to last longer.",
     "type": "walls",
     "cost": 1,
     "effects": [
-      { "stat": "baseMaxHealth", "type": "percent", "value": 0.2 }
+      { "stat": "baseMaxHealth", "type": "percent", "value": 0.1 }
     ],
-    "prerequisites": ["walls_1"]
+    "prerequisites": ["walls_basic_5"],
+    "level": 7,
+    "target": "player"
   },
   {
-    "id": "campfire_1",
+    "id": "walls_improved_1",
+    "name": "Improved Walls +1",
+    "description": "Max Health +1%",
+    "type": "walls",
+    "cost": 1,
+    "effects": [
+      { "stat": "baseMaxHealth", "type": "percent", "value": 0.01 }
+    ],
+    "prerequisites": ["walls_improved_0"],
+    "level": 8,
+    "target": "player"
+  },
+  {
+    "id": "walls_improved_2",
+    "name": "Improved Walls +2",
+    "description": "Max Health +1%",
+    "type": "walls",
+    "cost": 1,
+    "effects": [
+      { "stat": "baseMaxHealth", "type": "percent", "value": 0.01 }
+    ],
+    "prerequisites": ["walls_improved_1"],
+    "level": 9,
+    "target": "player"
+  },
+  {
+    "id": "walls_improved_3",
+    "name": "Improved Walls +3",
+    "description": "Max Health +1%",
+    "type": "walls",
+    "cost": 1,
+    "effects": [
+      { "stat": "baseMaxHealth", "type": "percent", "value": 0.01 }
+    ],
+    "prerequisites": ["walls_improved_2"],
+    "level": 10,
+    "target": "player"
+  },
+  {
+    "id": "walls_improved_4",
+    "name": "Improved Walls +4",
+    "description": "Max Health +1%",
+    "type": "walls",
+    "cost": 1,
+    "effects": [
+      { "stat": "baseMaxHealth", "type": "percent", "value": 0.01 }
+    ],
+    "prerequisites": ["walls_improved_3"],
+    "level": 11,
+    "target": "player"
+  },
+  {
+    "id": "walls_improved_5",
+    "name": "Improved Walls +5",
+    "description": "Max Health +1%",
+    "type": "walls",
+    "cost": 1,
+    "effects": [
+      { "stat": "baseMaxHealth", "type": "percent", "value": 0.01 }
+    ],
+    "prerequisites": ["walls_improved_4"],
+    "level": 12,
+    "target": "player"
+  },
+  {
+    "id": "walls_todo_0",
+    "name": "todo Walls",
+    "description": "todo",
+    "type": "walls",
+    "cost": 1,
+    "effects": [
+      { "stat": "baseMaxHealth", "type": "percent", "value": 0.1 }
+    ],
+    "prerequisites": ["walls_improved_5"],
+    "level": 13,
+    "target": "player"
+  },
+  {
+    "id": "campfire_basic_0",
     "name": "Campfire",
-    "description": "Campfire to warm foodbodies and food, increasing morale (health, speed) by a bit.",
+    "description": "Campfire to warm bodies and food.",
     "type": "campfire",
     "cost": 1,
     "effects": [
       { "stat": "speed", "type": "percent", "value": 0.05 },
-      { "stat": "maxHealth", "type": "percent", "value": 0.05 }
+      { "stat": "maxHealth", "type": "percent", "value": 0.05 },
+      { "stat": "actionSpeed", "type": "percent", "value": -0.05 }
     ],
-    "prerequisites": []
+    "prerequisites": [],
+    "level": 1,
+    "target": "unit"
   },
   {
-    "id": "campfire_2",
+    "id": "campfire_basic_1",
+    "name": "Campfire +1",
+    "description": "Units Health +1%",
+    "type": "campfire",
+    "cost": 1,
+    "effects": [
+      { "stat": "maxHealth", "type": "percent", "value": 0.01 }
+    ],
+    "prerequisites": ["campfire_basic_0"],
+    "level": 2,
+    "target": "unit"
+  },
+  {
+    "id": "campfire_basic_2",
+    "name": "Campfire +2",
+    "description": "Units Health +1%",
+    "type": "campfire",
+    "cost": 1,
+    "effects": [
+      { "stat": "maxHealth", "type": "percent", "value": 0.01 }
+    ],
+    "prerequisites": ["campfire_basic_1"],
+    "level": 3,
+    "target": "unit"
+  },
+  {
+    "id": "campfire_basic_3",
+    "name": "Campfire +3",
+    "description": "Units Speed +3%",
+    "type": "campfire",
+    "cost": 1,
+    "effects": [
+      { "stat": "speed", "type": "percent", "value": 0.03 }
+    ],
+    "prerequisites": ["campfire_basic_2"],
+    "level": 4,
+    "target": "unit"
+  },
+  {
+    "id": "campfire_basic_4",
+    "name": "Campfire +4",
+    "description": "Units Attack Speed +2%",
+    "type": "campfire",
+    "cost": 1,
+    "effects": [
+      { "stat": "actionSpeed", "type": "percent", "value": -0.02 }
+    ],
+    "prerequisites": ["campfire_basic_3"],
+    "level": 5,
+    "target": "unit"
+  },
+  {
+    "id": "campfire_basic_5",
+    "name": "Campfire +5",
+    "description": "Units Attack Speed +2%",
+    "type": "campfire",
+    "cost": 1,
+    "effects": [
+      { "stat": "actionSpeed", "type": "percent", "value": -0.02 }
+    ],
+    "prerequisites": ["campfire_basic_4"],
+    "level": 6,
+    "target": "unit"
+  },
+  {
+    "id": "campfire_cauldron_0",
     "name": "Campfire with cauldron",
-    "description": "Better meals, better morale (health, speed).",
+    "description": "Better meals, better morale.",
     "type": "campfire",
     "cost": 1,
     "effects": [
       { "stat": "speed", "type": "percent", "value": 0.1 },
-      { "stat": "maxHealth", "type": "percent", "value": 0.1 }
+      { "stat": "maxHealth", "type": "percent", "value": 0.1 },
+      { "stat": "actionSpeed", "type": "percent", "value": -0.05 }
     ],
-    "prerequisites": ["campfire_1"]
+    "prerequisites": ["campfire_basic_5"],
+    "level": 7,
+    "target": "unit"
+  },
+  {
+    "id": "campfire_cauldron_1",
+    "name": "Cauldron Campfire +1",
+    "description": "Units Speed +3%",
+    "type": "campfire",
+    "cost": 1,
+    "effects": [
+      { "stat": "speed", "type": "percent", "value": 0.03 }
+    ],
+    "prerequisites": ["campfire_cauldron_0"],
+    "level": 8,
+    "target": "unit"
+  },
+  {
+    "id": "campfire_cauldron_2",
+    "name": "Cauldron Campfire +2",
+    "description": "Units Speed +3%",
+    "type": "campfire",
+    "cost": 1,
+    "effects": [
+      { "stat": "speed", "type": "percent", "value": 0.03 }
+    ],
+    "prerequisites": ["campfire_cauldron_1"],
+    "level": 9,
+    "target": "unit"
+  },
+  {
+    "id": "campfire_cauldron_3",
+    "name": "Cauldron Campfire +3",
+    "description": "Units Max Health +1%",
+    "type": "campfire",
+    "cost": 1,
+    "effects": [
+      { "stat": "maxHealth", "type": "percent", "value": 0.01 }
+    ],
+    "prerequisites": ["campfire_cauldron_2"],
+    "level": 10,
+    "target": "unit"
+  },
+  {
+    "id": "campfire_cauldron_4",
+    "name": "Cauldron Campfire +4",
+    "description": "Units Max Health +1%",
+    "type": "campfire",
+    "cost": 1,
+    "effects": [
+      { "stat": "maxHealth", "type": "percent", "value": 0.01 }
+    ],
+    "prerequisites": ["campfire_cauldron_3"],
+    "level": 11,
+    "target": "unit"
+  },
+  {
+    "id": "campfire_cauldron_5",
+    "name": "Cauldron Campfire +5",
+    "description": "Units Attack Speed +2%",
+    "type": "campfire",
+    "cost": 1,
+    "effects": [
+      { "stat": "actionSpeed", "type": "percent", "value": -0.02 }
+    ],
+    "prerequisites": ["campfire_cauldron_4"],
+    "level": 12,
+    "target": "unit"
+  },
+  {
+    "id": "campfire_todo_0",
+    "name": "Campfire todo",
+    "description": "todo",
+    "type": "campfire",
+    "cost": 1,
+    "effects": [
+      { "stat": "speed", "type": "percent", "value": 0.1 },
+      { "stat": "maxHealth", "type": "percent", "value": 0.1 },
+      { "stat": "actionSpeed", "type": "percent", "value": -0.05 }
+    ],
+    "prerequisites": ["campfire_cauldron_5"],
+    "level": 13,
+    "target": "unit"
   }
 ]

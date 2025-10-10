@@ -142,10 +142,14 @@ export class AIController {
      * @returns An array of units that contain the required tag.
      */
     private getUnitsByTag(requiredTag: string) : Array<{unitType: string, unitConfig: UnitProps}> {
-        return this.player.selectedUnits.filter(unitData => {
-            // unitData.unitConfig.tags is string[] array (e.g., ['generic', 'melee', 'warrior'])
+        return Array.from(this.player.selectedUnits.entries())
+        .filter(([unitType, unitData]) => {
             return unitData.unitConfig.tags.includes(requiredTag);
-        });
+        })
+        .map(([unitType, unitData]) => ({
+            unitType: unitType,
+            unitConfig: unitData.unitConfig
+        }));
     }
 
     /**
@@ -155,7 +159,7 @@ export class AIController {
      * @param unitsToCheck Units to check, all selected units by default
      * @returns Object {unitType: string, unitConfig: UnitProps}
      */
-    private getBestUnitByStat(stat: keyof UnitProps, highest: boolean = true, unitsToCheck: Array<{unitType: string, unitConfig: UnitProps}> = this.player.selectedUnits, ): {unitType: string, unitConfig: UnitProps} {
+    private getBestUnitByStat(stat: keyof UnitProps, highest: boolean = true, unitsToCheck: Array<{unitType: string, unitConfig: UnitProps}>): {unitType: string, unitConfig: UnitProps} {
         if(highest){
             return unitsToCheck.reduce((prev, curr) => {
                 return prev.unitConfig[stat] > curr.unitConfig[stat] ? prev : curr;
@@ -174,7 +178,7 @@ export class AIController {
             return;
         }
         else{
-            const unit = this.getBestUnitByStat('cost', false);
+            const unit = this.getBestUnitByStat('cost', false, this.getUnitsByTag('generic'));
             this.player.canAfford(unit.unitConfig.cost) && this.player.addUnitToQueue(unit.unitType);
         }
     }
@@ -209,7 +213,7 @@ export class AIController {
             return;
         }
         else{
-            const unit = this.getBestUnitByStat('cost', false);
+            const unit = this.getBestUnitByStat('cost', false, this.getUnitsByTag('generic'));
             this.player.canAfford(unit.unitConfig.cost) && this.player.addUnitToQueue(unit.unitType);
         }
     }

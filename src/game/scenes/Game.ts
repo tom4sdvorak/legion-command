@@ -19,6 +19,7 @@ import { UnitUpgrade } from '../helpers/UnitUpgrade';
 import { FireArrow } from '../projectiles/FireArrow';
 import { PurpleBall } from '../projectiles/PurpleBall';
 import { Wizard } from '../units/Wizard';
+import { TotalEffect, UpgradeManager } from '../helpers/UpgradeManager';
 
 export class Game extends Scene
 {
@@ -91,7 +92,8 @@ export class Game extends Scene
         const redPos = new Phaser.Math.Vector2(0, this.worldHeight+this.globalOffsetY);
         this.add.sprite(50, redPos.y, 'tent').setOrigin(0,1).setScale(1.5).setDepth(11);
         this.baseRed = new PlayerBase(this, 'red', redPos, this.blueUnitsPhysics, this.redProjectiles);
-        this.playerRed = new Player(this, this.baseRed, redPos, this.redUnitsPhysics, this.blueUnitsPhysics, this.redProjectiles, this.objectPool, this.baseGroup, this.redConfigLoader);
+        this.playerRed = new Player(this, this.baseRed, redPos, this.redUnitsPhysics, this.blueUnitsPhysics, 
+            this.redProjectiles, this.objectPool, this.baseGroup, this.redConfigLoader, this.registry.get('selectedUnits'));
         this.playerRed.changePassiveIncome(1, true);
         this.playerRed.addMoney(999);
         this.applyPermaUpgrades();
@@ -105,7 +107,8 @@ export class Game extends Scene
             this.add.sprite(this.worldWidth-10, this.worldHeight+this.globalOffsetY+35, 'mineBase', 'mine_fg').setOrigin(1,1).setDepth(10).setScale(1.1),
         ];
         this.baseBlue = new PlayerBase(this, 'blue', bluePos, this.redUnitsPhysics, this.blueProjectiles);
-        this.playerBlue = new AIPlayer(this, this.baseBlue, bluePos, this.blueUnitsPhysics, this.redUnitsPhysics, this.blueProjectiles, this.objectPool, this.baseGroup, this.blueConfigLoader);
+        this.playerBlue = new AIPlayer(this, this.baseBlue, bluePos, this.blueUnitsPhysics, this.redUnitsPhysics, 
+            this.blueProjectiles, this.objectPool, this.baseGroup, this.blueConfigLoader, this.registry.get('allUnits'));
         this.playerBlue.changePassiveIncome(1, true);
         this.playerBlue.addMoney(10);
         if(devConfig.AI) this.AIController = new AIController(this.playerBlue, this.playerRed, 'EASY');
@@ -115,72 +118,51 @@ export class Game extends Scene
     }
 
     applyPermaUpgrades(){
-        const constructionJson = this.cache.json.get('constructionData');
-        
         // Get list of ID of all bought upgrades 
         const allBuiltConstructions : string[] = this.registry.get('builtConstructions') ?? [];
-        let highestUpgrades = new Map<string, number>();
-        let permaUpgrades = new Map<string, { stat: string; type: string; value: number }[]>();
+        const upgradeManager = UpgradeManager.getInstance();
+        const playerUpgrades : Record<string, TotalEffect> = upgradeManager.calculateEffects(allBuiltConstructions, 'player');
 
-        // Get highest tier of each upgrade
-        allBuiltConstructions.forEach(conID => {
-            const construction = conID.split('_');
-            const buildingName = construction[0];
-            const currentTier = parseInt(construction[1]);
-
-            if(!highestUpgrades.has(buildingName)) highestUpgrades.set(buildingName, 0);
-            if (highestUpgrades.get(buildingName)! < currentTier) { highestUpgrades.set(buildingName, currentTier); }
+        /* WALLS */
+        const hasWallUpgrade: boolean = allBuiltConstructions.some(upgradeID => {
+            const upgrade = upgradeManager.getConstructionUpgradeByID(upgradeID);
+            return upgrade && upgrade.type === 'walls'; // Return true if the upgrade exists AND its type is 'walls'
         });
+        if(hasWallUpgrade){
+            this.baseRed.buildWalls();
+            const healthEffect = playerUpgrades.baseMaxHealth ?? { flat: 0, percent: 0 };
+            const newHealth = (this.baseRed.getMaxHealth() + healthEffect.flat) * (1 + healthEffect.percent);
+            this.baseRed.setMaxHealth(newHealth);
+        }
 
-        // Get data from JSON for each upgrade
-        highestUpgrades.forEach((tier, building) => {
-            const construction = constructionJson.find((con: any) => con.id === `${building}_${tier}`);
-            if(construction){
-                permaUpgrades.set(construction.type, construction.effects);
-            }
+        /* WATCHTOWER */
+        const hasWatchtowerUpgrade: boolean = allBuiltConstructions.some(upgradeID => {
+            const upgrade = upgradeManager.getConstructionUpgradeByID(upgradeID);
+            return upgrade && upgrade.type === 'watchtower'; // Return true if the upgrade exists AND its type is 'watchtower'
         });
+        if(hasWatchtowerUpgrade){
+            const damageEffect = playerUpgrades.baseDamage ?? { flat: 0, percent: 0 };
+            const rangeEffect = playerUpgrades.baseRange ?? { flat: 0, percent: 0 };
+            const projectilesEffect = playerUpgrades.baseProjectiles ?? { flat: 0, percent: 0, specialValue: 'arrows' };
 
-        permaUpgrades.forEach((effects, type) => {
-            switch (type) {
-                case 'watchtower':
-                    //Retrieve the stats
-                    const baseDamage : number = effects.find(effect => effect.stat === 'baseDamage')?.value ?? 0;
-                    const baseRange : number = effects.find(effect => effect.stat === 'baseRange')?.value ?? 0;
-                    const baseProjectiles : string = effects.find(effect => effect.stat === 'baseProjectiles')?.type ?? '';
+            // Retrieve correct object pool
+            type ProjectileKey = keyof ObjectPool['projectiles'];
+            const key = projectilesEffect.specialValue as ProjectileKey;
+            const projectileGroup = this.objectPool.projectiles[key];
+            if(projectileGroup === undefined) return;
 
-                    // Retrieve correct object pool
-                    type ProjectileKey = keyof ObjectPool['projectiles'];
-                    const key = baseProjectiles as ProjectileKey;
-                    const projectileGroup = this.objectPool.projectiles[key];
-                    if(projectileGroup === undefined) return;
+            this.baseRed.enableWatchtower(damageEffect.flat*(1+damageEffect.percent), rangeEffect.flat*(1+rangeEffect.percent), projectileGroup);
+        }
 
-                    this.baseRed.enableWatchtower(baseDamage, baseRange, projectileGroup);
-                    break;
-                case 'walls':
-                    const baseMaxHealthMultiplier : number = effects.find(effect => effect.stat === 'baseMaxHealth')?.value ?? 0;
-                    this.baseRed.setMaxHealth(this.baseRed.getMaxHealth() * (baseMaxHealthMultiplier+1));
-                    this.baseRed.buildWalls();
-                    break;
-                case 'campfire':
-                    // Translate construction upgrade as unit upgrade
-                    const newUnitUpgrade : UnitUpgrade = {
-                        id: "campfire_buff",
-                        name: "Campfire Buff",
-                        description: "Increased morale",
-                        rarity: "common",
-                        tags: [],
-                        effects: effects,
-                    }
-                    // Apply to all units of player
-                    this.playerRed.unitsUpgrades.forEach(unit => {
-                        unit.upgrades.push(newUnitUpgrade);
-                    });
-                    break;
-                default:
-                    break;
-            }
+        /* All Unit buffing constructions */
+        const unitUpgrades: string[] = allBuiltConstructions.filter(upgradeID => {
+            const upgrade = upgradeManager.getConstructionUpgradeByID(upgradeID);
+            return upgrade && upgrade.target === 'unit'; // Keep the ID only if the upgrade exists AND is targetting units
         });
+        this.playerRed.addUpgrade('ALL', unitUpgrades);
 
+        /* Potion */
+        this.playerRed.setPotion(this.registry.get('potionID'));
     }
 
     onUnitRemoved(unit: Unit){

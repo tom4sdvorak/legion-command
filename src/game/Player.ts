@@ -12,28 +12,9 @@ export class Player extends PlayerController {
 
     constructor(scene: Phaser.Scene, playerBase: PlayerBase, spawnPosition: Phaser.Math.Vector2, ownUnitsPhysics: Phaser.Physics.Arcade.Group,
                 enemyUnitsPhysics: Phaser.Physics.Arcade.Group, projectiles: Phaser.Physics.Arcade.Group,
-                objectPool: ObjectPool, baseGroup: Phaser.GameObjects.Group, configLoader: UnitConfigLoader)
+                objectPool: ObjectPool, baseGroup: Phaser.GameObjects.Group, configLoader: UnitConfigLoader, selectedUnits: string[])
     {
-        super(scene, playerBase, spawnPosition, ownUnitsPhysics, enemyUnitsPhysics, projectiles, objectPool, baseGroup, configLoader);
-
-        /* Save base stats of all selected units */
-        let selectedUnits : string[] = this.scene.registry.get('playerUnits');
-        const potionBuff = this.scene.registry.get('playerPotion');
-        let initialUpgrades : UnitUpgrade[] = [];
-        if(potionBuff){
-            const initialUpgrade : UnitUpgrade = {...potionBuff, rarity: "potion", tags: [] as string[]};
-            initialUpgrades.push(initialUpgrade);
-        }
-        selectedUnits.forEach(unitType => {
-            this.selectedUnits.push({
-                unitType: unitType,
-                unitConfig: this.configLoader.getUnitProps(unitType)
-            });
-            this.unitsUpgrades.push({
-                unitType: unitType,
-                upgrades: [...initialUpgrades]
-            })
-        });
+        super(scene, playerBase, spawnPosition, ownUnitsPhysics, enemyUnitsPhysics, projectiles, objectPool, baseGroup, configLoader, selectedUnits);
 
         this.faction = 'red';
         this.unitQueueMaxSize = 1;
@@ -46,11 +27,11 @@ export class Player extends PlayerController {
         }, this);
     }
 
-    public levelUp(unit: string, upgrade: UnitUpgrade) : void {
+    public levelUp(unit: string, upgrade: string) : void {
         this.resourceComponent.setMaxXP(this.resourceComponent.getMaxXP() * 1.5); // Increase next level up xp by 50%
         this.level++;
         eventsCenter.emit('xp-changed', this.faction, this.resourceComponent.getXP());
-        this.unitsUpgrades.find(unitUpgrades => unitUpgrades.unitType === unit)?.upgrades?.push(upgrade);
+        this.addUpgrade(unit, upgrade);
     }
 
     /* All setters below */

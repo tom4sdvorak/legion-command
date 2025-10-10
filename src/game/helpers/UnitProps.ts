@@ -6,6 +6,7 @@ export interface UnitProps {
     maxHealth: number;
     armor: number;
     damage: number;
+    meleeMultiplier: number;
     actionSpeed: number;
     attackRange: number;
     specialRange: number;

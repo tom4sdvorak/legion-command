@@ -1,4 +1,5 @@
 import { Scene } from 'phaser';
+import { UpgradeManager } from '../helpers/UpgradeManager';
 
 export class Preloader extends Scene
 {
@@ -139,6 +140,9 @@ export class Preloader extends Scene
         this.anims.addMix(`wizard_support_end`, `wizard_shoot`, 200);
         this.anims.addMix(`wizard_support_end`, `wizard_death`, 200);
 
+        /* Transfering data from JSONs to UpgradeManager to hold them as Maps */
+        const upgradeManager = UpgradeManager.getInstance();
+        upgradeManager.init(this.cache.json.get('unitUpgrades'), this.cache.json.get('constructionUpgrades'), this.cache.json.get('potions'));
 
         //  Move to the MainMenu. You could also swap this for a Scene Transition, such as a camera fade.
         this.scene.start('MainMenu');

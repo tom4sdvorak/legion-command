@@ -5,6 +5,7 @@
     "maxHealth": 100,
     "armor": 0,
     "damage": 10,
+    "meleeMultiplier": 1,
     "actionSpeed": 1000,
     "specialRange": 100,
     "specialCooldown": 10000,
@@ -22,6 +23,7 @@
     "meleeUnit": {
       "extends": "baseUnit",
       "maxHealth": 200,
+      "meleeMultiplier": 1,
       "damage": 20,
       "actionSpeed": 1000,
       "tags": ["melee"]
@@ -31,6 +33,7 @@
       "extends": "baseUnit",
       "cost": 20,
       "maxHealth": 80,
+      "meleeMultiplier": 0.2,
       "damage": 50,
       "attackRange": 200,
       "actionSpeed": 1000,
@@ -41,6 +44,7 @@
       "extends": "rangedUnit",
       "maxHealth": 100,
       "cost": 30,
+      "meleeMultiplier": 0.5,
       "damage": 10,
       "specialRange": 100,
       "tags": ["support"]
