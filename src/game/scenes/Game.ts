@@ -93,7 +93,7 @@ export class Game extends Scene
         this.add.sprite(50, redPos.y, 'tent').setOrigin(0,1).setScale(1.5).setDepth(11);
         this.baseRed = new PlayerBase(this, 'red', redPos, this.blueUnitsPhysics, this.redProjectiles);
         this.playerRed = new Player(this, this.baseRed, redPos, this.redUnitsPhysics, this.blueUnitsPhysics, 
-            this.redProjectiles, this.objectPool, this.baseGroup, this.redConfigLoader, this.registry.get('selectedUnits'));
+            this.redProjectiles, this.objectPool, this.baseGroup, this.redConfigLoader, this.registry.get('playerUnits'));
         this.playerRed.changePassiveIncome(1, true);
         this.playerRed.addMoney(999);
         this.applyPermaUpgrades();
@@ -162,7 +162,7 @@ export class Game extends Scene
         this.playerRed.addUpgrade('ALL', unitUpgrades);
 
         /* Potion */
-        this.playerRed.setPotion(this.registry.get('potionID'));
+        this.playerRed.setPotion(this.registry.get('playerPotion'));
     }
 
     onUnitRemoved(unit: Unit){

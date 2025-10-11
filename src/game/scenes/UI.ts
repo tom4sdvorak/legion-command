@@ -4,11 +4,12 @@ import { Player } from '../Player';
 import { UIComponent } from '../components/UIComponent';
 import { AIPlayer } from '../AIPlayer';
 import { devConfig } from '../helpers/DevConfig';
+import { UnitProps } from '../helpers/UnitProps';
 
 export class UI extends Scene
 {
     button: Phaser.GameObjects.Shape;
-    unitSpawnButtons: Phaser.GameObjects.Container[] = [];
+    unitSpawnButtons: UIComponent[] = [];
     player: Player;
     enemyPlayer: AIPlayer;
     unitLimit: number = 1;
@@ -30,6 +31,7 @@ export class UI extends Scene
     settingsImage: Phaser.GameObjects.Image;
     elapsedTime: number = 0;
     timerEvent: Phaser.Time.TimerEvent | null = null;
+    playerUnits: Map<string, UnitProps> = new Map<string, UnitProps>();
 
     constructor ()
     {
@@ -105,9 +107,19 @@ export class UI extends Scene
         this.scene.launch('Pause', { player: this.player, situation: 'pause' });
     }
 
+    public updateUnitStats(){
+        this.player.selectedUnits.forEach((unit, unitType: string) => {
+            const unitStats : UnitProps = this.player.getUnitStats(unitType);
+            this.playerUnits.set(unitType, unitStats);
+        });
+    }
+
     create ()
     {      
         this.events.once('shutdown', () => this.shutdown());
+
+        // Get initial stats of played units
+        this.updateUnitStats();
 
         // Create player healthbar
         let desiredBarWidth = this.cameras.main.width/4;
@@ -159,14 +171,16 @@ export class UI extends Scene
         this.XPBarUI.scaleX = 0;
 
         // Create unit spawning buttons based on selected units
-        const playedUnits = this.registry.get('playerUnits');
-        for(let i = -1; i < 2; i++) {
-            const spawnButtonUI = new UIComponent(this, 0, 0, 96, 96, 1);
+        //const playedUnits = this.registry.get('playerUnits');
+        let count = -1;
+        this.playerUnits.forEach((stats: UnitProps, unitType: string) => {
+            const x = this.cameras.main.width/2 + count*(96+48);
+            const y = this.cameras.main.height - 96;
+            const spawnButtonUI = new UIComponent(this, x, y, 96, 96, 1);
+            spawnButtonUI.setData('unitType', unitType);
             const innerButtonHeight = 96 - spawnButtonUI.getBorderThickness()[2]*2;
             const innerButtonWidth = 96 - spawnButtonUI.getBorderThickness()[0]*2;
-            const x = this.cameras.main.width/2 + i*(96+48);
-            const y = this.cameras.main.height - 96;
-            const unitSprite = this.add.image(0, 0, playedUnits[i+1] + '_static');
+            const unitSprite = this.add.image(0, 0, unitType + '_static');
             
             // Determine how to resize the unit sprite so it fits UI element
             const maxRatio = innerButtonWidth / innerButtonHeight;
@@ -188,12 +202,14 @@ export class UI extends Scene
             unitSprite.postFX.addGlow(0x000000, 2, 0, false, 1, 5);
             const unitLoadingBar = this.add.rectangle(0, innerButtonHeight/2, innerButtonWidth, innerButtonHeight, 0xffffff).setAlpha(0.5).setOrigin(0.5,1);
             unitLoadingBar.scaleY = 0;
-            const spawnButtonContainer = this.add.container(x, y);
-            spawnButtonContainer.setSize(96, 96);
-            spawnButtonContainer.add(spawnButtonUI);
-            spawnButtonContainer.add(unitLoadingBar);
-            spawnButtonContainer.add(unitSprite);
-            spawnButtonContainer.setInteractive()
+            //const spawnButtonContainer = this.add.container(x, y);
+            //spawnButtonContainer.setSize(96, 96);
+            spawnButtonUI.add(unitLoadingBar);
+            spawnButtonUI.insertElement(unitSprite);
+            //spawnButtonContainer.add(spawnButtonUI);
+            //spawnButtonContainer.add(unitLoadingBar);
+            //spawnButtonContainer.add(unitSprite);
+            spawnButtonUI.setInteractive()
                 .on('pointerover', () => {
                     let buttonBorder : Phaser.GameObjects.NineSlice = spawnButtonUI.list[2] as Phaser.GameObjects.NineSlice;
                     if(currentGlow) buttonBorder.postFX.remove(currentGlow);
@@ -204,25 +220,30 @@ export class UI extends Scene
                     if(currentGlow) buttonBorder.postFX.remove(currentGlow);
                 })
                 .on('pointerup', () => {
-                    if(this.isSpawning || this.player.getUnitQueue().length >= this.unitLimit || !this.player.canAfford(this.player.getUnitCost(playedUnits[i+1]))) return;
-                    eventsCenter.emit('spawn-red-unit', playedUnits[i+1]);
+                    if(this.isSpawning || this.player.getUnitQueue().length >= this.unitLimit) return;
+                    eventsCenter.emit('spawn-red-unit', unitType);
                     this.isSpawning = true;
-                    this.unitSpawnButtons.forEach((button) => {
-                        let buttonUI : UIComponent= button.list[0] as UIComponent;
-                        if(button.getData('canAfford') === true) buttonUI.changeTint(0x808080, 0xbfbfbf);
+                    this.unitSpawnButtons.forEach((button : UIComponent) => {
+                        //let buttonUI : UIComponent= button.list[0] as UIComponent;
+                        if(button.getData('canAfford') === true) button.changeTint(0x808080, 0xbfbfbf);
                     });
                     unitLoadingBar.scaleY = 1;
+                    if(!this.playerUnits.get(unitType)) throw new Error(`Unit type ${unitType} does not exist`);
+                    const unitSpawnTime = this.playerUnits.get(unitType)?.spawnTime || 0;
                     this.tweens.add({
                         targets: unitLoadingBar,
                         ease: 'Power1',
                         scaleY: 0,
-                        duration: this.player.getUnitSpawnTime(playedUnits[i+1])
+                        duration: unitSpawnTime
                     });
                 });
 
-            this.unitSpawnButtons.push(spawnButtonContainer);
-            Phaser.Display.Align.In.Center(unitSprite, spawnButtonUI);
-        }
+            //this.unitSpawnButtons.push(spawnButtonContainer);
+            this.unitSpawnButtons.push(spawnButtonUI);
+            this.add.existing(spawnButtonUI);
+            //Phaser.Display.Align.In.Center(unitSprite, spawnButtonUI);
+            count++;
+        });
 
         // Keep record of time
         this.timerEvent = this.time.addEvent({
@@ -277,25 +298,24 @@ export class UI extends Scene
         /** Event listener for player's money changes
          * updates money value in UI, renders UI buttons red if player cannot afford unit
          */
-        const playedUnits = this.registry.get('playerUnits');
-
         eventsCenter.on('money-changed', (faction: string, amount: number) => {
             if(faction != this.player.faction) return;
             this.moneyText.setText(`${amount}`);
-            this.unitSpawnButtons.forEach((button, i) => {
-                let buttonUI : UIComponent= button.list[0] as UIComponent;
-
-                if(this.player.canAfford(this.player.getUnitCost(playedUnits[i])) === false){
+            this.unitSpawnButtons.forEach((button : UIComponent, i) => {
+                const unitType : string = button.getData('unitType');
+                const stats = this.playerUnits.get(unitType);
+                if(!stats) throw new Error(`Unit type ${unitType} does not exist`);
+                if(this.player.canAfford(stats.cost) === false){
                     button.setData('canAfford', false);
-                    buttonUI.changeTint(devConfig.negativeColor, devConfig.negativeColorLight);
+                    button.changeTint(devConfig.negativeColor, devConfig.negativeColorLight);
                 }
                 else{
                     button.setData('canAfford', true);
                     if(this.isSpawning){
-                        buttonUI.changeTint(0x808080, 0xbfbfbf);
+                        button && button.changeTint(0x808080, 0xbfbfbf);
                     }
                     else{
-                        buttonUI.changeTint(-1,-1);
+                        button && button.changeTint(-1,-1);
                     }
                 }
             });
@@ -305,9 +325,8 @@ export class UI extends Scene
         eventsCenter.on('unit-spawned', (faction: string) => {
             if(faction != this.player.faction) return;
             this.isSpawning = false;
-            this.unitSpawnButtons.forEach((button) => {
-                let buttonUI : UIComponent= button.list[0] as UIComponent;
-                if(button.getData('canAfford') === true) buttonUI.changeTint(-1,-1);
+            this.unitSpawnButtons.forEach((button : UIComponent) => {
+                if(button.getData('canAfford') === true) button.changeTint(-1,-1);
             });
         });
 
@@ -324,7 +343,13 @@ export class UI extends Scene
             this.levelText.setText(`Level ${this.player.getLevel()}`);
         });
 
-        // Listener for level up events to update level bar
+        // Listener for player getting unit upgrade to update our cached unit stats
+        eventsCenter.on('upgrade-added', (faction: string) => {
+            if(faction != this.player.faction) return;
+            this.updateUnitStats();
+        });
+
+        // Listener for level up events to trigger level up screen
         eventsCenter.on('level-up', (faction: string) => {
             if(faction != this.player.faction) return;
             this.onLevelUp();

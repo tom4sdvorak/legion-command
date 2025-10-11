@@ -32,6 +32,7 @@ export class Player extends PlayerController {
         this.level++;
         eventsCenter.emit('xp-changed', this.faction, this.resourceComponent.getXP());
         this.addUpgrade(unit, upgrade);
+        eventsCenter.emit('upgrade-added', this.faction);
     }
 
     /* All setters below */

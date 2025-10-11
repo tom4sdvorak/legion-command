@@ -100,7 +100,7 @@ export class PlayerController {
             const statEffect = unitUpgrades[stat] ?? { flat: 0, percent: 0, specialValue: undefined };
             if(stat in newStats && typeof newStats[stat as keyof UnitProps] !== null){
                 if(typeof newStats[stat as keyof UnitProps] === 'number'){
-                    (newStats[stat as keyof UnitProps] as number) = ((newStats[stat as keyof UnitProps] as number) + statEffect.flat) * (1+statEffect.percent);
+                    (newStats[stat as keyof UnitProps] as number) = Math.floor(((newStats[stat as keyof UnitProps] as number) + statEffect.flat) * (1+statEffect.percent));
                 }
                 else if(typeof newStats[stat as keyof UnitProps] === 'boolean'){
                     if (statEffect.specialValue === 'special') {

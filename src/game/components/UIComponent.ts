@@ -13,17 +13,28 @@ export class UIComponent extends Phaser.GameObjects.Container {
     private background: Phaser.GameObjects.Image;
     private sizeW: number;
     private sizeH: number;
+    private scrollable: boolean = false;
     private borderStroke: Phaser.GameObjects.Graphics;
+    private contentContainer: Phaser.GameObjects.Container;
+    private contentMaskGraphics: Phaser.GameObjects.Graphics;
     private content: (Phaser.GameObjects.GameObject | Phaser.GameObjects.GameObject[])[] = [];
+
+    // For scrolling
+    private isDragging: boolean = false;
+    private dragStartY: number = 0;
+    private dragStartScrollY: number = 0;
+    private scrollLimitsY: { minY: number, maxY: number } = { minY: 0, maxY: 0 };
+
     private order: ['left' | 'center' | 'right', 'top' | 'center' | 'bottom'] = ['center', 'center'];
     private gap: number = 16;
     private padding: number = 16;
 
-    constructor(scene: Phaser.Scene, x: number, y: number, width: number, height: number, background: number) {
+    constructor(scene: Phaser.Scene, x: number, y: number, width: number, height: number, background: number, scrollable: boolean = false) {
         super(scene, x, y);
         this.sizeW = width;
         this.sizeH = height;
         this.setSize(width, height);
+        this.scrollable = scrollable;
         let chosenBackground : string;
         switch (background) {
             case 0:
@@ -48,14 +59,38 @@ export class UIComponent extends Phaser.GameObjects.Container {
 
         this.border = this.scene.add.nineslice(-width/2, -height/2, 'UI_border', undefined, width, height, 8, 8, 6, 6);
         this.border.setOrigin(0, 0);
-        this.add(this.border);        
+        this.add(this.border);
+
+        this.contentContainer = this.scene.add.container(0, 0);
+        this.contentContainer.setSize(width - this.padding * 2, height - this.padding * 2);
+        this.add(this.contentContainer);
+
+        if(scrollable){
+            this.contentMaskGraphics = this.scene.add.graphics();
+            this.contentMaskGraphics.fillRect(
+                -width / 2 + this.padding,
+                -height / 2 + this.padding,
+                width - (this.padding * 2),
+                height - (this.padding * 2)
+            );
+            const mask = this.contentMaskGraphics.createGeometryMask();
+            this.contentContainer.setMask(mask);
+
+            this.setInteractive(new Phaser.Geom.Rectangle(-width/2, -height/2, width, height), Phaser.Geom.Rectangle.Contains);
+            this.on('pointerdown', this.startDrag, this);
+            this.on('pointerup', this.stopDrag, this);
+            this.scene.input.on('pointermove', this.doDrag, this);
+        }
     }
 
-    public destroy(fromScene?: boolean): void {
+    public destroy(fromScene: boolean = true): void {
         this.border.destroy(fromScene);
         this.background.destroy(fromScene);
         this.borderStroke.destroy(fromScene);
-        for (const item of this.content) {
+        if (this.contentMaskGraphics) this.contentMaskGraphics.destroy(fromScene);
+        this.contentContainer.destroy(fromScene);
+        this.scene.input.off('pointermove', this.doDrag, this);
+        /*for (const item of this.content) {
             if (Array.isArray(item)) {
                 for (const gameObject of item) {
                     if (gameObject && gameObject.destroy) {
@@ -66,7 +101,7 @@ export class UIComponent extends Phaser.GameObjects.Container {
                 item.destroy();
             }
         }
-        this.content = [];
+        this.content = [];*/
         super.destroy(fromScene);
     }
 
@@ -126,7 +161,7 @@ export class UIComponent extends Phaser.GameObjects.Container {
         if(Array.isArray(element)){
             element.forEach(e => {
                 if('displayHeight' in e){
-                    this.add(e);
+                    this.contentContainer.add(e);
                 }
                 else{
                     console.error('UIComponent: insertElement() called with invalid element!');
@@ -136,7 +171,7 @@ export class UIComponent extends Phaser.GameObjects.Container {
             this.content.push(element);
         }
         else if('displayHeight' in element){
-            this.add(element);
+            this.contentContainer.add(element);
             this.content.push(element);
         }
         else{
@@ -154,6 +189,16 @@ export class UIComponent extends Phaser.GameObjects.Container {
 
     public setPadding(padding: number): void {
         this.padding = padding;
+        this.contentContainer.setSize(this.sizeW - this.padding * 2, this.sizeH - this.padding * 2);
+        if(this.contentMaskGraphics){
+            this.contentMaskGraphics.clear();
+            this.contentMaskGraphics.fillRect(
+                -this.sizeW / 2 + this.padding,
+                -this.sizeH / 2 + this.padding,
+                this.sizeW - (this.padding * 2),
+                this.sizeH - (this.padding * 2)
+            );
+        }
         this.positionElements(this.order);
     }
 
@@ -196,16 +241,31 @@ export class UIComponent extends Phaser.GameObjects.Container {
             }
         }, 0) + (itemCount - 1) * this.gap;
 
+
+        if(this.scrollable){
+            const availableHeight = this.sizeH - (this.padding * 2);
+            this.scrollLimitsY.maxY = 0; 
+            if (totalContentHeight > availableHeight) {
+                this.scrollLimitsY.minY = availableHeight - totalContentHeight;
+                this.contentContainer.y = 0; 
+            } else {
+                this.scrollLimitsY.minY = 0;
+                if (position[1] === 'center') {
+                    this.contentContainer.y = -totalContentHeight / 2 + availableHeight / 2;
+                }
+            }
+        }
+        
+
         // Figure out starting vertical position
-        let startY;
+        let startY = 0;
         switch (position[1]) {
             case 'top':
-                startY = (-this.sizeH / 2) + this.padding;
+                startY = 0;
                 break;
             case 'bottom':
-                startY = (this.sizeH / 2) - totalContentHeight - this.padding;
+                startY = this.contentContainer.height - totalContentHeight;
                 break;
-            case 'center':
             default:
                 startY = -totalContentHeight / 2;
                 break;
@@ -215,11 +275,11 @@ export class UIComponent extends Phaser.GameObjects.Container {
         let startX, originX;
         switch (position[0]) {
             case 'left':
-                startX = (-this.sizeW / 2) + this.padding;
+                startX = (-this.contentContainer.width / 2);
                 originX = 0;
                 break;
             case 'right':
-                startX = (this.sizeW / 2) - this.padding;
+                startX = (this.contentContainer.width / 2);
                 originX = 1;
                 break;
             default:
@@ -299,5 +359,38 @@ export class UIComponent extends Phaser.GameObjects.Container {
                 }
             }
         });
+    }
+
+    private getLocalY(globalY: number): number {
+        return globalY - (this.y - this.sizeH / 2);
+    }
+
+    private startDrag(pointer: Phaser.Input.Pointer): void {
+        // Only allow drag if content is overflowing
+        if (this.scrollLimitsY.minY >= 0) return; 
+
+        this.isDragging = true;
+        this.dragStartY = this.getLocalY(pointer.y);
+        this.dragStartScrollY = this.contentContainer.y;
+    }
+
+    private stopDrag(): void {
+        this.isDragging = false;
+    }
+
+    private doDrag(pointer: Phaser.Input.Pointer): void {
+        if (!this.isDragging) return;
+
+        // Calculate movement difference since drag started
+        const currentLocalY = this.getLocalY(pointer.y);
+        const deltaY = currentLocalY - this.dragStartY;
+
+        // Calculate new Y position, applying it to the scroll container
+        let newY = this.dragStartScrollY + deltaY;
+
+        // Clamp the position to ensure it stays within bounds
+        newY = Phaser.Math.Clamp(newY, this.scrollLimitsY.minY, this.scrollLimitsY.maxY);
+
+        this.contentContainer.y = newY;
     }
 }

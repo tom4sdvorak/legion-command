@@ -142,7 +142,7 @@ export class Preloader extends Scene
 
         /* Transfering data from JSONs to UpgradeManager to hold them as Maps */
         const upgradeManager = UpgradeManager.getInstance();
-        upgradeManager.init(this.cache.json.get('unitUpgrades'), this.cache.json.get('constructionUpgrades'), this.cache.json.get('potions'));
+        upgradeManager.init(this.cache.json.get('unitUpgrades'), this.cache.json.get('constructionData'), this.cache.json.get('potionData'));
 
         //  Move to the MainMenu. You could also swap this for a Scene Transition, such as a camera fade.
         this.scene.start('MainMenu');

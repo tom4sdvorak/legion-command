@@ -2,6 +2,7 @@ import { Scene, GameObjects } from 'phaser';
 import { UIComponent } from '../components/UIComponent';
 import SaveManager from '../helpers/SaveManager';
 import { devConfig } from '../helpers/DevConfig';
+import { ConstructionUpgrade, Potion, UpgradeManager } from '../helpers/UpgradeManager';
 
 export class PreGame extends Scene
 {
@@ -15,6 +16,7 @@ export class PreGame extends Scene
     constructionMenu: UIComponent;
     potionSelected: boolean = false;
     largeWindowSize: {w: number, h: number} = {w: 0, h: 0};
+    upgradeManager: UpgradeManager;
 
     constructor ()
     {
@@ -28,6 +30,7 @@ export class PreGame extends Scene
         this.gameHeight = this.game.config.height as number;
         this.largeWindowSize.w = (this.gameWidth/4*3);
         this.largeWindowSize.h = this.gameHeight-128;
+        this.upgradeManager = UpgradeManager.getInstance();
     }
 
     create ()
@@ -208,9 +211,9 @@ export class PreGame extends Scene
         this.add.existing(this.constructionMenu);
         this.constructionMenu.setInteractive();
 
-        const constructionJson = this.cache.json.get('constructionData');
+        const constructions : ConstructionUpgrade[] = this.upgradeManager.getAllConstructionUpgrades();
         let builtConstructions : string[] = this.registry.get('builtConstructions') ?? [];
-        constructionJson.forEach((con : any) => {
+        constructions.forEach((con : ConstructionUpgrade) => {
             if(!builtConstructions.includes(con.id)){
                 if(con.prerequisites.some((prereq : string) => !builtConstructions.includes(prereq))){
                     return;
@@ -255,8 +258,8 @@ export class PreGame extends Scene
         this.potionsMenu.setInteractive();
         
         // Load and show potions
-        const potionJson = this.cache.json.get('potionData');
-        potionJson.forEach((potion : any) => {
+        const potions : Potion[] = this.upgradeManager.getAllPotions();
+        potions.forEach((potion : Potion) => {
 
             // Potion info
             const potionName = this.add.bitmapText(0, 0, 'pixelFont', potion.name, 64).setMaxWidth(this.potionsMenu.width-64);
@@ -272,7 +275,7 @@ export class PreGame extends Scene
             potionButton.setInteractive().on('pointerup', () => {
                 this.potionsMenu.setVisible(false);
                 this.overlay.setVisible(false);
-                this.registry.set('playerPotion', potion);
+                this.registry.set('playerPotion', potion.id);
                 this.potionSelected = true;
                 alchemist.playAfterRepeat('alchemist_idleToDialog');
             });
@@ -349,9 +352,6 @@ export class PreGame extends Scene
             }
         });
 
-    }
-    showPotions() {
-        throw new Error('Method not implemented.');
     }
 
     update(){

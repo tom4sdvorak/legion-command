@@ -157,6 +157,7 @@ export class UpgradeManager {
                         TotalStats[effect.stat].specialValue = effect.type; 
                     }
                 }
+            
             }
         }
         return TotalStats;   
