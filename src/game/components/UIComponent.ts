@@ -1,3 +1,5 @@
+import { UI } from "../scenes/UI";
+
     /**
      * Constructor for the UIComponent.
      * 
@@ -18,12 +20,16 @@ export class UIComponent extends Phaser.GameObjects.Container {
     private contentContainer: Phaser.GameObjects.Container;
     private contentMaskGraphics: Phaser.GameObjects.Graphics;
     private content: (Phaser.GameObjects.GameObject | Phaser.GameObjects.GameObject[])[] = [];
+    private fixedContent: (Phaser.GameObjects.GameObject | Phaser.GameObjects.GameObject[])[] = [];
 
     // For scrolling
     private isDragging: boolean = false;
     private dragStartY: number = 0;
+    private dragStartX: number = 0;
     private dragStartScrollY: number = 0;
+    private dragStartScrollX: number = 0;
     private scrollLimitsY: { minY: number, maxY: number } = { minY: 0, maxY: 0 };
+    private scrollLimitsX: { minX: number, maxX: number } = { minX: 0, maxX: 0 };
 
     private order: ['left' | 'center' | 'right', 'top' | 'center' | 'bottom'] = ['center', 'center'];
     private gap: number = 16;
@@ -65,21 +71,11 @@ export class UIComponent extends Phaser.GameObjects.Container {
         this.contentContainer.setSize(width - this.padding * 2, height - this.padding * 2);
         this.add(this.contentContainer);
 
-        if(scrollable){
+        if(scrollable) {
             this.contentMaskGraphics = this.scene.add.graphics();
-            this.contentMaskGraphics.fillRect(
-                -width / 2 + this.padding,
-                -height / 2 + this.padding,
-                width - (this.padding * 2),
-                height - (this.padding * 2)
-            );
-            const mask = this.contentMaskGraphics.createGeometryMask();
-            this.contentContainer.setMask(mask);
-
-            this.setInteractive(new Phaser.Geom.Rectangle(-width/2, -height/2, width, height), Phaser.Geom.Rectangle.Contains);
+            this.createMask();
+            this.setInteractive(new Phaser.Geom.Rectangle(0, 0, width, height), Phaser.Geom.Rectangle.Contains);
             this.on('pointerdown', this.startDrag, this);
-            this.on('pointerup', this.stopDrag, this);
-            this.scene.input.on('pointermove', this.doDrag, this);
         }
     }
 
@@ -89,20 +85,23 @@ export class UIComponent extends Phaser.GameObjects.Container {
         this.borderStroke.destroy(fromScene);
         if (this.contentMaskGraphics) this.contentMaskGraphics.destroy(fromScene);
         this.contentContainer.destroy(fromScene);
-        this.scene.input.off('pointermove', this.doDrag, this);
-        /*for (const item of this.content) {
-            if (Array.isArray(item)) {
-                for (const gameObject of item) {
-                    if (gameObject && gameObject.destroy) {
-                        gameObject.destroy();
-                    }
-                }
-            } else if (item && item.destroy) {
-                item.destroy();
-            }
-        }
-        this.content = [];*/
+        this.scene.input.removeAllListeners();
+        this.removeAllListeners();
         super.destroy(fromScene);
+    }
+
+    private createMask(){
+        if(this.contentMaskGraphics) this.contentMaskGraphics.clear();
+        //this.contentMaskGraphics.fillStyle(0x000000, 0.5).setDepth(9999999);
+        this.contentMaskGraphics.fillRect(
+            -this.sizeW / 2 + this.padding,
+            -this.sizeH / 2 + this.padding,
+            this.sizeW - this.padding * 2,
+            this.sizeH - this.padding * 2
+        );
+        this.contentMaskGraphics.setPosition(this.x, this.y);
+        const mask = this.contentMaskGraphics.createGeometryMask();
+        this.contentContainer.setMask(mask);
     }
 
     public getWidth(): number {
@@ -157,22 +156,25 @@ export class UIComponent extends Phaser.GameObjects.Container {
      * Adds gameObject into the UI and reorganizes all the content
      * @param element GameObject to add
      */
-    public insertElement(element: Phaser.GameObjects.GameObject | Phaser.GameObjects.GameObject[]): void {
+    public insertElement(element: Phaser.GameObjects.GameObject | Phaser.GameObjects.GameObject[], isFixed?: boolean): void {
+        const targetArray = isFixed ? this.fixedContent : this.content;
+        const targetContainer = isFixed ? this : this.contentContainer;
+
         if(Array.isArray(element)){
             element.forEach(e => {
                 if('displayHeight' in e){
-                    this.contentContainer.add(e);
+                    targetContainer.add(e);
                 }
                 else{
                     console.error('UIComponent: insertElement() called with invalid element!');
                 }
                 
             });
-            this.content.push(element);
+            targetArray.push(element);
         }
         else if('displayHeight' in element){
-            this.contentContainer.add(element);
-            this.content.push(element);
+            targetContainer.add(element);
+            targetArray.push(element);
         }
         else{
             console.error('UIComponent: insertElement() called with invalid element!');
@@ -190,15 +192,7 @@ export class UIComponent extends Phaser.GameObjects.Container {
     public setPadding(padding: number): void {
         this.padding = padding;
         this.contentContainer.setSize(this.sizeW - this.padding * 2, this.sizeH - this.padding * 2);
-        if(this.contentMaskGraphics){
-            this.contentMaskGraphics.clear();
-            this.contentMaskGraphics.fillRect(
-                -this.sizeW / 2 + this.padding,
-                -this.sizeH / 2 + this.padding,
-                this.sizeW - (this.padding * 2),
-                this.sizeH - (this.padding * 2)
-            );
-        }
+        this.createMask();
         this.positionElements(this.order);
     }
 
@@ -241,6 +235,31 @@ export class UIComponent extends Phaser.GameObjects.Container {
             }
         }, 0) + (itemCount - 1) * this.gap;
 
+        // Calculate width of largest element (or sum of elements if they are inside array
+        const totalContentWidth = this.content.reduce((width, obj) => {
+            if(Array.isArray(obj)){
+                let rowWidth = 0;
+                for(const item of obj){
+                    if(isLayoutElement(item)){
+                        rowWidth += item.displayWidth;
+                    }
+                    else{
+                        console.error('UIComponent: positionElements() called with invalid element!');
+                        return width;
+                    }
+                }
+                return Math.max(width, rowWidth+(obj.length-1)*this.gap);
+            }
+            else{
+                if(isLayoutElement(obj)){
+                    return Math.max(width, obj.displayWidth);
+                }
+                else{
+                    console.error('UIComponent: positionElements() called with invalid element!');
+                    return width;
+                }
+            }
+        }, 0);
 
         if(this.scrollable){
             const availableHeight = this.sizeH - (this.padding * 2);
@@ -251,35 +270,56 @@ export class UIComponent extends Phaser.GameObjects.Container {
             } else {
                 this.scrollLimitsY.minY = 0;
                 if (position[1] === 'center') {
-                    this.contentContainer.y = -totalContentHeight / 2 + availableHeight / 2;
+                    //this.contentContainer.y = -totalContentHeight / 2 + availableHeight / 2;
                 }
             }
+            this.contentContainer.y = Phaser.Math.Clamp(this.contentContainer.y, this.scrollLimitsY.minY, this.scrollLimitsY.maxY);
+
+            const availableWidth = this.sizeW - (this.padding * 2);
+            this.scrollLimitsX.maxX = 0; 
+            if (totalContentWidth > availableWidth) {
+                this.scrollLimitsX.minX = availableWidth - totalContentWidth;
+            } else {
+                this.scrollLimitsX.minX = 0;
+            }
+            this.contentContainer.x = Phaser.Math.Clamp(this.contentContainer.x, this.scrollLimitsX.minX, this.scrollLimitsX.maxX);
         }
+
+        // Calculate height of any fixed content
+        const fixedContentHeight = this.fixedContent.reduce((height, obj) => {
+            const item = Array.isArray(obj) ? obj[0] : obj;
+            if(isLayoutElement(item)){
+                return height + item.displayHeight + this.gap;
+            }
+            return height;
+        }, 0);
         
 
         // Figure out starting vertical position
         let startY = 0;
         switch (position[1]) {
             case 'top':
-                startY = 0;
+                startY = (-this.sizeH / 2) + this.padding;
                 break;
             case 'bottom':
-                startY = this.contentContainer.height - totalContentHeight;
+                startY = (this.sizeH / 2) - (totalContentHeight+fixedContentHeight) - this.padding;
                 break;
             default:
-                startY = -totalContentHeight / 2;
+                startY = -(totalContentHeight+fixedContentHeight) / 2;
                 break;
         }
 
         // Figure out starting horizontal position
         let startX, originX;
+        let scrollableX = (-this.sizeW / 2) + this.padding; // Scrollable content always starts left
+        let scrollableOriginX = 0;
         switch (position[0]) {
             case 'left':
-                startX = (-this.contentContainer.width / 2);
+                startX = (-this.sizeW / 2) + this.padding;
                 originX = 0;
                 break;
             case 'right':
-                startX = (this.contentContainer.width / 2);
+                startX = (this.sizeW / 2) - this.padding;
                 originX = 1;
                 break;
             default:
@@ -289,8 +329,9 @@ export class UIComponent extends Phaser.GameObjects.Container {
         }
 
         let posY = startY;
+        const allContent = [...this.fixedContent, ...this.content];
         // Loop thrugh all elements positioning them correctly
-        this.content.forEach((element, index) => {
+        allContent.forEach((element, index) => {
             // If element is instead array of elements, position them next to each other on current Y position, respecting horizontal align (left, center, right)
             if(Array.isArray(element)){
                 if(element.length <= 0){
@@ -309,32 +350,39 @@ export class UIComponent extends Phaser.GameObjects.Container {
                 }, 0) + (element.length - 1) * this.gap;
                 let posX = startX;
 
-                // Figure out starting horizontal position
-                switch (position[0]) {
-                    case 'center':   
-                        posX = posX - totalContentWidth / 2; 
-                        break;
-                    case 'right':  
-                        posX = posX-totalContentWidth;
-                        break;
-                    default: 
-                        break;
+                if(element.length >= 1){
+                    // Figure out starting horizontal position if first element of the array is inside UIComponent directly (therefore part of fixed content)
+                    if(element[0].parentContainer instanceof UIComponent){
+                        switch (position[0]) {
+                            case 'center':   
+                                posX = posX - totalContentWidth / 2; 
+                                break;
+                            case 'right':  
+                                posX = posX-totalContentWidth;
+                                break;
+                            default: 
+                                break;
+                        }
+                    }
+                    else{ // Otherwise its part of the content container and if scrolling is enabled, should be positioned left most no matter what
+                        if(this.scrollable){
+                            posX = scrollableX;
+                        }
+                    }
                 }
-
+            
                 // Loop thru the elements inside array and position them correctly in current row
                 element.forEach(e => {
+                    
                     if(isLayoutElement(e)){
                         if(e instanceof Phaser.GameObjects.Container){
-                            e.getAll().forEach(child => {
-                                // @ts-ignore
-                                if('setOrigin' in child) child.setOrigin(0, 0.5);
-                            });
+                            e.setPosition(posX+(e.displayWidth/2), posY + (e.displayHeight * e.originY));
                         }
                         else{
                             // @ts-ignore
                             if('setOrigin' in e) e.setOrigin(0, 0.5);
+                            e.setPosition(posX, posY + (e.displayHeight * e.originY));
                         }
-                        e.setPosition(posX, posY + (e.displayHeight * e.originY));
                         posX += e.displayWidth + this.gap;
                     }
                 });
@@ -356,8 +404,10 @@ export class UIComponent extends Phaser.GameObjects.Container {
                     element.setPosition(startX, posY + (element.displayHeight * element.originY));
                     posY += element.displayHeight + this.gap;
                     
+                    
                 }
             }
+        
         });
     }
 
@@ -365,32 +415,93 @@ export class UIComponent extends Phaser.GameObjects.Container {
         return globalY - (this.y - this.sizeH / 2);
     }
 
+    private getLocalX(globalX: number): number {
+        return globalX - (this.x - this.sizeW / 2);
+    }
+
     private startDrag(pointer: Phaser.Input.Pointer): void {
         // Only allow drag if content is overflowing
-        if (this.scrollLimitsY.minY >= 0) return; 
-
+        if (this.scrollLimitsY.minY >= 0 && this.scrollLimitsX.minX >= 0) return;
         this.isDragging = true;
+        this.scene.input.on('pointermove', this.doDrag, this);
+        this.scene.input.once('pointerup', this.stopDrag, this);
+        this.scene.input.once('gameout',  this.stopDrag, this);
         this.dragStartY = this.getLocalY(pointer.y);
         this.dragStartScrollY = this.contentContainer.y;
+        this.dragStartX = this.getLocalX(pointer.x); 
+        this.dragStartScrollX = this.contentContainer.x;
     }
 
     private stopDrag(): void {
         this.isDragging = false;
+        this.scene.input.off('pointermove', this.doDrag, this);
+
+        // 2. Determine target X and Y positions
+        let targetX = this.contentContainer.x;
+        let targetY = this.contentContainer.y;
+
+        // Check X-axis limits
+        if (targetX > this.scrollLimitsX.maxX) {
+            targetX = this.scrollLimitsX.maxX;
+        } else if (targetX < this.scrollLimitsX.minX) {
+            targetX = this.scrollLimitsX.minX;
+        }
+
+        // Check Y-axis limits
+        if (targetY > this.scrollLimitsY.maxY) {
+            targetY = this.scrollLimitsY.maxY;
+        } else if (targetY < this.scrollLimitsY.minY) {
+            targetY = this.scrollLimitsY.minY;
+        }
+
+        // 3. If content is outside the bounds, tween it back
+        if (targetX !== this.contentContainer.x || targetY !== this.contentContainer.y) {
+            this.scene.tweens.add({
+                targets: this.contentContainer,
+                x: targetX,
+                y: targetY,
+                duration: 300,
+                ease: 'Quart.easeOut',
+            });
+        }
     }
 
     private doDrag(pointer: Phaser.Input.Pointer): void {
         if (!this.isDragging) return;
+        // --- X-Axis Logic ---
+        const isScrollableX = this.scrollLimitsX.minX < 0;
+        if (isScrollableX) {
+            const currentLocalX = this.getLocalX(pointer.x);
+            const deltaX = currentLocalX - this.dragStartX;
+            let newX = this.dragStartScrollX + deltaX;
+            
+            if (newX > this.scrollLimitsX.maxX) {
+                const overshoot = newX - this.scrollLimitsX.maxX;
+                newX = this.scrollLimitsX.maxX + overshoot * 0.5;
+            } else if (newX < this.scrollLimitsX.minX) {
+                const undershoot = this.scrollLimitsX.minX - newX;
+                newX = this.scrollLimitsX.minX - undershoot * 0.5;
+            }
 
-        // Calculate movement difference since drag started
-        const currentLocalY = this.getLocalY(pointer.y);
-        const deltaY = currentLocalY - this.dragStartY;
+            this.contentContainer.x = newX;
+        }
+        
+        // --- Y-Axis Logic ---
+        const isScrollableY = this.scrollLimitsY.minY < 0;
+        if (isScrollableY) {
+            const currentLocalY = this.getLocalY(pointer.y);
+            const deltaY = currentLocalY - this.dragStartY;
 
-        // Calculate new Y position, applying it to the scroll container
-        let newY = this.dragStartScrollY + deltaY;
+            // Calculate new Y position, applying it to the scroll container
+            let newY = this.dragStartScrollY + deltaY;
 
-        // Clamp the position to ensure it stays within bounds
-        newY = Phaser.Math.Clamp(newY, this.scrollLimitsY.minY, this.scrollLimitsY.maxY);
-
-        this.contentContainer.y = newY;
+            if (newY > this.scrollLimitsY.maxY) {
+                const overshoot = newY - this.scrollLimitsY.maxY;
+                newY = this.scrollLimitsY.maxY + overshoot * 0.5;
+            } else if (newY < this.scrollLimitsY.minY) {
+                const undershoot = this.scrollLimitsY.minY - newY;
+                newY = this.scrollLimitsY.minY - undershoot * 0.5;
+            }
+        }
     }
 }

@@ -192,8 +192,13 @@ export class UpgradeManager {
         return Array.from(this.unitUpgrades.values());
     }
 
-    public getAllConstructionUpgrades(): ConstructionUpgrade[] {
-        return Array.from(this.constructionUpgrades.values());
+    public getAllConstructionUpgrades(type?: 'watchtower' | 'walls' | 'campfire'): ConstructionUpgrade[] {
+        if (type) {
+            return Array.from(this.constructionUpgrades.values()).filter(upgrade => upgrade.type === type);
+        }
+        else{
+            return Array.from(this.constructionUpgrades.values());
+        }
     }
 
     public getAllPotions(): Potion[] {

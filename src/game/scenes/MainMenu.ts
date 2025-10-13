@@ -3,6 +3,7 @@ import { UIComponent } from '../components/UIComponent';
 import SaveManager, { SaveData } from '../helpers/SaveManager';
 import { OverlayComponent } from '../components/OverlayComponent';
 import { devConfig } from '../helpers/DevConfig';
+import { FramedImage } from '../components/FramedImage';
 
 export class MainMenu extends Scene
 {
@@ -20,7 +21,7 @@ export class MainMenu extends Scene
     {
         this.events.once('shutdown', () => this.shutdown());
         // x, y, width, height, background (0: lighter, 1: darker)
-        this.mainMenu = new UIComponent(this, (this.game.config.width as number)/2, (this.game.config.height as number)/2, (this.game.config.width as number)*0.6, (this.game.config.height as number)*0.9, 1); 
+        this.mainMenu = new UIComponent(this, (this.game.config.width as number)/2, (this.game.config.height as number)/2, (this.game.config.width as number)*0.6, (this.game.config.height as number)*0.9, 1, true); 
         const interactableGroup = this.add.group();
         this.overlay = new OverlayComponent(this, 0x000000, 0.3);
         this.overlay.on('overlay-clicked', () => this.hideSaveSlots());
@@ -32,10 +33,26 @@ export class MainMenu extends Scene
         const creditsButton = this.add.bitmapText(0, 0, 'pixelFont', 'Credits', buttonSize).setOrigin(0.5, 0.5).setInteractive().on('pointerup', () => this.showCredits());
         interactableGroup.add(creditsButton);
 
+        // TEST
+        const testIcon = new FramedImage(this, 0, 0, 64, 64, 'round');
+        testIcon.putInside(this.add.bitmapText(0, 0, 'pixelFont', 'O', 64));
+        const testLine = this.add.line(0, 0, 0, 32, 128, 32, 0x000000, 1).setLineWidth(20);
+        const testIcon2 = new FramedImage(this, 0, 0, 64, 64, 'round');
+        testIcon2.putInside(this.add.bitmapText(0, 0, 'pixelFont', 'O', 64));
+        const testLine2 = this.add.line(0, 0, 0, 32, 128, 32, 0x000000, 1).setLineWidth(20);
+        const testIcon3 = new FramedImage(this, 0, 0, 64, 64, 'round');
+        testIcon3.putInside(this.add.bitmapText(0, 0, 'pixelFont', 'O', 64));
+        const testLine3 = this.add.line(0, 0, 0, 32, 128, 32, 0x000000, 1).setLineWidth(20);
+        const testIcon4 = new FramedImage(this, 0, 0, 64, 64, 'round');
+        testIcon4.putInside(this.add.bitmapText(0, 0, 'pixelFont', 'O', 64));
+        const testLine4 = this.add.line(0, 0, 0, 32, 128, 32, 0x000000, 1).setLineWidth(20);
+        this.mainMenu.insertElement([testIcon, testLine, testIcon2, testLine2, testIcon3, testLine3, testIcon4, testLine4]);
+        // END TEST
+
         //this.mainMenu.add([continueButton, newGameButton, creditsButton]);
-        this.mainMenu.insertElement(playButton);
-        this.mainMenu.insertElement(creditsButton);
-        this.mainMenu.positionElements(['center', 'center'], 16, 16);
+        this.mainMenu.insertElement(playButton, true);
+        this.mainMenu.insertElement(creditsButton, false);
+        this.mainMenu.positionElements(['right', 'center'], 16, 16);
         this.add.existing(this.mainMenu);
 
         interactableGroup.getChildren().forEach(child => {

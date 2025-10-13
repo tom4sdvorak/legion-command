@@ -92,13 +92,10 @@ export class PreGame extends Scene
                     }
                 });
             });
-            let glow = mySprite.postFX?.addGlow(0x000000, 2, 0, false, 1, 10);
             mySprite.on('pointerover', () => {
-                mySprite.postFX.remove(glow);
-                glow = mySprite.postFX.addGlow(0xffff00, 10, 0, false, 1, 1);
+                mySprite.postFX.addGlow(0xffff00, 10, 0, false, 1, 1);
             }).on('pointerout', () => {
-                mySprite.postFX.remove(glow);
-                glow = mySprite.postFX?.addGlow(0x000000, 2, 0, false, 1, 10);
+                mySprite.postFX.clear();
             });
 
             mySprite.play(`${unit}_idle`);
@@ -111,13 +108,10 @@ export class PreGame extends Scene
             this.showConstructionMenu();
             this.overlay.setVisible(true);
         });
-        let sawmillGlow = sawmill.postFX?.addGlow(0x000000, 2, 0, false, 1, 10);
         sawmill.on('pointerover', () => {
-            sawmill.postFX.remove(sawmillGlow);
-            sawmillGlow = sawmill.postFX.addGlow(0x00FFFF, 10, 0, false, 1, 1);
+            sawmill.postFX.addGlow(0x00FFFF, 10, 0, false, 1, 1);
         }).on('pointerout', () => {
-            sawmill.postFX.remove(sawmillGlow);
-            sawmillGlow = sawmill.postFX?.addGlow(0x000000, 2, 0, false, 1, 10);
+            sawmill.postFX.clear();
         });
 
         this.add.sprite(this.gameWidth/2, this.gameHeight/2, 'campfire').play('campfire_burning').setDisplaySize(64,64);
@@ -211,15 +205,16 @@ export class PreGame extends Scene
         this.add.existing(this.constructionMenu);
         this.constructionMenu.setInteractive();
 
-        const constructions : ConstructionUpgrade[] = this.upgradeManager.getAllConstructionUpgrades();
-        let builtConstructions : string[] = this.registry.get('builtConstructions') ?? [];
+        const constructions : ConstructionUpgrade[] = this.upgradeManager.getAllConstructionUpgrades('walls');
+        const builtConstructions : string[] = this.registry.get('builtConstructions') ?? [];
         constructions.forEach((con : ConstructionUpgrade) => {
             if(!builtConstructions.includes(con.id)){
                 if(con.prerequisites.some((prereq : string) => !builtConstructions.includes(prereq))){
                     return;
-                }                
+                }
+                
                 // Upgrade info
-                const conName = this.add.bitmapText(0, 0, 'pixelFont', con.name, 64).setMaxWidth(this.constructionMenu.width-64);
+                /*const conName = this.add.bitmapText(0, 0, 'pixelFont', con.name, 64).setMaxWidth(this.constructionMenu.width-64);
                 const conText = this.add.bitmapText(0, 0, 'pixelFont', con.description, 32).setMaxWidth(this.constructionMenu.width-64);
                 const conCostText = this.add.bitmapText(0, 0, 'pixelFont', `Cost: ${con.cost}`, 32).setOrigin(0,0.5);
                 const coinImage = this.add.image(0, 0, 'coin').setDisplaySize(32, 32).setOrigin(0,0.5);
@@ -238,7 +233,7 @@ export class PreGame extends Scene
 
                 this.constructionMenu.insertElement(conName);
                 this.constructionMenu.insertElement(conText);
-                this.constructionMenu.insertElement([conCostText, coinImage, conButton]);
+                this.constructionMenu.insertElement([conCostText, coinImage, conButton]);*/
 
             }
         });
@@ -294,13 +289,10 @@ export class PreGame extends Scene
             this.overlay.setVisible(true);
         });
 
-        let glow = alchemist.postFX?.addGlow(0x000000, 2, 0, false, 1, 10);
         alchemist.on('pointerover', () => {
-            alchemist.postFX.remove(glow);
-            glow = alchemist.postFX.addGlow(0x00FFFF, 10, 0, false, 1, 1);
+            alchemist.postFX.addGlow(0x00FFFF, 10, 0, false, 1, 1);
         }).on('pointerout', () => {
-            alchemist.postFX.remove(glow);
-            glow = alchemist.postFX?.addGlow(0x000000, 2, 0, false, 1, 10);
+            alchemist.postFX.clear();
         });
 
         alchemist.on('animationcomplete', (anim : Phaser.Animations.Animation, frame : Phaser.Animations.AnimationFrame) => {
