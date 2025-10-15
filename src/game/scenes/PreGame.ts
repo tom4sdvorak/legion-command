@@ -3,6 +3,7 @@ import { UIComponent } from '../components/UIComponent';
 import SaveManager from '../helpers/SaveManager';
 import { devConfig } from '../helpers/DevConfig';
 import { ConstructionUpgrade, Potion, UpgradeManager } from '../helpers/UpgradeManager';
+import { FramedImage } from '../components/FramedImage';
 
 export class PreGame extends Scene
 {
@@ -187,7 +188,7 @@ export class PreGame extends Scene
         yesText.setDropShadow(1, 1, devConfig.positiveColor, 1);
         this.readyCheck.insertElement(readyText);
         this.readyCheck.insertElement([ noText, yesText ]);
-        this.readyCheck.positionElements(['center', 'center'], 32, 16);
+        this.readyCheck.positionElements(['center', 'center'], 0, 32);
         this.add.existing(this.readyCheck);
         this.readyCheck.setVisible(false).setDepth(1001).setInteractive();
     }
@@ -201,44 +202,95 @@ export class PreGame extends Scene
     /* Handles sawmill sprite and construction upgrades */
     showConstructionMenu(){
 
-        this.constructionMenu = new UIComponent(this, (this.gameWidth-this.largeWindowSize.w/2-64), this.gameHeight/2, this.largeWindowSize.w, this.largeWindowSize.h, 0).setDepth(1001);
+        this.constructionMenu = new UIComponent(this, (this.gameWidth-this.largeWindowSize.w/2-64), this.gameHeight/2, this.largeWindowSize.w, this.largeWindowSize.h, 0, true).setDepth(1001);
         this.add.existing(this.constructionMenu);
         this.constructionMenu.setInteractive();
 
-        const constructions : ConstructionUpgrade[] = this.upgradeManager.getAllConstructionUpgrades('walls');
+        const wallCons : ConstructionUpgrade[] = this.upgradeManager.getAllConstructionUpgrades('walls');
+        const towerCons : ConstructionUpgrade[] = this.upgradeManager.getAllConstructionUpgrades('watchtower');
+        const fireCons : ConstructionUpgrade[] = this.upgradeManager.getAllConstructionUpgrades('campfire');
         const builtConstructions : string[] = this.registry.get('builtConstructions') ?? [];
-        constructions.forEach((con : ConstructionUpgrade) => {
-            if(!builtConstructions.includes(con.id)){
-                if(con.prerequisites.some((prereq : string) => !builtConstructions.includes(prereq))){
-                    return;
-                }
-                
-                // Upgrade info
-                /*const conName = this.add.bitmapText(0, 0, 'pixelFont', con.name, 64).setMaxWidth(this.constructionMenu.width-64);
-                const conText = this.add.bitmapText(0, 0, 'pixelFont', con.description, 32).setMaxWidth(this.constructionMenu.width-64);
-                const conCostText = this.add.bitmapText(0, 0, 'pixelFont', `Cost: ${con.cost}`, 32).setOrigin(0,0.5);
-                const coinImage = this.add.image(0, 0, 'coin').setDisplaySize(32, 32).setOrigin(0,0.5);
 
-                // Buying button
-                const conButtonBorder = this.add.rectangle(0, 0, 96, 34, 0xffffff, 0).setStrokeStyle(1, 0x000000);
-                const conBuyText = this.add.bitmapText(0, 0, 'pixelFont', `BUILD`, 32);
-                const conButton = this.add.container(0, 0, [conButtonBorder, conBuyText]);
-                conButton.setSize(96, 34);
-                conButton.setInteractive().on('pointerup', () => {
-                    this.constructionMenu.destroy();
-                    this.overlay.setVisible(false);
-                    builtConstructions.push(con.id);
-                    this.registry.set('builtConstructions', builtConstructions);
-                });
-
-                this.constructionMenu.insertElement(conName);
-                this.constructionMenu.insertElement(conText);
-                this.constructionMenu.insertElement([conCostText, coinImage, conButton]);*/
-
+        // Upgrade info
+        let conID : string | undefined;
+        let lastClicked : FramedImage | undefined;
+        const padding = 32;
+        const conName = this.add.bitmapText(0, 0, 'pixelFont', 'Upgrade:', 64).setMaxWidth(this.constructionMenu.width-padding*2);
+        const conText = this.add.bitmapText(0, 0, 'pixelFont', 'Description:', 32).setMaxWidth(this.constructionMenu.width-padding*2);
+        const conCostText = this.add.bitmapText(0, 0, 'pixelFont', `Cost:   `, 32).setOrigin(0,0.5);
+        const coinImage = this.add.image(0, 0, 'coin').setDisplaySize(32, 32).setOrigin(0,0.5);
+        const divider = this.add.line(0, 0, 0, 0, this.constructionMenu.width-padding*2, 0, 0x000000).setLineWidth(8);
+        const conBuyText = this.add.bitmapText(0, 0, 'pixelFont', `BUILD`, 32).setInteractive();
+        conBuyText.on('pointerup', () => {
+            if(conID){
+                if(builtConstructions.includes(conID)) return;
+                builtConstructions.push(conID);
+                this.registry.set('builtConstructions', builtConstructions);
+                this.constructionMenu.destroy();
+                this.showConstructionMenu();
             }
         });
+        this.constructionMenu.insertElement(conName, true);
+        this.constructionMenu.insertElement(conText, true);
+        this.constructionMenu.insertElement([conCostText, coinImage, conBuyText], true);
+        this.constructionMenu.insertElement(divider, true);
+
+        // Loop through construction upgrade types
+        for(let i = 0; i < 3; i++){
+            let constructions : ConstructionUpgrade[] = [];
+            let tempArray : any[] = [];
+            let firstNotBuilt : boolean = true;
+            switch(i){
+                case 0:
+                    constructions = wallCons;
+                    break;
+                case 1:
+                    constructions = towerCons;
+                    break;
+                case 2:
+                    constructions = fireCons;
+                    break;
+            }
+            
+            constructions.forEach((con : ConstructionUpgrade) => {
+                let conSlot : FramedImage;
+                const line : Phaser.GameObjects.Line = this.add.line(0, 0, 0, 0, 64, 0, devConfig.negativeColor).setLineWidth(8);
+                if(con.tier === 'major'){
+                    conSlot = new FramedImage(this, 0, 0, 72, 72, 'squircle').setInteractive();
+                }
+                else{
+                    conSlot = new FramedImage(this, 0, 0, 48, 48, 'square').setInteractive();
+                }
+                conSlot.changeBorder(4, devConfig.negativeColor); // Set all upgrades to not possible color
+                if(builtConstructions.includes(con.id)){ // Change those already built to neutral color
+                    conSlot.changeBorder(4, 0x000000);
+                    line.strokeColor = 0x000000;
+                }
+                else if(firstNotBuilt){ // On finding first upgrade not built, give it special color
+                    firstNotBuilt = false;
+                    conSlot.changeBorder(4, devConfig.positiveColor);
+                    line.strokeColor = devConfig.positiveColor;
+                }
+                conSlot.on('pointerup', () => {
+                    if(lastClicked && lastClicked !== conSlot){
+                        lastClicked.changeBorder(4);
+                    }
+                    conID = con.id;
+                    lastClicked = conSlot;
+                    conName.setText(`Upgrade: ${con.name}`);
+                    conText.setText(`Description: ${con.description}`);
+                    conCostText.setText(`Cost: ${con.cost}`);
+                    conSlot.changeBorder(8);
+                });
+                conSlot.putInside(this.add.bitmapText(0, 0, 'pixelFont', con.name[0], 32));
+                tempArray.push(line, conSlot);
+            });
+            tempArray.splice(0,1);
+            this.constructionMenu.insertElement(tempArray);
+        }
+        
         if(this.constructionMenu.getContentLength() <= 0) return;
-        this.constructionMenu.positionElements(['left', 'top'], 8, 16);
+        this.constructionMenu.positionElements(['left', 'top'], 0, 16, padding);
 
 
     }
@@ -279,7 +331,7 @@ export class PreGame extends Scene
             this.potionsMenu.insertElement(potionText);
             this.potionsMenu.insertElement([potionCostText, coinImage, potionButton]);
         });
-        this.potionsMenu.positionElements(['left', 'top'], 8, 16);
+        this.potionsMenu.positionElements(['left', 'top'], 0, 8);
 
         const alchemist = this.add.sprite(100, 300, 'alchemist').play('alchemist_idle').setScale(2);
         alchemist.setInteractive({ pixelPerfect: true }).on('pointerup', () => {

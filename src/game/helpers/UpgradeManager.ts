@@ -14,6 +14,7 @@ export interface ConstructionUpgrade {
     effects: Effect[]; // Array of stat changes applied by this upgrade
     prerequisites: string[]; // Array of IDs that must be purchased first
     level: number; // The sequential level within the construction's progression
+    tier: 'major' | 'minor'; // Whether this upgrade is major or minor
 }
 
 export interface UnitUpgrade {

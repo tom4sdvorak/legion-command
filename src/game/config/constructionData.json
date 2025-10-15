@@ -12,7 +12,8 @@
     ],
     "prerequisites": [],
     "level": 1,
-    "target": "player"
+    "target": "player",
+    "tier": "major"
   },
   {
     "id": "watchtower_basic_1",
@@ -25,7 +26,8 @@
     ],
     "prerequisites": ["watchtower_basic_0"],
     "level": 2,
-    "target": "player"
+    "target": "player",
+    "tier": "minor"
   },
   {
     "id": "watchtower_basic_2",
@@ -38,7 +40,8 @@
     ],
     "prerequisites": ["watchtower_basic_1"],
     "level": 3,
-    "target": "player"
+    "target": "player",
+    "tier": "minor"
   },
   {
     "id": "watchtower_basic_3",
@@ -51,7 +54,8 @@
     ],
     "prerequisites": ["watchtower_basic_2"],
     "level": 4,
-    "target": "player"
+    "target": "player",
+    "tier": "minor"
   },
   {
     "id": "watchtower_basic_4",
@@ -64,7 +68,8 @@
     ],
     "prerequisites": ["watchtower_basic_3"],
     "level": 5,
-    "target": "player"
+    "target": "player",
+    "tier": "minor"
   },
   {
     "id": "watchtower_basic_5",
@@ -77,7 +82,8 @@
     ],
     "prerequisites": ["watchtower_basic_4"],
     "level": 6,
-    "target": "player"
+    "target": "player",
+    "tier": "minor"
   },
   {
     "id": "watchtower_flaming_0",
@@ -92,7 +98,8 @@
     ],
     "prerequisites": ["watchtower_basic_5"],
     "level": 7,
-    "target": "player"
+    "target": "player",
+    "tier": "major"
   },
   {
     "id": "watchtower_flaming_1",
@@ -105,7 +112,8 @@
     ],
     "prerequisites": ["watchtower_flaming_0"],
     "level": 8,
-    "target": "player"
+    "target": "player",
+    "tier": "minor"
   },
   {
     "id": "watchtower_flaming_2",
@@ -118,7 +126,8 @@
     ],
     "prerequisites": ["watchtower_flaming_1"],
     "level": 9,
-    "target": "player"
+    "target": "player",
+    "tier": "minor"
   },
   {
     "id": "watchtower_flaming_3",
@@ -131,7 +140,8 @@
     ],
     "prerequisites": ["watchtower_flaming_2"],
     "level": 10,
-    "target": "player"
+    "target": "player",
+    "tier": "minor"
   },
   {
     "id": "watchtower_flaming_4",
@@ -144,7 +154,8 @@
     ],
     "prerequisites": ["watchtower_flaming_3"],
     "level": 11,
-    "target": "player"
+    "target": "player",
+    "tier": "minor"
   },
   {
     "id": "watchtower_flaming_5",
@@ -157,7 +168,8 @@
     ],
     "prerequisites": ["watchtower_flaming_4"],
     "level": 12,
-    "target": "player"
+    "target": "player",
+    "tier": "minor"
   },
   {
     "id": "watchtower_TODO_0",
@@ -172,7 +184,8 @@
     ],
     "prerequisites": ["watchtower_flaming_5"],
     "level": 13,
-    "target": "player"
+    "target": "player",
+    "tier": "major"
   },
   {
     "id": "walls_basic_0",
@@ -185,7 +198,8 @@
     ],
     "prerequisites": [],
     "level": 1,
-    "target": "player"
+    "target": "player",
+    "tier": "major"
   },
   {
     "id": "walls_basic_1",
@@ -198,7 +212,8 @@
     ],
     "prerequisites": ["walls_basic_0"],
     "level": 2,
-    "target": "player"
+    "target": "player",
+    "tier": "minor"
   },
   {
     "id": "walls_basic_2",
@@ -211,7 +226,8 @@
     ],
     "prerequisites": ["walls_basic_1"],
     "level": 3,
-    "target": "player"
+    "target": "player",
+    "tier": "minor"
   },
   {
     "id": "walls_basic_3",
@@ -224,7 +240,8 @@
     ],
     "prerequisites": ["walls_basic_2"],
     "level": 4,
-    "target": "player"
+    "target": "player",
+    "tier": "minor"
   },
   {
     "id": "walls_basic_4",
@@ -237,7 +254,8 @@
     ],
     "prerequisites": ["walls_basic_3"],
     "level": 5,
-    "target": "player"
+    "target": "player",
+    "tier": "minor"
   },
   {
     "id": "walls_basic_5",
@@ -250,7 +268,8 @@
     ],
     "prerequisites": ["walls_basic_4"],
     "level": 6,
-    "target": "player"
+    "target": "player",
+    "tier": "minor"
   },
   {
     "id": "walls_improved_0",
@@ -263,7 +282,8 @@
     ],
     "prerequisites": ["walls_basic_5"],
     "level": 7,
-    "target": "player"
+    "target": "player",
+    "tier": "major"
   },
   {
     "id": "walls_improved_1",
@@ -276,7 +296,8 @@
     ],
     "prerequisites": ["walls_improved_0"],
     "level": 8,
-    "target": "player"
+    "target": "player",
+    "tier": "minor"
   },
   {
     "id": "walls_improved_2",
@@ -289,7 +310,8 @@
     ],
     "prerequisites": ["walls_improved_1"],
     "level": 9,
-    "target": "player"
+    "target": "player",
+    "tier": "minor"
   },
   {
     "id": "walls_improved_3",
@@ -302,7 +324,8 @@
     ],
     "prerequisites": ["walls_improved_2"],
     "level": 10,
-    "target": "player"
+    "target": "player",
+    "tier": "minor"
   },
   {
     "id": "walls_improved_4",
@@ -315,7 +338,8 @@
     ],
     "prerequisites": ["walls_improved_3"],
     "level": 11,
-    "target": "player"
+    "target": "player",
+    "tier": "minor"
   },
   {
     "id": "walls_improved_5",
@@ -328,7 +352,8 @@
     ],
     "prerequisites": ["walls_improved_4"],
     "level": 12,
-    "target": "player"
+    "target": "player",
+    "tier": "minor"
   },
   {
     "id": "walls_todo_0",
@@ -341,7 +366,8 @@
     ],
     "prerequisites": ["walls_improved_5"],
     "level": 13,
-    "target": "player"
+    "target": "player",
+    "tier": "major"
   },
   {
     "id": "campfire_basic_0",
@@ -356,7 +382,8 @@
     ],
     "prerequisites": [],
     "level": 1,
-    "target": "unit"
+    "target": "unit",
+    "tier": "major"
   },
   {
     "id": "campfire_basic_1",
@@ -369,7 +396,8 @@
     ],
     "prerequisites": ["campfire_basic_0"],
     "level": 2,
-    "target": "unit"
+    "target": "unit",
+    "tier": "minor"
   },
   {
     "id": "campfire_basic_2",
@@ -382,7 +410,8 @@
     ],
     "prerequisites": ["campfire_basic_1"],
     "level": 3,
-    "target": "unit"
+    "target": "unit",
+    "tier": "minor"
   },
   {
     "id": "campfire_basic_3",
@@ -395,7 +424,8 @@
     ],
     "prerequisites": ["campfire_basic_2"],
     "level": 4,
-    "target": "unit"
+    "target": "unit",
+    "tier": "minor"
   },
   {
     "id": "campfire_basic_4",
@@ -408,7 +438,8 @@
     ],
     "prerequisites": ["campfire_basic_3"],
     "level": 5,
-    "target": "unit"
+    "target": "unit",
+    "tier": "minor"
   },
   {
     "id": "campfire_basic_5",
@@ -421,7 +452,8 @@
     ],
     "prerequisites": ["campfire_basic_4"],
     "level": 6,
-    "target": "unit"
+    "target": "unit",
+    "tier": "minor"
   },
   {
     "id": "campfire_cauldron_0",
@@ -436,7 +468,8 @@
     ],
     "prerequisites": ["campfire_basic_5"],
     "level": 7,
-    "target": "unit"
+    "target": "unit",
+    "tier": "major"
   },
   {
     "id": "campfire_cauldron_1",
@@ -449,7 +482,8 @@
     ],
     "prerequisites": ["campfire_cauldron_0"],
     "level": 8,
-    "target": "unit"
+    "target": "unit",
+    "tier": "minor"
   },
   {
     "id": "campfire_cauldron_2",
@@ -462,7 +496,8 @@
     ],
     "prerequisites": ["campfire_cauldron_1"],
     "level": 9,
-    "target": "unit"
+    "target": "unit",
+    "tier": "minor"
   },
   {
     "id": "campfire_cauldron_3",
@@ -475,7 +510,8 @@
     ],
     "prerequisites": ["campfire_cauldron_2"],
     "level": 10,
-    "target": "unit"
+    "target": "unit",
+    "tier": "minor"
   },
   {
     "id": "campfire_cauldron_4",
@@ -488,7 +524,8 @@
     ],
     "prerequisites": ["campfire_cauldron_3"],
     "level": 11,
-    "target": "unit"
+    "target": "unit",
+    "tier": "minor"
   },
   {
     "id": "campfire_cauldron_5",
@@ -501,7 +538,8 @@
     ],
     "prerequisites": ["campfire_cauldron_4"],
     "level": 12,
-    "target": "unit"
+    "target": "unit",
+    "tier": "minor"
   },
   {
     "id": "campfire_todo_0",
@@ -516,6 +554,7 @@
     ],
     "prerequisites": ["campfire_cauldron_5"],
     "level": 13,
-    "target": "unit"
+    "target": "unit",
+    "tier": "major"
   }
 ]

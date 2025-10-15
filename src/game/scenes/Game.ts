@@ -317,6 +317,7 @@ export class Game extends Scene
 
     create ()
     {             
+        if(this.registry.get('playerUnits').length < 3 || this.registry.get('playerUnits').length > 3) throw new Error(`Player has wrong amount of units ${this.registry.get('playerUnits').length}`);
         // Setup the game screen
         this.camera = this.cameras.main;
         this.cameras.main.setBounds(0, 0, this.worldWidth, this.worldHeight);

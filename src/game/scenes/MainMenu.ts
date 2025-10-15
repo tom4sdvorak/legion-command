@@ -33,26 +33,10 @@ export class MainMenu extends Scene
         const creditsButton = this.add.bitmapText(0, 0, 'pixelFont', 'Credits', buttonSize).setOrigin(0.5, 0.5).setInteractive().on('pointerup', () => this.showCredits());
         interactableGroup.add(creditsButton);
 
-        // TEST
-        const testIcon = new FramedImage(this, 0, 0, 64, 64, 'round');
-        testIcon.putInside(this.add.bitmapText(0, 0, 'pixelFont', 'O', 64));
-        const testLine = this.add.line(0, 0, 0, 32, 128, 32, 0x000000, 1).setLineWidth(20);
-        const testIcon2 = new FramedImage(this, 0, 0, 64, 64, 'round');
-        testIcon2.putInside(this.add.bitmapText(0, 0, 'pixelFont', 'O', 64));
-        const testLine2 = this.add.line(0, 0, 0, 32, 128, 32, 0x000000, 1).setLineWidth(20);
-        const testIcon3 = new FramedImage(this, 0, 0, 64, 64, 'round');
-        testIcon3.putInside(this.add.bitmapText(0, 0, 'pixelFont', 'O', 64));
-        const testLine3 = this.add.line(0, 0, 0, 32, 128, 32, 0x000000, 1).setLineWidth(20);
-        const testIcon4 = new FramedImage(this, 0, 0, 64, 64, 'round');
-        testIcon4.putInside(this.add.bitmapText(0, 0, 'pixelFont', 'O', 64));
-        const testLine4 = this.add.line(0, 0, 0, 32, 128, 32, 0x000000, 1).setLineWidth(20);
-        this.mainMenu.insertElement([testIcon, testLine, testIcon2, testLine2, testIcon3, testLine3, testIcon4, testLine4]);
-        // END TEST
-
         //this.mainMenu.add([continueButton, newGameButton, creditsButton]);
-        this.mainMenu.insertElement(playButton, true);
-        this.mainMenu.insertElement(creditsButton, false);
-        this.mainMenu.positionElements(['right', 'center'], 16, 16);
+        this.mainMenu.insertElement(playButton);
+        this.mainMenu.insertElement(creditsButton);
+        this.mainMenu.positionElements(['center', 'center']);
         this.add.existing(this.mainMenu);
 
         interactableGroup.getChildren().forEach(child => {
@@ -137,7 +121,7 @@ export class MainMenu extends Scene
                 saveSlotDeleteButton.setDropShadow(2, 2, devConfig.negativeColor, 1);
                 saveSlotUIElement.insertElement(saveSlotDeleteButton);
             }
-            saveSlotUIElement.positionElements(['center', 'center'], 64, 16);
+            saveSlotUIElement.positionElements(['center', 'center'], 0, 64);
             this.saveSlotsContainer.add(saveSlotUIElement);
             currentPosX += UIElementWidth + gap;
             saveSlotUIElement.setInteractive()
@@ -240,7 +224,7 @@ export class MainMenu extends Scene
         cancelText.setDropShadow(2, 2, devConfig.positiveColor, 1);
         deleteCheck.insertElement(readyText);
         deleteCheck.insertElement([ deleteText, cancelText ]);
-        deleteCheck.positionElements(['center', 'center'], 32, 16);
+        deleteCheck.positionElements(['center', 'center'], 0, 32);
         this.add.existing(deleteCheck);
         deleteCheck.setDepth(9001).setInteractive();
         overlay.show(true);

@@ -76,7 +76,7 @@ export class GameOver extends Scene
         this.gameOverUI.insertElement(unitsKilledText);
         this.gameOverUI.insertElement(unitsSpawnedText);
         this.gameOverUI.insertElement(continueText);
-        this.gameOverUI.positionElements(['center', 'center'], 16, 32);
+        this.gameOverUI.positionElements(['center', 'center']);
         this.add.existing(this.gameOverUI);
 
 

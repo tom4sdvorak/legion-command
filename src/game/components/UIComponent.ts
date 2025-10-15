@@ -32,8 +32,10 @@ export class UIComponent extends Phaser.GameObjects.Container {
     private scrollLimitsX: { minX: number, maxX: number } = { minX: 0, maxX: 0 };
 
     private order: ['left' | 'center' | 'right', 'top' | 'center' | 'bottom'] = ['center', 'center'];
-    private gap: number = 16;
+    private marginBottom: number = 16;
+    private marginRight: number = 16;
     private padding: number = 16;
+
 
     constructor(scene: Phaser.Scene, x: number, y: number, width: number, height: number, background: number, scrollable: boolean = false) {
         super(scene, x, y);
@@ -155,6 +157,8 @@ export class UIComponent extends Phaser.GameObjects.Container {
     /**
      * Adds gameObject into the UI and reorganizes all the content
      * @param element GameObject to add
+     * @param sendToBack if true, the element will be added to the back of the UI
+     * @param isFixed if true, the element will be added as fixed element that will never scroll
      */
     public insertElement(element: Phaser.GameObjects.GameObject | Phaser.GameObjects.GameObject[], isFixed?: boolean): void {
         const targetArray = isFixed ? this.fixedContent : this.content;
@@ -164,6 +168,8 @@ export class UIComponent extends Phaser.GameObjects.Container {
             element.forEach(e => {
                 if('displayHeight' in e){
                     targetContainer.add(e);
+                    if(e instanceof Phaser.GameObjects.Line) targetContainer.sendToBack(e); // Makes all lines be in the background of any other element over them
+                       
                 }
                 else{
                     console.error('UIComponent: insertElement() called with invalid element!');
@@ -196,19 +202,22 @@ export class UIComponent extends Phaser.GameObjects.Container {
         this.positionElements(this.order);
     }
 
-    public setGap(gap: number): void {
-        this.gap = gap;
+    public setMargin(right: number, bottom: number): void {
+        this.marginBottom = bottom;
+        this.marginRight = right;
         this.positionElements(this.order);
     }
 
     /**
      * @param position an array of two strings ['left' | 'center' | 'right', 'top' | 'center' | 'bottom']
-     * @param gap the distance between elements in pixels, default is the current gap
+     * @param marginRight the distance between one element and the one on the right of it
+     * @param marginBottom the distance between one element and the one below it
      * @param padding the distance between elements and the border in pixels, default is the current padding
      */
-    positionElements(position: ['left' | 'center' | 'right', 'top' | 'center' | 'bottom'] = ['center', 'center'], gap: number = this.gap, padding: number = this.padding): void {
+    positionElements(position: ['left' | 'center' | 'right', 'top' | 'center' | 'bottom'] = ['center', 'center'], marginRight: number = this.marginRight, marginBottom: number = this.marginBottom, padding: number = this.padding): void {
         this.order = position;
-        this.gap = gap;
+        this.marginBottom = marginBottom;
+        this.marginRight = marginRight;
         this.padding = padding;
 
         // Helper function for typescript to check element properties/methods
@@ -217,12 +226,12 @@ export class UIComponent extends Phaser.GameObjects.Container {
         }
 
         const itemCount = this.content.length;
-        if(itemCount <= 0) {
+        /*if(itemCount <= 0 && this.fixedContent.length <= 0){ {
             console.error('UIComponent: positionElements() called without any elements!');
             return;
-        }
+        }*/
 
-        // Calculate height of all elements
+        // Calculate height of all (non-fixed) elements
         const totalContentHeight = this.content.reduce((height, obj) => {
             // Check if the current item is an array and use the first element if it is
             const item = Array.isArray(obj) ? obj[0] : obj;
@@ -233,9 +242,9 @@ export class UIComponent extends Phaser.GameObjects.Container {
                 console.error('UIComponent: positionElements() called with invalid element!');
                 return height;
             }
-        }, 0) + (itemCount - 1) * this.gap;
+        }, 0) + (itemCount - 1) * this.marginBottom;
 
-        // Calculate width of largest element (or sum of elements if they are inside array
+        // Calculate width of largestnon-fixed element (or sum of elements if they are inside array)
         const totalContentWidth = this.content.reduce((width, obj) => {
             if(Array.isArray(obj)){
                 let rowWidth = 0;
@@ -248,7 +257,7 @@ export class UIComponent extends Phaser.GameObjects.Container {
                         return width;
                     }
                 }
-                return Math.max(width, rowWidth+(obj.length-1)*this.gap);
+                return Math.max(width, rowWidth+(obj.length-1)*this.marginRight);
             }
             else{
                 if(isLayoutElement(obj)){
@@ -289,7 +298,7 @@ export class UIComponent extends Phaser.GameObjects.Container {
         const fixedContentHeight = this.fixedContent.reduce((height, obj) => {
             const item = Array.isArray(obj) ? obj[0] : obj;
             if(isLayoutElement(item)){
-                return height + item.displayHeight + this.gap;
+                return height + item.displayHeight + this.marginBottom;
             }
             return height;
         }, 0);
@@ -347,7 +356,7 @@ export class UIComponent extends Phaser.GameObjects.Container {
                         console.error('UIComponent: positionElements() called with invalid element!');
                         return width;
                     }
-                }, 0) + (element.length - 1) * this.gap;
+                }, 0) + (element.length - 1) * this.marginRight;
                 let posX = startX;
 
                 if(element.length >= 1){
@@ -371,23 +380,24 @@ export class UIComponent extends Phaser.GameObjects.Container {
                     }
                 }
             
+                
+                if(isLayoutElement(element[0])) posY += element[0].displayHeight/2; // Change Y coordinate of this row based on half height of the first element
                 // Loop thru the elements inside array and position them correctly in current row
                 element.forEach(e => {
-                    
                     if(isLayoutElement(e)){
                         if(e instanceof Phaser.GameObjects.Container){
-                            e.setPosition(posX+(e.displayWidth/2), posY + (e.displayHeight * e.originY));
+                            e.setPosition(posX+(e.displayWidth/2), posY);
                         }
                         else{
                             // @ts-ignore
                             if('setOrigin' in e) e.setOrigin(0, 0.5);
-                            e.setPosition(posX, posY + (e.displayHeight * e.originY));
+                            e.setPosition(posX, posY);
                         }
-                        posX += e.displayWidth + this.gap;
+                        posX += e.displayWidth + this.marginRight;
                     }
                 });
-                // Move to next row by height of first element in array and gap
-                if(isLayoutElement(element[0])) posY += element[0].displayHeight + this.gap;
+                // Move to next row by half height of first element in array and gap
+                if(isLayoutElement(element[0])) posY += element[0].displayHeight/2 + this.marginBottom;
             }
             else{
                 if(isLayoutElement(element)){
@@ -402,7 +412,7 @@ export class UIComponent extends Phaser.GameObjects.Container {
                         if('setOrigin' in element) element.setOrigin(originX, 0.5);
                     }
                     element.setPosition(startX, posY + (element.displayHeight * element.originY));
-                    posY += element.displayHeight + this.gap;
+                    posY += element.displayHeight + this.marginBottom;
                     
                     
                 }
