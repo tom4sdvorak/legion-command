@@ -1,3 +1,5 @@
+import { IconKey } from "./IconKeys";
+
 export interface Effect {
     stat: string; // The stat to modify
     type: string; // Either flat, percent, or special string for any special upgrade
@@ -14,6 +16,7 @@ export interface ConstructionUpgrade {
     effects: Effect[]; // Array of stat changes applied by this upgrade
     prerequisites: string[]; // Array of IDs that must be purchased first
     level: number; // The sequential level within the construction's progression
+    iconFrameKey: IconKey; // Frame name of the icon used for this upgrade
     tier: 'major' | 'minor'; // Whether this upgrade is major or minor
 }
 

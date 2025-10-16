@@ -24,17 +24,20 @@ export class UIComponent extends Phaser.GameObjects.Container {
 
     // For scrolling
     private isDragging: boolean = false;
+    private wasDragged: boolean = false;
     private dragStartY: number = 0;
     private dragStartX: number = 0;
     private dragStartScrollY: number = 0;
     private dragStartScrollX: number = 0;
     private scrollLimitsY: { minY: number, maxY: number } = { minY: 0, maxY: 0 };
     private scrollLimitsX: { minX: number, maxX: number } = { minX: 0, maxX: 0 };
+    private dragThreshold: number = 8;
 
     private order: ['left' | 'center' | 'right', 'top' | 'center' | 'bottom'] = ['center', 'center'];
     private marginBottom: number = 16;
     private marginRight: number = 16;
     private padding: number = 16;
+    
 
 
     constructor(scene: Phaser.Scene, x: number, y: number, width: number, height: number, background: number, scrollable: boolean = false) {
@@ -112,6 +115,10 @@ export class UIComponent extends Phaser.GameObjects.Container {
 
     public getHeight(): number {
         return this.sizeH;
+    }
+
+    public getWasDragged(): boolean {
+        return this.wasDragged;
     }
 
     /**
@@ -361,7 +368,7 @@ export class UIComponent extends Phaser.GameObjects.Container {
 
                 if(element.length >= 1){
                     // Figure out starting horizontal position if first element of the array is inside UIComponent directly (therefore part of fixed content)
-                    if(element[0].parentContainer instanceof UIComponent){
+                    if(!this.scrollable || element[0].parentContainer instanceof UIComponent){
                         switch (position[0]) {
                             case 'center':   
                                 posX = posX - totalContentWidth / 2; 
@@ -433,6 +440,7 @@ export class UIComponent extends Phaser.GameObjects.Container {
         // Only allow drag if content is overflowing
         if (this.scrollLimitsY.minY >= 0 && this.scrollLimitsX.minX >= 0) return;
         this.isDragging = true;
+        this.wasDragged = false;
         this.scene.input.on('pointermove', this.doDrag, this);
         this.scene.input.once('pointerup', this.stopDrag, this);
         this.scene.input.once('gameout',  this.stopDrag, this);
@@ -483,6 +491,13 @@ export class UIComponent extends Phaser.GameObjects.Container {
         if (isScrollableX) {
             const currentLocalX = this.getLocalX(pointer.x);
             const deltaX = currentLocalX - this.dragStartX;
+
+            // Only allow dragging if the drag distance is greater than the threshold
+            if (Math.abs(deltaX) > this.dragThreshold) {
+                this.wasDragged = true;
+            }
+            if (!this.wasDragged) return;
+
             let newX = this.dragStartScrollX + deltaX;
             
             if (newX > this.scrollLimitsX.maxX) {

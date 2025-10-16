@@ -224,7 +224,7 @@ export class MainMenu extends Scene
         cancelText.setDropShadow(2, 2, devConfig.positiveColor, 1);
         deleteCheck.insertElement(readyText);
         deleteCheck.insertElement([ deleteText, cancelText ]);
-        deleteCheck.positionElements(['center', 'center'], 0, 32);
+        deleteCheck.positionElements(['center', 'center']);
         this.add.existing(deleteCheck);
         deleteCheck.setDepth(9001).setInteractive();
         overlay.show(true);

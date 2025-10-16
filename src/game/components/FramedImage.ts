@@ -80,7 +80,7 @@ export class FramedImage extends Phaser.GameObjects.Container {
             }
         }
         else{
-            scaleFactor = scaleFactor * 0.9;
+            scaleFactor = scaleFactor * 0.8;
             if(this.inside instanceof Phaser.GameObjects.BitmapText || this.inside instanceof Phaser.GameObjects.Text){
                 this.inside.x += scaleFactor;
             }

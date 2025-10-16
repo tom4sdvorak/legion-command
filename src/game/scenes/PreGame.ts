@@ -4,6 +4,7 @@ import SaveManager from '../helpers/SaveManager';
 import { devConfig } from '../helpers/DevConfig';
 import { ConstructionUpgrade, Potion, UpgradeManager } from '../helpers/UpgradeManager';
 import { FramedImage } from '../components/FramedImage';
+import { ICON_FRAMES } from '../helpers/IconKeys';
 
 export class PreGame extends Scene
 {
@@ -213,17 +214,21 @@ export class PreGame extends Scene
 
         // Upgrade info
         let conID : string | undefined;
+        let preConID : string | undefined;
         let lastClicked : FramedImage | undefined;
         const padding = 32;
         const conName = this.add.bitmapText(0, 0, 'pixelFont', 'Upgrade:', 64).setMaxWidth(this.constructionMenu.width-padding*2);
-        const conText = this.add.bitmapText(0, 0, 'pixelFont', 'Description:', 32).setMaxWidth(this.constructionMenu.width-padding*2);
-        const conCostText = this.add.bitmapText(0, 0, 'pixelFont', `Cost:   `, 32).setOrigin(0,0.5);
+        const conText = this.add.bitmapText(0, 0, 'pixelFont', '', 32).setMaxWidth(this.constructionMenu.width-padding*2);
+        const conCostText = this.add.bitmapText(0, 0, 'pixelFont', `Cost:   `, 48).setOrigin(0,0.5);
         const coinImage = this.add.image(0, 0, 'coin').setDisplaySize(32, 32).setOrigin(0,0.5);
         const divider = this.add.line(0, 0, 0, 0, this.constructionMenu.width-padding*2, 0, 0x000000).setLineWidth(8);
-        const conBuyText = this.add.bitmapText(0, 0, 'pixelFont', `BUILD`, 32).setInteractive();
+        const empty = this.add.zone(0,0,128,32);
+        const conBuyText = new FramedImage(this, 0, 0, 128, 48, 'square').setInteractive().setVisible(false);
+        conBuyText.putInside(this.add.bitmapText(0, 0, 'pixelFont', 'Build', 48));
         conBuyText.on('pointerup', () => {
-            if(conID){
+            if(conID && preConID){
                 if(builtConstructions.includes(conID)) return;
+                if(preConID !== 'none' && !builtConstructions.includes(preConID)) return;
                 builtConstructions.push(conID);
                 this.registry.set('builtConstructions', builtConstructions);
                 this.constructionMenu.destroy();
@@ -232,7 +237,7 @@ export class PreGame extends Scene
         });
         this.constructionMenu.insertElement(conName, true);
         this.constructionMenu.insertElement(conText, true);
-        this.constructionMenu.insertElement([conCostText, coinImage, conBuyText], true);
+        this.constructionMenu.insertElement([conCostText, coinImage, empty, conBuyText], true);
         this.constructionMenu.insertElement(divider, true);
 
         // Loop through construction upgrade types
@@ -261,28 +266,58 @@ export class PreGame extends Scene
                 else{
                     conSlot = new FramedImage(this, 0, 0, 48, 48, 'square').setInteractive();
                 }
+                conSlot.putInside(this.add.image(0, 0, 'icons', ICON_FRAMES[con.iconFrameKey]));
                 conSlot.changeBorder(4, devConfig.negativeColor); // Set all upgrades to not possible color
                 if(builtConstructions.includes(con.id)){ // Change those already built to neutral color
                     conSlot.changeBorder(4, 0x000000);
+                    conSlot.setData('built', true);
+                    conSlot.setData('canBuild', false);
                     line.strokeColor = 0x000000;
                 }
                 else if(firstNotBuilt){ // On finding first upgrade not built, give it special color
                     firstNotBuilt = false;
                     conSlot.changeBorder(4, devConfig.positiveColor);
                     line.strokeColor = devConfig.positiveColor;
+                    conSlot.setData('built', false);
+                    conSlot.setData('canBuild', true);
+                }
+                else{
+                    conSlot.setData('built', false);
+                    conSlot.setData('canBuild', false);
                 }
                 conSlot.on('pointerup', () => {
+                    if (this.constructionMenu.getWasDragged()) {
+                        return;
+                    }
                     if(lastClicked && lastClicked !== conSlot){
                         lastClicked.changeBorder(4);
                     }
+                    if(conSlot.getData('built')){
+                        conBuyText.setVisible(false);
+                    }
+                    else if(!conSlot.getData('canBuild')){
+                        conBuyText.setVisible(true);
+                        conBuyText.changeBorder(4, devConfig.negativeColor);
+                        conBuyText.changeBackground(devConfig.negativeColorLight, 0.5);
+                    }
+                    else{
+                        conBuyText.setVisible(true);
+                        conBuyText.changeBorder(4, devConfig.positiveColor);
+                        conBuyText.changeBackground(devConfig.positiveColorLight, 0.5);
+                    } 
                     conID = con.id;
+                    if(con.prerequisites.length > 0){
+                        preConID = con.prerequisites[0];
+                    }
+                    else{
+                        preConID = 'none';
+                    }
                     lastClicked = conSlot;
                     conName.setText(`Upgrade: ${con.name}`);
-                    conText.setText(`Description: ${con.description}`);
+                    conText.setText(`${con.description}`);
                     conCostText.setText(`Cost: ${con.cost}`);
                     conSlot.changeBorder(8);
                 });
-                conSlot.putInside(this.add.bitmapText(0, 0, 'pixelFont', con.name[0], 32));
                 tempArray.push(line, conSlot);
             });
             tempArray.splice(0,1);
@@ -290,7 +325,7 @@ export class PreGame extends Scene
         }
         
         if(this.constructionMenu.getContentLength() <= 0) return;
-        this.constructionMenu.positionElements(['left', 'top'], 0, 16, padding);
+        this.constructionMenu.positionElements(['left', 'top'], 0, 32, padding);
 
 
     }

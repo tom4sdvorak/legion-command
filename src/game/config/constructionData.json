@@ -13,6 +13,7 @@
     "prerequisites": [],
     "level": 1,
     "target": "player",
+    "iconFrameKey": "TOWER",
     "tier": "major"
   },
   {
@@ -27,6 +28,7 @@
     "prerequisites": ["watchtower_basic_0"],
     "level": 2,
     "target": "player",
+    "iconFrameKey": "DMG_UP",
     "tier": "minor"
   },
   {
@@ -41,6 +43,7 @@
     "prerequisites": ["watchtower_basic_1"],
     "level": 3,
     "target": "player",
+    "iconFrameKey": "RANGE_UP",
     "tier": "minor"
   },
   {
@@ -55,6 +58,7 @@
     "prerequisites": ["watchtower_basic_2"],
     "level": 4,
     "target": "player",
+    "iconFrameKey": "DMG_UP",
     "tier": "minor"
   },
   {
@@ -69,6 +73,7 @@
     "prerequisites": ["watchtower_basic_3"],
     "level": 5,
     "target": "player",
+    "iconFrameKey": "RANGE_UP",
     "tier": "minor"
   },
   {
@@ -83,6 +88,7 @@
     "prerequisites": ["watchtower_basic_4"],
     "level": 6,
     "target": "player",
+    "iconFrameKey": "DMG_UP",
     "tier": "minor"
   },
   {
@@ -99,6 +105,7 @@
     "prerequisites": ["watchtower_basic_5"],
     "level": 7,
     "target": "player",
+    "iconFrameKey": "FIRE_ARROWS",
     "tier": "major"
   },
   {
@@ -113,6 +120,7 @@
     "prerequisites": ["watchtower_flaming_0"],
     "level": 8,
     "target": "player",
+    "iconFrameKey": "DMG_UP",
     "tier": "minor"
   },
   {
@@ -127,6 +135,7 @@
     "prerequisites": ["watchtower_flaming_1"],
     "level": 9,
     "target": "player",
+    "iconFrameKey": "ACTION_SPEED_UP",
     "tier": "minor"
   },
   {
@@ -141,6 +150,7 @@
     "prerequisites": ["watchtower_flaming_2"],
     "level": 10,
     "target": "player",
+    "iconFrameKey": "DMG_UP",
     "tier": "minor"
   },
   {
@@ -155,6 +165,7 @@
     "prerequisites": ["watchtower_flaming_3"],
     "level": 11,
     "target": "player",
+    "iconFrameKey": "ACTION_SPEED_UP",
     "tier": "minor"
   },
   {
@@ -169,6 +180,7 @@
     "prerequisites": ["watchtower_flaming_4"],
     "level": 12,
     "target": "player",
+    "iconFrameKey": "DMG_UP",
     "tier": "minor"
   },
   {
@@ -185,6 +197,7 @@
     "prerequisites": ["watchtower_flaming_5"],
     "level": 13,
     "target": "player",
+    "iconFrameKey": "FIRE_ARROWS",
     "tier": "major"
   },
   {
@@ -199,6 +212,7 @@
     "prerequisites": [],
     "level": 1,
     "target": "player",
+    "iconFrameKey": "DEFENSE",
     "tier": "major"
   },
   {
@@ -213,6 +227,7 @@
     "prerequisites": ["walls_basic_0"],
     "level": 2,
     "target": "player",
+    "iconFrameKey": "HP_UP",
     "tier": "minor"
   },
   {
@@ -227,6 +242,7 @@
     "prerequisites": ["walls_basic_1"],
     "level": 3,
     "target": "player",
+    "iconFrameKey": "HP_UP",
     "tier": "minor"
   },
   {
@@ -241,6 +257,7 @@
     "prerequisites": ["walls_basic_2"],
     "level": 4,
     "target": "player",
+    "iconFrameKey": "HP_UP",
     "tier": "minor"
   },
   {
@@ -255,6 +272,7 @@
     "prerequisites": ["walls_basic_3"],
     "level": 5,
     "target": "player",
+    "iconFrameKey": "HP_UP",
     "tier": "minor"
   },
   {
@@ -269,6 +287,7 @@
     "prerequisites": ["walls_basic_4"],
     "level": 6,
     "target": "player",
+    "iconFrameKey": "HP_UP",
     "tier": "minor"
   },
   {
@@ -283,6 +302,7 @@
     "prerequisites": ["walls_basic_5"],
     "level": 7,
     "target": "player",
+    "iconFrameKey": "DEFENSE_EXTRA",
     "tier": "major"
   },
   {
@@ -297,6 +317,7 @@
     "prerequisites": ["walls_improved_0"],
     "level": 8,
     "target": "player",
+    "iconFrameKey": "HP_UP",
     "tier": "minor"
   },
   {
@@ -311,6 +332,7 @@
     "prerequisites": ["walls_improved_1"],
     "level": 9,
     "target": "player",
+    "iconFrameKey": "HP_UP",
     "tier": "minor"
   },
   {
@@ -325,6 +347,7 @@
     "prerequisites": ["walls_improved_2"],
     "level": 10,
     "target": "player",
+    "iconFrameKey": "HP_UP",
     "tier": "minor"
   },
   {
@@ -339,6 +362,7 @@
     "prerequisites": ["walls_improved_3"],
     "level": 11,
     "target": "player",
+    "iconFrameKey": "HP_UP",
     "tier": "minor"
   },
   {
@@ -353,6 +377,7 @@
     "prerequisites": ["walls_improved_4"],
     "level": 12,
     "target": "player",
+    "iconFrameKey": "HP_UP",
     "tier": "minor"
   },
   {
@@ -367,6 +392,7 @@
     "prerequisites": ["walls_improved_5"],
     "level": 13,
     "target": "player",
+    "iconFrameKey": "DEFENSE_EXTRA",
     "tier": "major"
   },
   {
@@ -383,6 +409,7 @@
     "prerequisites": [],
     "level": 1,
     "target": "unit",
+    "iconFrameKey": "CAMPFIRE",
     "tier": "major"
   },
   {
@@ -397,6 +424,7 @@
     "prerequisites": ["campfire_basic_0"],
     "level": 2,
     "target": "unit",
+    "iconFrameKey": "HP_UP",
     "tier": "minor"
   },
   {
@@ -411,6 +439,7 @@
     "prerequisites": ["campfire_basic_1"],
     "level": 3,
     "target": "unit",
+    "iconFrameKey": "HP_UP",
     "tier": "minor"
   },
   {
@@ -425,6 +454,7 @@
     "prerequisites": ["campfire_basic_2"],
     "level": 4,
     "target": "unit",
+    "iconFrameKey": "MOVE_SPEED_UP",
     "tier": "minor"
   },
   {
@@ -439,6 +469,7 @@
     "prerequisites": ["campfire_basic_3"],
     "level": 5,
     "target": "unit",
+    "iconFrameKey": "ACTION_SPEED_UP",
     "tier": "minor"
   },
   {
@@ -453,6 +484,7 @@
     "prerequisites": ["campfire_basic_4"],
     "level": 6,
     "target": "unit",
+    "iconFrameKey": "ACTION_SPEED_UP",
     "tier": "minor"
   },
   {
@@ -469,6 +501,7 @@
     "prerequisites": ["campfire_basic_5"],
     "level": 7,
     "target": "unit",
+    "iconFrameKey": "POT",
     "tier": "major"
   },
   {
@@ -483,6 +516,7 @@
     "prerequisites": ["campfire_cauldron_0"],
     "level": 8,
     "target": "unit",
+    "iconFrameKey": "MOVE_SPEED_UP",
     "tier": "minor"
   },
   {
@@ -497,6 +531,7 @@
     "prerequisites": ["campfire_cauldron_1"],
     "level": 9,
     "target": "unit",
+    "iconFrameKey": "MOVE_SPEED_UP",
     "tier": "minor"
   },
   {
@@ -511,6 +546,7 @@
     "prerequisites": ["campfire_cauldron_2"],
     "level": 10,
     "target": "unit",
+    "iconFrameKey": "HP_UP",
     "tier": "minor"
   },
   {
@@ -525,6 +561,7 @@
     "prerequisites": ["campfire_cauldron_3"],
     "level": 11,
     "target": "unit",
+    "iconFrameKey": "HP_UP",
     "tier": "minor"
   },
   {
@@ -539,6 +576,7 @@
     "prerequisites": ["campfire_cauldron_4"],
     "level": 12,
     "target": "unit",
+    "iconFrameKey": "ACTION_SPEED_UP",
     "tier": "minor"
   },
   {
@@ -555,6 +593,7 @@
     "prerequisites": ["campfire_cauldron_5"],
     "level": 13,
     "target": "unit",
+    "iconFrameKey": "POT",
     "tier": "major"
   }
 ]
