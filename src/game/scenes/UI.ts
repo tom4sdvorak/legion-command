@@ -8,39 +8,55 @@ import { UnitProps } from '../helpers/UnitProps';
 
 export class UI extends Scene
 {
-    button: Phaser.GameObjects.Shape;
+    button: Phaser.GameObjects.Shape | undefined;
     unitSpawnButtons: UIComponent[] = [];
-    player: Player;
-    enemyPlayer: AIPlayer;
+    player: Player | undefined;
+    enemyPlayer: AIPlayer | undefined;
     unitLimit: number = 1;
-    moneyText: Phaser.GameObjects.BitmapText
-    moneyImage: Phaser.GameObjects.Image;
-    hpBarUI: UIComponent;
-    hpBar: Phaser.GameObjects.Graphics;
-    enemyHPBar: Phaser.GameObjects.Graphics;
+    moneyText: Phaser.GameObjects.BitmapText | undefined;
+    moneyImage: Phaser.GameObjects.Image | undefined;
+    hpBarUI: UIComponent | undefined;
+    hpBar: Phaser.GameObjects.Graphics | undefined;
+    enemyHPBarUI: UIComponent | undefined;
+    enemyHPBar: Phaser.GameObjects.Graphics | undefined;
     hpBarWidth: number = 0;
     hpBarHeight: number = 0;
     isSpawning: boolean = false;
     enemyHPBarWidth: number = 0;
     enemyHPBarHeight: number = 0;
-    timeText: Phaser.GameObjects.BitmapText;
-    XPBarUI: Phaser.GameObjects.Rectangle;
-    levelText: Phaser.GameObjects.BitmapText;
-    levelPopUp: UIComponent;
-    overlay: Phaser.GameObjects.Rectangle;
-    settingsImage: Phaser.GameObjects.Image;
+    timeText: Phaser.GameObjects.BitmapText | undefined;
+    XPBarUI: Phaser.GameObjects.Rectangle | undefined;
+    levelText: Phaser.GameObjects.BitmapText | undefined;
+    levelPopUp: UIComponent | undefined;
+    overlay: Phaser.GameObjects.Rectangle | undefined;
+    settingsImage: Phaser.GameObjects.Image | undefined;
     elapsedTime: number = 0;
     timerEvent: Phaser.Time.TimerEvent | null = null;
     playerUnits: Map<string, UnitProps> = new Map<string, UnitProps>();
+    
 
     constructor ()
     {
         super('UI');
     }
 
-    init(data: { player: Player, enemy: Player, playedUnits: string[] }): void {
+    /**
+     * 
+     * @param data Receives reference to human player and AI player classes
+     */
+    init(data: { player: Player, enemy: Player}): void {
         this.player = data.player;
         this.enemyPlayer = data.enemy;
+        if(!this.player) throw new Error('Player is undefined');
+        if(!this.enemyPlayer) throw new Error('Enemy player is undefined');
+
+        // --- Recommended additions for a clean state ---
+        this.unitSpawnButtons = [];
+        this.unitLimit = 1;
+        this.isSpawning = false;
+        this.elapsedTime = 0;
+        this.playerUnits = new Map<string, UnitProps>();
+
     }
 
     /*private renderUnitQueue():void{       
@@ -77,6 +93,7 @@ export class UI extends Scene
     }*/
 
     public updateHPBar(){
+        if(!this.hpBar || !this.player) return;
         this.hpBar.clear();
         let hpRatio = this.player.getHealth(false);
         this.hpBar.fillGradientStyle(0xECEA45, 0xECEA45, 0x1CC949, 0x1CC949, 1);
@@ -86,6 +103,7 @@ export class UI extends Scene
     }
 
     public updateEnemyHPBar(){
+        if(!this.enemyHPBar || !this.enemyPlayer) return;
         this.enemyHPBar.clear();
         let hpRatio = this.enemyPlayer.getHealth(false);
         this.enemyHPBar.fillGradientStyle(0xec8845, 0xec8845, 0xc91c1c, 0xc91c1c, 1);
@@ -95,6 +113,7 @@ export class UI extends Scene
     }
 
     public updateXPBar(newValue: number){
+        if(!this.XPBarUI || !this.player) return;
         this.XPBarUI.scaleX = newValue/this.player.nextLevelXP();
         if(this.XPBarUI.scaleX > 1) this.XPBarUI.scaleX = 1;
     }
@@ -108,8 +127,9 @@ export class UI extends Scene
     }
 
     public updateUnitStats(){
+        if(!this.player) return;
         this.player.selectedUnits.forEach((unit, unitType: string) => {
-            const unitStats : UnitProps = this.player.getUnitStats(unitType);
+            const unitStats : UnitProps = this.player!.getUnitStats(unitType);
             this.playerUnits.set(unitType, unitStats);
         });
     }
@@ -132,16 +152,16 @@ export class UI extends Scene
         this.updateHPBar();
 
         // Create hp bar for AI opponent
-        let enemyHPBarUI = new UIComponent(this, this.cameras.main.width-(desiredBarWidth/2+24), 48, desiredBarWidth, 48, 0);
-        this.add.existing(enemyHPBarUI);
-        this.enemyHPBarWidth = enemyHPBarUI.getWidth()-enemyHPBarUI.getBorderThickness()[0]*2;
-        this.enemyHPBarHeight = enemyHPBarUI.getHeight()-enemyHPBarUI.getBorderThickness()[2]*2;
+        this.enemyHPBarUI = new UIComponent(this, this.cameras.main.width-(desiredBarWidth/2+24), 48, desiredBarWidth, 48, 0);
+        this.add.existing(this.enemyHPBarUI);
+        this.enemyHPBarWidth = this.enemyHPBarUI.getWidth()-this.enemyHPBarUI.getBorderThickness()[0]*2;
+        this.enemyHPBarHeight = this.enemyHPBarUI.getHeight()-this.enemyHPBarUI.getBorderThickness()[2]*2;
         this.enemyHPBar = this.add.graphics();
-        enemyHPBarUI.add(this.enemyHPBar);
+        this.enemyHPBarUI.add(this.enemyHPBar);
         this.updateEnemyHPBar();
 
         // Display resources
-        this.moneyText = this.add.bitmapText(this.cameras.main.width/4-(32+50+24), this.cameras.main.height - (96), 'pixelFont', `${this.player.getMoney()}`, 48).setOrigin(1, 0.5).setTintFill(0xffffff);
+        this.moneyText = this.add.bitmapText(this.cameras.main.width/4-(32+50+24), this.cameras.main.height - (96), 'pixelFont', `${this.player!.getMoney()}`, 48).setOrigin(1, 0.5).setTintFill(0xffffff);
         this.moneyImage = this.add.image(this.cameras.main.width/4-50, this.cameras.main.height - (96), 'coin').setOrigin(1, 0.5).setDisplaySize(40, 40);
         let moneyImageBorder = this.add.graphics();
         moneyImageBorder.lineStyle(1, 0xffffff, 1);
@@ -153,18 +173,18 @@ export class UI extends Scene
         this.settingsImage.on('pointerup', () => {
             this.onPause()
         }).on('pointerover', () => {
-            this.settingsImage.postFX.remove(settingsImageGlow);
-            this.settingsImage.postFX.addGlow(0xffffff, 10, 0, false, 1, 1);
+            this.settingsImage?.postFX.remove(settingsImageGlow);
+            this.settingsImage?.postFX.addGlow(0xffffff, 10, 0, false, 1, 1);
         }).on('pointerout', () => {
-            this.settingsImage.postFX.clear();
-            settingsImageGlow = this.settingsImage.postFX.addGlow(0xA8A9AD, 10, 1, false, 1, 1);
+            this.settingsImage?.postFX.clear();
+            settingsImageGlow = this.settingsImage!.postFX.addGlow(0xA8A9AD, 10, 1, false, 1, 1);
         })
 
         // Display elapsed time
         this.timeText = this.add.bitmapText(this.cameras.main.width/2, 48, 'pixelFont', `0:00`, 48).setOrigin(0.5, 0.5).setTintFill(0x000000);
 
         // Display level
-        this.levelText = this.add.bitmapText(16, this.cameras.main.height-16, 'pixelFont', `Level ${this.player.getLevel()}`, 48).setOrigin(0, 1).setTintFill(0xffd700);
+        this.levelText = this.add.bitmapText(16, this.cameras.main.height-16, 'pixelFont', `Level ${this.player?.getLevel()}`, 48).setOrigin(0, 1).setTintFill(0xffd700);
 
         // Create XP bar
         this.XPBarUI = this.add.rectangle(0, this.cameras.main.height, this.cameras.main.width, 16, 0xffd700).setOrigin(0, 1).setDepth(999);
@@ -211,21 +231,20 @@ export class UI extends Scene
             //spawnButtonContainer.add(unitSprite);
             spawnButtonUI.setInteractive()
                 .on('pointerover', () => {
-                    let buttonBorder : Phaser.GameObjects.NineSlice = spawnButtonUI.list[2] as Phaser.GameObjects.NineSlice;
+                    let buttonBorder : Phaser.GameObjects.NineSlice = spawnButtonUI.getBorder();
                     if(currentGlow) buttonBorder.postFX.remove(currentGlow);
                     currentGlow = buttonBorder.postFX.addGlow(0xffff00, 10, 0, false, 1, 1);
                 })
                 .on('pointerout', () => {
-                    let buttonBorder : Phaser.GameObjects.NineSlice = spawnButtonUI.list[2] as Phaser.GameObjects.NineSlice;
+                    let buttonBorder : Phaser.GameObjects.NineSlice = spawnButtonUI.getBorder();
                     if(currentGlow) buttonBorder.postFX.remove(currentGlow);
                 })
                 .on('pointerup', () => {
-                    if(this.isSpawning || this.player.getUnitQueue().length >= this.unitLimit) return;
+                    if(this.isSpawning || this.player!.getUnitQueue().length >= this.unitLimit || !spawnButtonUI.getData('canAfford')) return;
                     eventsCenter.emit('spawn-red-unit', unitType);
                     this.isSpawning = true;
                     this.unitSpawnButtons.forEach((button : UIComponent) => {
-                        //let buttonUI : UIComponent= button.list[0] as UIComponent;
-                        if(button.getData('canAfford') === true) button.changeTint(0x808080, 0xbfbfbf);
+                        this.updateButtonStates();
                     });
                     unitLoadingBar.scaleY = 1;
                     if(!this.playerUnits.get(unitType)) throw new Error(`Unit type ${unitType} does not exist`);
@@ -251,7 +270,7 @@ export class UI extends Scene
         callback: () => {
             this.elapsedTime++;
             const formatedTime = [Math.floor(this.elapsedTime / 60), ((this.elapsedTime % 60).toFixed(0)).padStart(2, '0')].join(':');
-            this.timeText.setText(formatedTime);  
+            this.timeText?.setText(formatedTime);  
         },
         callbackScope: this,
         loop: true
@@ -294,64 +313,65 @@ export class UI extends Scene
         this.button.setData('parent', image2c);
         image2c.setData('parent', this.button);*/
     }
+
+    private updateButtonStates(): void {
+        this.unitSpawnButtons.forEach((button: UIComponent) => {
+            const unitType: string = button.getData('unitType');
+            const stats = this.playerUnits.get(unitType);
+            if (!stats) return;
+
+            const canAfford = this.player!.canAfford(stats.cost);
+            button.setData('canAfford', canAfford);
+
+            if (!canAfford) {
+                button.changeTint(devConfig.negativeColor, devConfig.negativeColorLight);
+            } else if (this.isSpawning) {
+                button.changeTint(0x808080, 0xbfbfbf);
+            } else {
+                button.changeTint(-1, -1); // Reset tint
+            }
+        });
+    }
+
     bindListeners() {
         /** Event listener for player's money changes
          * updates money value in UI, renders UI buttons red if player cannot afford unit
          */
         eventsCenter.on('money-changed', (faction: string, amount: number) => {
-            if(faction != this.player.faction) return;
-            this.moneyText.setText(`${amount}`);
-            this.unitSpawnButtons.forEach((button : UIComponent, i) => {
-                const unitType : string = button.getData('unitType');
-                const stats = this.playerUnits.get(unitType);
-                if(!stats) throw new Error(`Unit type ${unitType} does not exist`);
-                if(this.player.canAfford(stats.cost) === false){
-                    button.setData('canAfford', false);
-                    button.changeTint(devConfig.negativeColor, devConfig.negativeColorLight);
-                }
-                else{
-                    button.setData('canAfford', true);
-                    if(this.isSpawning){
-                        button && button.changeTint(0x808080, 0xbfbfbf);
-                    }
-                    else{
-                        button && button.changeTint(-1,-1);
-                    }
-                }
-            });
+            if(faction != this.player?.faction) return;
+            this.moneyText?.setText(`${amount}`);
+            this.updateButtonStates();
         });
 
         // Listens for player's unit spawn event in order to remove the grey tint
         eventsCenter.on('unit-spawned', (faction: string) => {
-            if(faction != this.player.faction) return;
+            if(faction != this.player?.faction) return;
             this.isSpawning = false;
-            this.unitSpawnButtons.forEach((button : UIComponent) => {
-                if(button.getData('canAfford') === true) button.changeTint(-1,-1);
-            });
+            this.updateButtonStates();
         });
 
         // Listeners for basese damage to update each health bars
         eventsCenter.on('base-take-damage', (faction: string) => {
-            if(faction != this.player.faction) this.updateEnemyHPBar()
+            if(faction != this.player!.faction) this.updateEnemyHPBar()
             else this.updateHPBar();
         });
 
         // Listener for XP accumulation events to update xp bar
         eventsCenter.on('xp-changed', (faction: string, amount: number) => {
-            if(faction != this.player.faction) return;
+            if(faction != this.player!.faction) return;
             this.updateXPBar(amount);
-            this.levelText.setText(`Level ${this.player.getLevel()}`);
+            this.levelText?.setText(`Level ${this.player!.getLevel()}`);
         });
 
         // Listener for player getting unit upgrade to update our cached unit stats
         eventsCenter.on('upgrade-added', (faction: string) => {
-            if(faction != this.player.faction) return;
+            if(faction != this.player!.faction) return;
             this.updateUnitStats();
         });
 
         // Listener for level up events to trigger level up screen
         eventsCenter.on('level-up', (faction: string) => {
-            if(faction != this.player.faction) return;
+            if(faction != this.player!.faction) return;
             this.onLevelUp();
         });
 
@@ -363,7 +383,7 @@ export class UI extends Scene
 
         // Listens to base destroyed event that is fired with losing faction
         eventsCenter.on('base-destroyed', (faction : string) => {
-            const winner : string = (faction === this.player.faction) ? this.enemyPlayer.faction : this.player.faction;
+            const winner : string = (faction === this.player!.faction) ? this.enemyPlayer!.faction : this.player!.faction;
             this.gameOver(winner);
         });
     }
@@ -373,9 +393,10 @@ export class UI extends Scene
      * @param faction Faction of the winner
      */
     gameOver(faction: string) {
+        if(!this.player) throw new Error('Player is undefined');
         // Save data about the game and player to register
         this.registry.set('playTime', this.registry.get('playTime') + this.elapsedTime);
-        if(faction === this.player.faction) this.registry.set('gamesWon', this.registry.get('gamesWon') + 1);
+        if(faction === this.player!.faction) this.registry.set('gamesWon', this.registry.get('gamesWon') + 1);
         this.scene.launch('GameOver', { winner: (faction === this.player.faction), playTime: this.elapsedTime, level: this.player.getLevel(), money: this.player.getMoney(), unitsKilled: this.player.unitsKilled, unitsSpawned: this.player.unitCounter });
         this.scene.stop('Game');
         this.scene.stop('UI');
@@ -386,8 +407,32 @@ export class UI extends Scene
     }
 
     shutdown() {
-        this.timerEvent?.destroy;
+        eventsCenter.removeAllListeners();
+        this.input.removeAllListeners();
+        this.timerEvent?.destroy();
         this.timerEvent = null;
         this.tweens.killAll();
+        this.hpBarUI?.destroy();
+        this.hpBarUI = undefined;
+        this.enemyHPBarUI?.destroy();
+        this.enemyHPBarUI = undefined;
+        this.moneyText?.destroy();
+        this.moneyText = undefined;
+        this.moneyImage?.destroy();
+        this.moneyImage = undefined;
+        this.settingsImage?.destroy();
+        this.settingsImage = undefined;
+        this.timeText?.destroy();
+        this.timeText = undefined;
+        this.levelText?.destroy();
+        this.levelText = undefined;
+        this.XPBarUI?.destroy();
+        this.XPBarUI = undefined;
+        this.levelPopUp?.destroy();
+        this.levelPopUp = undefined;
+        this.overlay?.destroy();
+        this.overlay = undefined;
+        this.unitSpawnButtons.forEach(button => button.destroy());
+        this.unitSpawnButtons = [];
     }
 }

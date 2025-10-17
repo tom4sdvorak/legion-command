@@ -90,7 +90,6 @@ export class UIComponent extends Phaser.GameObjects.Container {
         this.borderStroke.destroy(fromScene);
         if (this.contentMaskGraphics) this.contentMaskGraphics.destroy(fromScene);
         this.contentContainer.destroy(fromScene);
-        this.scene.input.removeAllListeners();
         this.removeAllListeners();
         super.destroy(fromScene);
     }
@@ -135,6 +134,14 @@ export class UIComponent extends Phaser.GameObjects.Container {
      */
     public getContent(): (Phaser.GameObjects.GameObject | Phaser.GameObjects.GameObject[])[] {
         return this.content;
+    }
+
+    /**
+     * 
+     * @returns NineSlice GameObject that creates the textured border of this UI
+     */
+    public getBorder(): Phaser.GameObjects.NineSlice {
+        return this.border;
     }
 
     /**
@@ -452,6 +459,7 @@ export class UIComponent extends Phaser.GameObjects.Container {
 
     private stopDrag(): void {
         this.isDragging = false;
+        this.wasDragged = false;
         this.scene.input.off('pointermove', this.doDrag, this);
 
         // 2. Determine target X and Y positions

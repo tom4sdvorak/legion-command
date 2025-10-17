@@ -331,7 +331,18 @@
         "start": 0,
         "count": 40
       },
-      "frameRate": 0,
+      "frameRate": 10,
+      "repeat": -1
+    }
+  },
+  "campfire_pot": {
+    "burning": {
+      "key": "campfire_pot_burning",
+      "frames": {
+        "start": 0,
+        "count": 40
+      },
+      "frameRate": 10,
       "repeat": -1
     }
   },

@@ -95,7 +95,7 @@ export class Game extends Scene
         this.playerRed = new Player(this, this.baseRed, redPos, this.redUnitsPhysics, this.blueUnitsPhysics, 
             this.redProjectiles, this.objectPool, this.baseGroup, this.redConfigLoader, this.registry.get('playerUnits'));
         this.playerRed.changePassiveIncome(1, true);
-        this.playerRed.addMoney(999);
+        this.playerRed.addMoney(100);
         this.applyPermaUpgrades();
 
         // Create and setup AI player
@@ -110,7 +110,7 @@ export class Game extends Scene
         this.playerBlue = new AIPlayer(this, this.baseBlue, bluePos, this.blueUnitsPhysics, this.redUnitsPhysics, 
             this.blueProjectiles, this.objectPool, this.baseGroup, this.blueConfigLoader, this.registry.get('allUnits'));
         this.playerBlue.changePassiveIncome(1, true);
-        this.playerBlue.addMoney(100);
+        //this.playerBlue.addMoney(100);
         if(devConfig.AI) this.AIController = new AIController(this.playerBlue, this.playerRed, 'EASY');
 
         this.baseGroup.add(this.baseRed);

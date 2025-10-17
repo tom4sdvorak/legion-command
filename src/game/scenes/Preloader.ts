@@ -99,6 +99,7 @@ export class Preloader extends Scene
         // Other sprites
         this.load.setPath('assets/sprites/other');
         this.load.spritesheet('campfire', 'campfire/sprite_sheet.png',{frameWidth: 32, frameHeight: 32});
+        this.load.spritesheet('campfire_pot', 'campfire_pot/sprite_sheet.png',{frameWidth: 32, frameHeight: 32});
         this.load.spritesheet('alchemist', 'alchemist/sprite_sheet.png',{frameWidth: 64, frameHeight: 64});
         this.load.spritesheet('sawmill', 'sawmill/sprite_sheet.png',{frameWidth: 64, frameHeight: 64});
         this.load.spritesheet('icons', 'icons/sprite_sheet.png',{frameWidth: 64, frameHeight: 64});

@@ -46,7 +46,7 @@ export class PlayerBase extends Phaser.Physics.Arcade.Sprite{
         this.body?.setOffset(0,-this.sizeH/2);
 
         // Add healthbar
-        this.healthComponent = new HealthComponent(this, 5000, false, this.sizeW, 20, spawnPosition.y-this.sizeH/2);
+        this.healthComponent = new HealthComponent(this, 1000, false, this.sizeW, 20, spawnPosition.y-this.sizeH/2);
         this.on('death', this.die, this);
         //this.healthBar = this.scene.add.rectangle(this.x, this.y-this.height/2, this.width, 20, 0x00ff00).setDepth(1).setAlpha(1);       
     }

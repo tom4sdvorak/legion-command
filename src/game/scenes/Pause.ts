@@ -108,7 +108,7 @@ export class Pause extends Scene {
         this.menu.insertElement(resumeButton);
         this.menu.insertElement([slowDownButton, gameSpeedText, speedUpButton]);
         this.menu.insertElement(giveUpButton);
-        this.menu.positionElements(['center', 'center'], 0, 32, 32);
+        this.menu.positionElements(['center', 'center'], 16, 32, 32);
 
         // Group them all as clickable elements and give them on hover glow
         const interactableGroup = this.add.group();
