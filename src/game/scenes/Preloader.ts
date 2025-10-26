@@ -48,7 +48,6 @@ export class Preloader extends Scene
         // Objects
         this.load.setPath('assets/images/items');
         this.load.image('signpost', 'signpost.png');
-        this.load.image('coin', 'coin.png');
         this.load.image('cog', 'cog.png');
         this.load.image('tent', 'tent.png');
         this.load.image('tent_large', 'tent_large.png');
@@ -103,6 +102,8 @@ export class Preloader extends Scene
         this.load.spritesheet('alchemist', 'alchemist/sprite_sheet.png',{frameWidth: 64, frameHeight: 64});
         this.load.spritesheet('sawmill', 'sawmill/sprite_sheet.png',{frameWidth: 64, frameHeight: 64});
         this.load.spritesheet('icons', 'icons/sprite_sheet.png',{frameWidth: 64, frameHeight: 64});
+        this.load.spritesheet('coin_silver', 'silver_coin/sprite_sheet.png',{frameWidth: 32, frameHeight: 32});
+        this.load.spritesheet('coin_gold', 'gold_coin/sprite_sheet.png',{frameWidth: 32, frameHeight: 32});
 
         // Icons
         

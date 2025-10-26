@@ -4,7 +4,7 @@
     "name": "Basic Watchtower",
     "description": "Simple watchtower with an archer.",
     "type": "watchtower",
-    "cost": 1,
+    "cost": 100,
     "effects": [
       { "stat": "baseDamage", "type": "flat", "value": 10 },
       { "stat": "baseRange", "type": "flat", "value": 100 },
@@ -21,7 +21,7 @@
     "name": "Basic Watchtower +1",
     "description": "Damage +2",
     "type": "watchtower",
-    "cost": 1,
+    "cost": 50,
     "effects": [
       { "stat": "baseDamage", "type": "flat", "value": 2 }
     ],
@@ -36,7 +36,7 @@
     "name": "Basic Watchtower +2",
     "description": "Range +10",
     "type": "watchtower",
-    "cost": 1,
+    "cost": 50,
     "effects": [
       { "stat": "baseRange", "type": "flat", "value": 10 }
     ],
@@ -51,7 +51,7 @@
     "name": "Basic Watchtower +3",
     "description": "Damage +2",
     "type": "watchtower",
-    "cost": 1,
+    "cost": 50,
     "effects": [
       { "stat": "baseDamage", "type": "flat", "value": 2 }
     ],
@@ -66,7 +66,7 @@
     "name": "Basic Watchtower +4",
     "description": "Range +10",
     "type": "watchtower",
-    "cost": 1,
+    "cost": 50,
     "effects": [
       { "stat": "baseRange", "type": "flat", "value": 10 }
     ],
@@ -81,7 +81,7 @@
     "name": "Basic Watchtower +5",
     "description": "Damage +2",
     "type": "watchtower",
-    "cost": 1,
+    "cost": 50,
     "effects": [
       { "stat": "baseDamage", "type": "flat", "value": 2 }
     ],
@@ -96,7 +96,7 @@
     "name": "Flaming Arrows Watchtower",
     "description": "Now with a flaming arrows.",
     "type": "watchtower",
-    "cost": 1,
+    "cost": 100,
     "effects": [
       { "stat": "baseDamage", "type": "flat", "value": 10 },
       { "stat": "baseRange", "type": "flat", "value": 50 },
@@ -113,7 +113,7 @@
     "name": "Flaming Watchtower +1",
     "description": "Damage +3",
     "type": "watchtower",
-    "cost": 1,
+    "cost": 50,
     "effects": [
       { "stat": "baseDamage", "type": "flat", "value": 3 }
     ],
@@ -128,7 +128,7 @@
     "name": "Flaming Watchtower +2",
     "description": "Attack Speed +10%",
     "type": "watchtower",
-    "cost": 1,
+    "cost": 50,
     "effects": [
       { "stat": "attackSpeed", "type": "percent", "value": -0.1 }
     ],
@@ -143,7 +143,7 @@
     "name": "Flaming Watchtower +3",
     "description": "Damage +3",
     "type": "watchtower",
-    "cost": 1,
+    "cost": 50,
     "effects": [
       { "stat": "baseDamage", "type": "flat", "value": 3 }
     ],
@@ -158,7 +158,7 @@
     "name": "Flaming Watchtower +4",
     "description": "Attack Speed +10%",
     "type": "watchtower",
-    "cost": 1,
+    "cost": 50,
     "effects": [
       { "stat": "attackSpeed", "type": "percent", "value": -0.1 }
     ],
@@ -173,7 +173,7 @@
     "name": "Flaming Watchtower +5",
     "description": "Damage +3",
     "type": "watchtower",
-    "cost": 1,
+    "cost": 50,
     "effects": [
       { "stat": "baseDamage", "type": "flat", "value": 3 }
     ],
@@ -188,7 +188,7 @@
     "name": "TODO Watchtower",
     "description": "todo",
     "type": "watchtower",
-    "cost": 1,
+    "cost": 100,
     "effects": [
       { "stat": "baseDamage", "type": "flat", "value": 10 },
       { "stat": "baseRange", "type": "flat", "value": 50 },
@@ -205,7 +205,7 @@
     "name": "Basic walls",
     "description": "Some walls to last longer.",
     "type": "walls",
-    "cost": 1,
+    "cost": 100,
     "effects": [
       { "stat": "baseMaxHealth", "type": "percent", "value": 0.05 }
     ],
@@ -220,7 +220,7 @@
     "name": "Basic Walls +1",
     "description": "Max Health +1%",
     "type": "walls",
-    "cost": 1,
+    "cost": 50,
     "effects": [
       { "stat": "baseMaxHealth", "type": "percent", "value": 0.01 }
     ],
@@ -235,7 +235,7 @@
     "name": "Basic Walls +2",
     "description": "Max Health +1%",
     "type": "walls",
-    "cost": 1,
+    "cost": 50,
     "effects": [
       { "stat": "baseMaxHealth", "type": "percent", "value": 0.01 }
     ],
@@ -250,7 +250,7 @@
     "name": "Basic Walls +3",
     "description": "Max Health +1%",
     "type": "walls",
-    "cost": 1,
+    "cost": 50,
     "effects": [
       { "stat": "baseMaxHealth", "type": "percent", "value": 0.01 }
     ],
@@ -265,7 +265,7 @@
     "name": "Basic Walls +4",
     "description": "Max Health +1%",
     "type": "walls",
-    "cost": 1,
+    "cost": 50,
     "effects": [
       { "stat": "baseMaxHealth", "type": "percent", "value": 0.01 }
     ],
@@ -280,7 +280,7 @@
     "name": "Basic Walls +5",
     "description": "Max Health +1%",
     "type": "walls",
-    "cost": 1,
+    "cost": 50,
     "effects": [
       { "stat": "baseMaxHealth", "type": "percent", "value": 0.01 }
     ],
@@ -295,7 +295,7 @@
     "name": "Improved Walls",
     "description": "Bit better walls to last longer.",
     "type": "walls",
-    "cost": 1,
+    "cost": 100,
     "effects": [
       { "stat": "baseMaxHealth", "type": "percent", "value": 0.1 }
     ],
@@ -310,7 +310,7 @@
     "name": "Improved Walls +1",
     "description": "Max Health +1%",
     "type": "walls",
-    "cost": 1,
+    "cost": 50,
     "effects": [
       { "stat": "baseMaxHealth", "type": "percent", "value": 0.01 }
     ],
@@ -325,7 +325,7 @@
     "name": "Improved Walls +2",
     "description": "Max Health +1%",
     "type": "walls",
-    "cost": 1,
+    "cost": 50,
     "effects": [
       { "stat": "baseMaxHealth", "type": "percent", "value": 0.01 }
     ],
@@ -340,7 +340,7 @@
     "name": "Improved Walls +3",
     "description": "Max Health +1%",
     "type": "walls",
-    "cost": 1,
+    "cost": 50,
     "effects": [
       { "stat": "baseMaxHealth", "type": "percent", "value": 0.01 }
     ],
@@ -355,7 +355,7 @@
     "name": "Improved Walls +4",
     "description": "Max Health +1%",
     "type": "walls",
-    "cost": 1,
+    "cost": 50,
     "effects": [
       { "stat": "baseMaxHealth", "type": "percent", "value": 0.01 }
     ],
@@ -370,7 +370,7 @@
     "name": "Improved Walls +5",
     "description": "Max Health +1%",
     "type": "walls",
-    "cost": 1,
+    "cost": 50,
     "effects": [
       { "stat": "baseMaxHealth", "type": "percent", "value": 0.01 }
     ],
@@ -385,7 +385,7 @@
     "name": "todo Walls",
     "description": "todo",
     "type": "walls",
-    "cost": 1,
+    "cost": 100,
     "effects": [
       { "stat": "baseMaxHealth", "type": "percent", "value": 0.1 }
     ],
@@ -400,7 +400,7 @@
     "name": "Campfire",
     "description": "Campfire to warm bodies and food.",
     "type": "campfire",
-    "cost": 1,
+    "cost": 100,
     "effects": [
       { "stat": "speed", "type": "percent", "value": 0.05 },
       { "stat": "maxHealth", "type": "percent", "value": 0.05 },
@@ -417,7 +417,7 @@
     "name": "Campfire +1",
     "description": "Units Health +1%",
     "type": "campfire",
-    "cost": 1,
+    "cost": 50,
     "effects": [
       { "stat": "maxHealth", "type": "percent", "value": 0.01 }
     ],
@@ -432,7 +432,7 @@
     "name": "Campfire +2",
     "description": "Units Health +1%",
     "type": "campfire",
-    "cost": 1,
+    "cost": 50,
     "effects": [
       { "stat": "maxHealth", "type": "percent", "value": 0.01 }
     ],
@@ -447,7 +447,7 @@
     "name": "Campfire +3",
     "description": "Units Speed +3%",
     "type": "campfire",
-    "cost": 1,
+    "cost": 50,
     "effects": [
       { "stat": "speed", "type": "percent", "value": 0.03 }
     ],
@@ -462,7 +462,7 @@
     "name": "Campfire +4",
     "description": "Units Attack Speed +2%",
     "type": "campfire",
-    "cost": 1,
+    "cost": 50,
     "effects": [
       { "stat": "actionSpeed", "type": "percent", "value": -0.02 }
     ],
@@ -477,7 +477,7 @@
     "name": "Campfire +5",
     "description": "Units Attack Speed +2%",
     "type": "campfire",
-    "cost": 1,
+    "cost": 50,
     "effects": [
       { "stat": "actionSpeed", "type": "percent", "value": -0.02 }
     ],
@@ -492,7 +492,7 @@
     "name": "Campfire with cauldron",
     "description": "Better meals, better morale.",
     "type": "campfire",
-    "cost": 1,
+    "cost": 100,
     "effects": [
       { "stat": "speed", "type": "percent", "value": 0.1 },
       { "stat": "maxHealth", "type": "percent", "value": 0.1 },
@@ -509,7 +509,7 @@
     "name": "Cauldron Campfire +1",
     "description": "Units Speed +3%",
     "type": "campfire",
-    "cost": 1,
+    "cost": 50,
     "effects": [
       { "stat": "speed", "type": "percent", "value": 0.03 }
     ],
@@ -524,7 +524,7 @@
     "name": "Cauldron Campfire +2",
     "description": "Units Speed +3%",
     "type": "campfire",
-    "cost": 1,
+    "cost": 50,
     "effects": [
       { "stat": "speed", "type": "percent", "value": 0.03 }
     ],
@@ -539,7 +539,7 @@
     "name": "Cauldron Campfire +3",
     "description": "Units Max Health +1%",
     "type": "campfire",
-    "cost": 1,
+    "cost": 50,
     "effects": [
       { "stat": "maxHealth", "type": "percent", "value": 0.01 }
     ],
@@ -554,7 +554,7 @@
     "name": "Cauldron Campfire +4",
     "description": "Units Max Health +1%",
     "type": "campfire",
-    "cost": 1,
+    "cost": 50,
     "effects": [
       { "stat": "maxHealth", "type": "percent", "value": 0.01 }
     ],
@@ -569,7 +569,7 @@
     "name": "Cauldron Campfire +5",
     "description": "Units Attack Speed +2%",
     "type": "campfire",
-    "cost": 1,
+    "cost": 50,
     "effects": [
       { "stat": "actionSpeed", "type": "percent", "value": -0.02 }
     ],
@@ -584,7 +584,7 @@
     "name": "Campfire todo",
     "description": "todo",
     "type": "campfire",
-    "cost": 1,
+    "cost": 100,
     "effects": [
       { "stat": "speed", "type": "percent", "value": 0.1 },
       { "stat": "maxHealth", "type": "percent", "value": 0.1 },

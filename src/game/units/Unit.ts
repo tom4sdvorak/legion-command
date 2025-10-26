@@ -80,6 +80,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
             */
             let bodyOffsetY = ((this.scene.camera.height-this.body.y-this.body.height+this.scene.getGlobalOffset().y)/this.unitProps.scale);
             this.body.setOffset(this.body.offset.x, bodyOffsetY);
+            this.setInteractive(new Phaser.Geom.Rectangle(this.body.offset.x, this.body.offset.y, this.body.width, this.body.height), Phaser.Geom.Rectangle.Contains);
         }
 
         if (this.outlineSprite) {
@@ -99,7 +100,6 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         this.scene.children.add(this.outlineSprite);
 
         // Add mouse/touch interaction
-        this.setInteractive();
         this.on('pointerover', () => {
             this.postFX.addGlow(0xffff00, 10, 0, false, 1, 1);
         }).on('pointerout', () => {

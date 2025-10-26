@@ -28,7 +28,7 @@ export default class SaveManager {
         playerData: {
             builtUpgrades: [],
             unlockedUnits: [],
-            coins: 0,
+            coins: 100,
             gamesPlayed: 0,
             gamesWon: 0
         }
@@ -48,7 +48,7 @@ export default class SaveManager {
      * @returns SaveData object with the data from the registry
      */
     private static createSaveFromData(scene: Phaser.Scene): SaveData {
-        let newSave = SaveManager.getNewSave();
+        let newSave = this.getNewSave();
         newSave.metadata.saveName = scene.registry.get('saveName');
         newSave.metadata.saveSlot = scene.registry.get('saveSlot');
         newSave.metadata.timestamp = new Date().toISOString();
@@ -66,10 +66,16 @@ export default class SaveManager {
      * @param scene Any scene that will have access to global registry
      * @returns True if successful
      */
-    public static saveGame(scene: Phaser.Scene) : boolean {
-        const save = SaveManager.createSaveFromData(scene);
-        const saved = SaveManager.save(save, save.metadata.saveSlot);
-        return saved;
+    public static async saveGame(scene: Phaser.Scene) : Promise<boolean> {
+        const save = this.createSaveFromData(scene);
+        try {
+            await this.save(save, save.metadata.saveSlot);
+            return true;
+        }
+        catch(e) {
+            console.error("Local storage issue: " + e);
+            return false;
+        }
     }
 
 
@@ -79,17 +85,19 @@ export default class SaveManager {
      * @param saveSlot string name of slot to save to
      * @returns true if successful
      */
-    private static save(save: SaveData, saveSlot: string): boolean {
-        try {
-            localStorage.setItem(saveSlot, JSON.stringify(save));
-        }
-        catch(e) {
-            console.error("Local storage issue: " + e);
-            return false;
-        }
-        console.log("Saved game to " + saveSlot);
-        console.log(save);
-        return true;
+    private static async save(save: SaveData, saveSlot: string): Promise<void> {
+        return new Promise((resolve, reject) => {
+            try {
+                localStorage.setItem(saveSlot, JSON.stringify(save));
+                console.log("Saved game to " + saveSlot);
+                console.log(save);
+                resolve();            
+            }
+            catch(e) {
+                console.error("Local storage issue: " + e);
+                reject(e);
+            }
+        });
     }
 
     /**
@@ -97,13 +105,19 @@ export default class SaveManager {
      * @param saveSlot string name of slot to save to
      * @returns true if successful
      */
-    static createAndSaveGame(saveSlot: string): boolean {
-        let newSave = SaveManager.getNewSave();
+    static async createAndSaveGame(saveSlot: string): Promise<boolean> {
+        let newSave = this.getNewSave();
         newSave.metadata.saveName = `Save ${saveSlot.split('_')[1]}`;
         newSave.metadata.saveSlot = saveSlot;
         newSave.metadata.timestamp = new Date().toISOString();
-        const saved = SaveManager.save(newSave, saveSlot);
-        return saved;
+        try {
+            await this.save(newSave, saveSlot);
+            return true;
+        }
+        catch(e) {
+            console.error("Local storage issue: " + e);
+            return false;
+        }
     }
 
     /**

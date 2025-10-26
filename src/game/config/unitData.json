@@ -71,7 +71,7 @@
       "extends": "supportUnit",
       "cost": 30,
       "projectileOffsetY": -62,
-      "projectileVelocity": 50,
+      "projectileVelocity": 150,
       "bodyWidth": 96,
       "scale": 0.8,
       "tags": ["wizard"]

@@ -27,10 +27,22 @@ export class MainMenu extends Scene
         this.overlay.on('overlay-clicked', () => this.hideSaveSlots());
         
         // Menu buttons
-        const buttonSize = 48;
-        const playButton = this.add.bitmapText(0, 0, 'pixelFont', 'Play', buttonSize).setOrigin(0.5, 0.5).setInteractive().on('pointerup', () => this.showSaveSlots());
+        const buttonSize = 64;
+        let menuTween : Phaser.Tweens.Tween | undefined;
+        //const playButton = this.add.bitmapText(0, 0, 'pixelFont', 'Play', buttonSize).setOrigin(0.5, 0.5).setInteractive().on('pointerup', () => this.showSaveSlots());
+        const playButton = this.add.bitmapText(0, 0, 'pixelFont', 'Play', buttonSize).setOrigin(0.5, 0.5).setInteractive()
+            .on('pointerup', () => {
+                this.showSaveSlots();
+                this.tweens.killTweensOf(interactableGroup.getChildren());
+            });
+        //cancelText.setDropShadow(2, 2, devConfig.positiveColor, 1);
         interactableGroup.add(playButton);
-        const creditsButton = this.add.bitmapText(0, 0, 'pixelFont', 'Credits', buttonSize).setOrigin(0.5, 0.5).setInteractive().on('pointerup', () => this.showCredits());
+        //const creditsButton = this.add.bitmapText(0, 0, 'pixelFont', 'Credits', buttonSize).setOrigin(0.5, 0.5).setInteractive().on('pointerup', () => this.showCredits());
+        const creditsButton = this.add.bitmapText(0, 0, 'pixelFont', 'Credits', buttonSize).setOrigin(0.5, 0.5).setInteractive()
+            .on('pointerup', () => {
+                this.showCredits();
+                this.tweens.killTweensOf(interactableGroup.getChildren());
+            });
         interactableGroup.add(creditsButton);
 
         //this.mainMenu.add([continueButton, newGameButton, creditsButton]);
@@ -40,12 +52,24 @@ export class MainMenu extends Scene
         this.add.existing(this.mainMenu);
 
         interactableGroup.getChildren().forEach(child => {
-            child.setInteractive();
             child.on('pointerover', () => {
-                (child as any).postFX.addGlow(0xFFFF00, 1, 0, false);
+                this.tweens.killTweensOf(interactableGroup.getChildren());
+                (child as Phaser.GameObjects.BitmapText).setScale(1.0); 
+                menuTween = this.tweens.add({
+                    targets: child,
+                    ease: 'power2.inOut',
+                    duration: 200,
+                    scaleX: { start: 1.0, to: 1.1 }, 
+                    scaleY: { start: 1.0, to: 1.1 },
+                    yoyo: true,
+                    repeat: -1
+                });
             }, this);
             child.on('pointerout', ()=>{
-                (child as any).postFX.clear();
+                if (menuTween && menuTween.isPlaying()) {
+                    menuTween.stop();
+                }
+                (child as Phaser.GameObjects.BitmapText).setScale(1.0);
             }, this);
         });
     }
@@ -230,11 +254,11 @@ export class MainMenu extends Scene
         overlay.show(true);
     }
 
-    chooseSaveSlot(saveSlot: string, isNew: boolean) {
+    async chooseSaveSlot(saveSlot: string, isNew: boolean) {
         let loaded = false;
         // If new game, create new save and load its default values
         if(isNew){
-            let saved = SaveManager.createAndSaveGame(saveSlot);
+            let saved = await SaveManager.createAndSaveGame(saveSlot);
             if(saved) loaded = SaveManager.loadGame(this, saveSlot);
         }
         else{

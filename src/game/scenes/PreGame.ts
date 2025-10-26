@@ -23,6 +23,12 @@ export class PreGame extends Scene
     campfire: Phaser.GameObjects.Sprite| undefined;
     alchemist: Phaser.GameObjects.Sprite| undefined;
     sawmill: Phaser.GameObjects.Sprite| undefined;
+    settingsImage: GameObjects.Image;
+    playerMoney: number = 0;
+    playerMoneyText: GameObjects.BitmapText;
+    moneyImage: GameObjects.Sprite;
+    exitButton: GameObjects.BitmapText;
+    readyButtonTween: Phaser.Tweens.Tween;
 
     constructor ()
     {
@@ -45,6 +51,7 @@ export class PreGame extends Scene
         this.events.once('shutdown', () => this.shutdown());
         //Save game on entering pregame
         SaveManager.saveGame(this);
+        this.playerMoney = this.registry.get('coins');
 
         this.add.image(0, 0, 'pregamelayer3').setDisplaySize(this.gameWidth, this.gameHeight).setOrigin(0, 0);
         this.add.image(0, 0, 'pregamelayer1').setDisplaySize(this.gameWidth, this.gameHeight).setOrigin(0, 0);
@@ -53,19 +60,46 @@ export class PreGame extends Scene
         this.add.image(0, 0, 'pregamelayer5').setDisplaySize(this.gameWidth, this.gameHeight).setOrigin(0, 0);
         this.readyCheckLogic();
 
-        this.readyButton = this.add.bitmapText(this.gameWidth-100, this.gameHeight-100, 'pixelFont', 'Selected 0/3', 64).setOrigin(1, 1).setInteractive()
+        // Display UI elements
+        const layoutX = 96
+        const layoutY = 96;
+        this.add.rectangle(0, layoutY, this.gameWidth, 64, 0x000000).setOrigin(0, 0).setAlpha(0.5);
+        this.playerMoneyText = this.add.bitmapText(layoutX, layoutY, 'pixelFont', `${this.playerMoney}`, 64).setOrigin(0, 0).setTintFill(0xFFFF00).setDropShadow(3, 3, 0x000000, 1);
+        this.moneyImage = this.add.sprite(layoutX+this.playerMoneyText.width, layoutY+14, 'coin_gold').setOrigin(0, 0).setDisplaySize(36, 36);
+        this.moneyImage.play('coin_gold_rotate');
+        this.readyButton = this.add.bitmapText(this.gameWidth/2, layoutY, 'pixelFont', 'Selected 0/3', 64).setOrigin(0.5, 0).setTintFill(0xFFFF00).setDropShadow(3, 3, 0x000000, 1).setInteractive()
             .on('pointerover', () => {
                 if(this.unitsToTake.length < 3) return;
-                this.readyButton?.postFX?.addGlow(0xFFFF00, 1, 0, false);
+                this.readyButton?.setTintFill(devConfig.positiveColor);
             })
             .on('pointerout', () => {
-                if(this.unitsToTake.length < 3) return;
-                this.readyButton?.postFX?.clear();
+                this.readyButton?.setTintFill(0xFFFF00);
             })
             .on('pointerup', () => {
                 if(this.unitsToTake.length < 3) return;
                 this.overlay?.setVisible(true);
                 this.readyCheck?.setVisible(true);
+        });
+        this.exitButton = this.add.bitmapText(this.gameWidth-layoutX, layoutY, 'pixelFont', 'QUIT', 64).setOrigin(1, 0).setTintFill(0xFFFF00).setDropShadow(3, 3, 0x000000, 1).setInteractive()
+            .on('pointerup', () => {
+                this.handleQuit();
+            })
+            .on('pointerover', () => {
+                this.tweens.killTweensOf(this.exitButton);
+                this.exitButton.setTintFill(devConfig.negativeColor);
+                this.tweens.add({
+                    targets: this.exitButton,
+                    ease: 'power2.inOut',
+                    duration: 200,
+                    scaleX: { start: 1.0, to: 1.1 }, 
+                    scaleY: { start: 1.0, to: 1.1 },
+                    yoyo: true,
+                    repeat: -1
+                });
+            })
+            .on('pointerout', () => {
+                this.exitButton.setTintFill(0xFFFF00);
+                this.tweens.killTweensOf(this.exitButton);
             });
 
         const unitList : string[] = this.registry.get('allUnits');
@@ -101,11 +135,13 @@ export class PreGame extends Scene
                 });
             });
             mySprite.on('pointerover', () => {
+                mySprite.postFX.clear();
                 mySprite.postFX.addGlow(0xffff00, 10, 0, false, 1, 1);
             }).on('pointerout', () => {
                 mySprite.postFX.clear();
+                mySprite.postFX.addGlow(0x000000, 2, 0, false, 1, 2);
             });
-
+            mySprite.postFX.addGlow(0x000000, 2, 0, false, 1, 2);
             mySprite.play(`${unit}_idle`);
             mySprite.setDepth(mySprite.y);
             
@@ -114,15 +150,33 @@ export class PreGame extends Scene
         this.alchemistLogic();
         this.redoPregameConstruction();
         this.sawmill = this.add.sprite(300, 300, 'sawmill').play('sawmill_work').setDisplaySize(96, 96);
+        this.sawmill?.postFX.addGlow(0x000000, 2, 0, false, 1, 2);
         this.sawmill.setInteractive({ pixelPerfect: true }).on('pointerup', () => {
             this.showConstructionMenu();
             this.overlay?.setVisible(true);
         });
         this.sawmill.on('pointerover', () => {
+            this.sawmill?.postFX.clear();
             this.sawmill?.postFX.addGlow(0x00FFFF, 10, 0, false, 1, 1);
         }).on('pointerout', () => {
             this.sawmill?.postFX.clear();
+            this.sawmill?.postFX.addGlow(0x000000, 2, 0, false, 1, 2);
         });
+
+        
+
+        /*this.settingsImage = this.add.image(this.cameras.main.width/4*3+50, this.cameras.main.height - 96, 'cog').setOrigin(0, 0.5).setDisplaySize(80, 80).setInteractive();
+        this.settingsImage.postFX.addGlow(0xA8A9AD, 10, 1, false, 1, 1);
+        this.settingsImage.setTint(0xA9A9A9);
+        this.settingsImage.on('pointerup', () => {
+            this.scene.start('MainMenu');
+        }).on('pointerover', () => {
+            this.settingsImage?.postFX.clear();
+            this.settingsImage?.postFX.addGlow(0xffffff, 10, 0, false, 1, 1);
+        }).on('pointerout', () => {
+            this.settingsImage?.postFX.clear();
+            this.settingsImage.postFX.addGlow(0xA8A9AD, 10, 1, false, 1, 1);
+        })*/
         
         
 
@@ -133,6 +187,17 @@ export class PreGame extends Scene
             this.potionsMenu?.setVisible(false);
             this.constructionMenu?.destroy();
         });
+    }
+    async handleQuit() {
+        try {
+            await SaveManager.saveGame(this); 
+            console.log('Save successful');
+            this.scene.start('MainMenu');
+
+        } catch (error) {
+            console.error('Save failed:', error);
+            this.scene.start('MainMenu');
+        }
     }
 
     shutdown() {
@@ -265,30 +330,35 @@ export class PreGame extends Scene
         const fireCons : ConstructionUpgrade[] = this.upgradeManager.getAllConstructionUpgrades('campfire');
 
         // Upgrade info
-        let conID : string | undefined;
-        let preConID : string | undefined;
+        //let conID : string | undefined;
+        //let preConID : string | undefined;
+        let selectedCon : ConstructionUpgrade | undefined;
         let lastClicked : FramedImage | undefined;
-        const padding = 32;
-        const conName = this.add.bitmapText(0, 0, 'pixelFont', ' ', 64).setMaxWidth(this.constructionMenu.width-padding*2);
+        const padding = 16;
+        const title = this.add.bitmapText(0, 0, 'pixelFont', 'WORKSHOP', 64).setMaxWidth(this.constructionMenu.width-padding*2);
+        const conName = this.add.bitmapText(0, 0, 'pixelFont', ' ', 48).setMaxWidth(this.constructionMenu.width-padding*2);
         const conText = this.add.bitmapText(0, 0, 'pixelFont', ' ', 32).setMaxWidth(this.constructionMenu.width-padding*2);
         const conCostText = this.add.bitmapText(0, 0, 'pixelFont', `Cost:`, 48).setOrigin(0,0.5).setVisible(false);
-        const conCost = this.add.bitmapText(0, 0, 'pixelFont', `   `, 48).setOrigin(0,0.5);
-        const coinImage = this.add.image(0, 0, 'coin').setDisplaySize(32, 32).setOrigin(0,0.5).setVisible(false);
+        const conCost = this.add.bitmapText(0, 0, 'pixelFont', `    `, 48).setOrigin(0,0.5);
+        const coinImage = this.add.image(0, 0, 'coin_gold').setOrigin(0,0.5).setVisible(false);
         const divider = this.add.line(0, 0, 0, 0, this.constructionMenu.width-padding*2, 0, 0x000000).setLineWidth(8);
         const empty = this.add.zone(0,0,128,32);
         const conBuyText = new FramedImage(this, 0, 0, 128, 48, 'square').setInteractive().setVisible(false);
         conBuyText.putInside(this.add.bitmapText(0, 0, 'pixelFont', 'Build', 48));
         conBuyText.on('pointerup', () => {
-            if(conID && preConID){
-                if(this.builtConstructions.includes(conID)) return;
-                if(preConID !== 'none' && !this.builtConstructions.includes(preConID)) return;
-                this.builtConstructions.push(conID);
+            if(selectedCon){ // If a construction is selected
+                if(this.builtConstructions.includes(selectedCon.id)) return; // Skip if the construction is already built
+                if(selectedCon.prerequisites.length > 0 && !this.builtConstructions.includes(selectedCon.prerequisites[0])) return; // Skip if a prerequisite is not built
+                if(this.registry.get('coins') < selectedCon.cost) return; // Skip if not enough coins
+                this.registry.set('coins', this.registry.get('coins') - selectedCon.cost);
+                this.builtConstructions.push(selectedCon.id);
                 this.registry.set('builtConstructions', this.builtConstructions);
                 this.constructionMenu?.destroy();
                 this.redoPregameConstruction();
                 this.showConstructionMenu();
             }
         });
+        this.constructionMenu.insertElement(title, true);
         this.constructionMenu.insertElement(conName, true);
         this.constructionMenu.insertElement(conText, true);
         this.constructionMenu.insertElement([conCostText, conCost, coinImage, empty, conBuyText], true);
@@ -361,18 +431,25 @@ export class PreGame extends Scene
                         conBuyText.setVisible(true);
                         conBuyText.changeBorder(4, devConfig.positiveColor);
                         conBuyText.changeBackground(devConfig.positiveColorLight, 0.5);
-                    } 
-                    conID = con.id;
-                    if(con.prerequisites.length > 0){
+                    }
+                    selectedCon = con; 
+                    //conID = con.id;
+                    /*if(con.prerequisites.length > 0){
                         preConID = con.prerequisites[0];
                     }
                     else{
                         preConID = 'none';
-                    }
+                    }*/
                     lastClicked = conSlot;
                     conName.setText(`${con.name}`);
                     conText.setText(`${con.description}`);
-                    conCost.setText(`${con.cost}`);
+
+                    // Turn cost number to 4 lenght string
+                    let costString = con.cost.toString();
+                    while(costString.length < 4){
+                        costString = ' ' + costString;
+                    }
+                    conCost.setText(costString);
                     conSlot.changeBorder(8);
                 });
                 tempArray.push(line, conSlot);
@@ -426,6 +503,7 @@ export class PreGame extends Scene
         this.potionsMenu.positionElements(['left', 'top'], 0, 8);
 
         this.alchemist = this.add.sprite(100, 300, 'alchemist').play('alchemist_idle').setScale(2);
+        this.alchemist.postFX.addGlow(0x000000, 2, 0, false, 1, 2);
         this.alchemist.setInteractive({ pixelPerfect: true }).on('pointerup', () => {
             if(this.potionSelected) return;
             this.alchemist?.playAfterRepeat('alchemist_idleToDialog');
@@ -434,9 +512,11 @@ export class PreGame extends Scene
         });
 
         this.alchemist.on('pointerover', () => {
+            this.alchemist?.postFX.clear();
             this.alchemist?.postFX.addGlow(0x00FFFF, 10, 0, false, 1, 1);
         }).on('pointerout', () => {
             this.alchemist?.postFX.clear();
+            this.alchemist?.postFX.addGlow(0x000000, 2, 0, false, 1, 2);
         });
 
         this.alchemist.on('animationcomplete', (anim : Phaser.Animations.Animation, frame : Phaser.Animations.AnimationFrame) => {
@@ -493,10 +573,21 @@ export class PreGame extends Scene
     update(){
         
         if (this.unitsToTake.length === 3) {
-            this.readyButton?.setText(`READY`);
+            this.readyButton?.setText(`READY?`);
+            if(this.readyButtonTween && this.readyButtonTween.isPlaying()) return;
+            this.readyButtonTween = this.tweens.add({
+                targets: this.readyButton,
+                ease: 'power2.inOut',
+                duration: 200,
+                scaleX: { start: 1.0, to: 1.2 }, 
+                scaleY: { start: 1.0, to: 1.2 },
+                yoyo: true,
+                repeat: -1
+            });
         }
         else{
             this.readyButton?.setText(`Selected ${this.unitsToTake.length}/3`);
+            this.tweens.killTweensOf(this.readyButton!);
         }
     }
 }

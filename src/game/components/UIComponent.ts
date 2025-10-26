@@ -12,7 +12,7 @@ import { UI } from "../scenes/UI";
      */
 export class UIComponent extends Phaser.GameObjects.Container {
     private border: Phaser.GameObjects.NineSlice;
-    private background: Phaser.GameObjects.Image;
+    private background: Phaser.GameObjects.TileSprite;
     private sizeW: number;
     private sizeH: number;
     private scrollable: boolean = false;
@@ -58,7 +58,7 @@ export class UIComponent extends Phaser.GameObjects.Container {
                 chosenBackground = 'UI_bg_lighter';
                 break;
         }
-        this.background = this.scene.add.image(-width/2, -height/2, chosenBackground);
+        this.background = this.scene.add.tileSprite(-width/2, -height/2, width, height, chosenBackground);
         this.background.setOrigin(0, 0);
         this.background.setDisplaySize(width, height);
         this.add(this.background);
@@ -460,7 +460,10 @@ export class UIComponent extends Phaser.GameObjects.Container {
     private stopDrag(): void {
         this.isDragging = false;
         this.wasDragged = false;
-        this.scene.input.off('pointermove', this.doDrag, this);
+        if(this.scene.input){
+            this.scene.input.off('pointermove', this.doDrag, this);
+        }
+        
 
         // 2. Determine target X and Y positions
         let targetX = this.contentContainer.x;

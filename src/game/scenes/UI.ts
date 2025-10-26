@@ -14,7 +14,7 @@ export class UI extends Scene
     enemyPlayer: AIPlayer | undefined;
     unitLimit: number = 1;
     moneyText: Phaser.GameObjects.BitmapText | undefined;
-    moneyImage: Phaser.GameObjects.Image | undefined;
+    moneyImage: Phaser.GameObjects.Sprite | undefined;
     hpBarUI: UIComponent | undefined;
     hpBar: Phaser.GameObjects.Graphics | undefined;
     enemyHPBarUI: UIComponent | undefined;
@@ -162,10 +162,11 @@ export class UI extends Scene
 
         // Display resources
         this.moneyText = this.add.bitmapText(this.cameras.main.width/4-(32+50+24), this.cameras.main.height - (96), 'pixelFont', `${this.player!.getMoney()}`, 48).setOrigin(1, 0.5).setTintFill(0xffffff);
-        this.moneyImage = this.add.image(this.cameras.main.width/4-50, this.cameras.main.height - (96), 'coin').setOrigin(1, 0.5).setDisplaySize(40, 40);
-        let moneyImageBorder = this.add.graphics();
+        this.moneyImage = this.add.sprite(this.cameras.main.width/4-50, this.cameras.main.height - (96), 'coin_silver').setOrigin(1, 0.5).setDisplaySize(40, 40);
+        this.moneyImage.play('coin_silver_rotate');
+        /*let moneyImageBorder = this.add.graphics();
         moneyImageBorder.lineStyle(1, 0xffffff, 1);
-        moneyImageBorder.strokeCircle(this.cameras.main.width/4-(50+20), this.cameras.main.height - (96), 20);
+        moneyImageBorder.strokeCircle(this.cameras.main.width/4-(50+20), this.cameras.main.height - (96), 20);*/
 
         // Display settings/pause menu
         this.settingsImage = this.add.image(this.cameras.main.width/4*3+50, this.cameras.main.height - 96, 'cog').setOrigin(0, 0.5).setDisplaySize(64, 64).setInteractive();
@@ -394,10 +395,22 @@ export class UI extends Scene
      */
     gameOver(faction: string) {
         if(!this.player) throw new Error('Player is undefined');
+        if(!this.enemyPlayer) throw new Error('Enemy player is undefined');
         // Save data about the game and player to register
         this.registry.set('playTime', this.registry.get('playTime') + this.elapsedTime);
-        if(faction === this.player!.faction) this.registry.set('gamesWon', this.registry.get('gamesWon') + 1);
-        this.scene.launch('GameOver', { winner: (faction === this.player.faction), playTime: this.elapsedTime, level: this.player.getLevel(), money: this.player.getMoney(), unitsKilled: this.player.unitsKilled, unitsSpawned: this.player.unitCounter });
+        let rewardMoney = 0;
+        if(faction === this.player!.faction) { // On player's victory
+            this.registry.set('gamesWon', this.registry.get('gamesWon') + 1);
+            rewardMoney = 100 + this.player.getMoney() * 0.1; // Victory reward is always 100 + 10% of owned coins
+            let totalMoney = this.registry.get('coins') + Math.floor(rewardMoney);
+            this.registry.set('coins', totalMoney);
+        } else { // On player's defeat
+            let damageDealt = 1 - this.enemyPlayer?.getHealth(false); // Determine how much damage was dealt to AI (0 = no dmg, 1 = all damage);
+            rewardMoney = this.player.getMoney() * (damageDealt/10); // Defeat reward is 0 to 10% of coins owned at the end
+            let totalMoney = this.registry.get('coins') + Math.floor(rewardMoney);
+            this.registry.set('coins', totalMoney);
+        }
+        this.scene.launch('GameOver', { winner: (faction === this.player.faction), playTime: this.elapsedTime, level: this.player.getLevel(), money: this.player.getMoney(), reward: Math.floor(rewardMoney), unitsKilled: this.player.unitsKilled, unitsSpawned: this.player.unitCounter });
         this.scene.stop('Game');
         this.scene.stop('UI');
     }
