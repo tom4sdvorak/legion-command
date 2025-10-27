@@ -18,13 +18,13 @@ export class Player extends PlayerController {
 
         this.faction = 'red';
         this.unitQueueMaxSize = 1;
-        // Listener for units dying, awarding human player XP
+        /*// Listener for units dying, awarding human player XP
         eventsCenter.on('unit-died', (unitFaction: string) => {
             if(unitFaction !== this.faction){
                 this.unitsKilled++;
                 this.gainXP(50);
             }
-        }, this);
+        }, this);*/
     }
 
     public levelUp(unit: string, upgrade: string) : void {

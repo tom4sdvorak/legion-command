@@ -5,7 +5,7 @@ import { PlayerController } from "./PlayerController";
 export class ResourceComponent {
     private money: number = 0;
     private xp: number = 0;
-    private maxXP: number = 100;
+    private maxXP: number = 1;
     private parent: PlayerController;
     private moneyPerSecond: number = 0;
 

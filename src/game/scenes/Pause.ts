@@ -41,10 +41,13 @@ export class Pause extends Scene {
             const upgradeName = this.add.bitmapText(0, (32-UIElementHeight/2), 'pixelFont', upgrade.name, 32).setOrigin(0.5, 0).setMaxWidth(UIElementWidth-32);
             const upgradeDescription = this.add.bitmapText(0, (-UIElementHeight/4), 'pixelFont', upgrade.description, 16).setOrigin(0.5, 0).setMaxWidth(UIElementWidth-32);
             const unitSprite = this.add.sprite(0, UIElementHeight/2, `${unitType}_static`).setOrigin(0, 1);
-            upgradeUIElement.insertElement(unitSprite);
+            const scaleY = 48 / unitSprite.height;
+            unitSprite.setScale(scaleY, scaleY);
+
             upgradeUIElement.insertElement(upgradeName);
             upgradeUIElement.insertElement(upgradeDescription);
-            upgradeUIElement.positionElements(['center', 'top'], 0, 32);
+            upgradeUIElement.insertElement(unitSprite);
+            upgradeUIElement.positionElements(['center', 'top'], 0, 32, 16);
 
             container.add(upgradeUIElement);
             currentPosX += UIElementWidth + gap;

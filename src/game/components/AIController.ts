@@ -10,16 +10,19 @@ const State = {
 };
 
 export class AIController {
-    private player: AIPlayer;
+    private player: AIPlayer | undefined;
     private state: string = State.IDLE;
     private lastDecision: number = 0;
     private difficulty: 'EASY' | 'MEDIUM' | 'HARD';
     private decisionTime: number = 0;
-    enemy: Player;
+    enemy: Player | undefined;
 
     constructor(parent: AIPlayer, enemy: Player, difficulty: 'EASY' | 'MEDIUM' | 'HARD' = 'EASY') {
         this.player = parent;
         this.enemy = enemy;
+        if(!this.player) throw new Error('Player is undefined');
+        if(!this.enemy) throw new Error('Enemy player is undefined');
+
         this.difficulty = difficulty;
 
         switch (this.difficulty) {
@@ -46,8 +49,14 @@ export class AIController {
 
         this.handleState();
     }
+
+    destroy() {
+        this.player = undefined;
+        this.enemy = undefined;
+    }
+
     handleState() {
-        if(this.player.isSpawning) return;
+        if(this.player!.isSpawning) return;
         switch (this.state) {
             case State.IDLE:
                 this.idle();
@@ -64,7 +73,7 @@ export class AIController {
             default:
                 throw new Error('Invalid state');
         }
-        //console.log("I have this many units: " + this.player.ownUnitsPhysics.getChildren().length);
+        //console.log("I have this many units: " + this.player!.ownUnitsPhysics.getChildren().length);
     }
 
     changeState(state: string) { 
@@ -84,17 +93,17 @@ export class AIController {
         };
 
         /* ENEMY UNITS VOTE */
-        const enemies = this.player.enemyUnitsPhysics.getChildren();
+        const enemies = this.player!.enemyUnitsPhysics.getChildren();
         strategyVote.defend += Math.min(enemies.length * 0.5, 5); // The more enemies the more defensive
         strategyVote.attack += Math.max(5 - enemies.length, -3); // The less enemies the more aggressive
 
         /* OWN UNITS VOTE */
-        const ownUnits = this.player.ownUnitsPhysics.getChildren();
+        const ownUnits = this.player!.ownUnitsPhysics.getChildren();
         strategyVote.attack += Math.min(ownUnits.length * 0.5, 5); // The more units we have, the more aggresive to be
         strategyVote.defend += Math.max(5 - ownUnits.length, -3); // The less units we have, the more defensive to be
 
         /* MONEY VOTE */
-        const money = this.player.getMoney();
+        const money = this.player!.getMoney();
         if (money <= 200) {
             strategyVote.save += 6 * (1 - money / 200); // At 0 money, vote = 6. At 100 money, vote = 3. At 200 money, vote = 0.
         }
@@ -103,19 +112,19 @@ export class AIController {
         }
 
         /* STATE OF THE GAME VOTE */
-        if(this.player.getHealth(false) > 0.9) {
+        if(this.player!.getHealth(false) > 0.9) {
             strategyVote.save += 2; // Prefer to save if very healthy   
             strategyVote.attack += 1; // Prefer to attack if very healthy
         }
-        else if(this.player.getHealth(false) < 0.3) {
+        else if(this.player!.getHealth(false) < 0.3) {
             strategyVote.defend += 1; // Prefer to defend if very hurt
             strategyVote.attack -= 1; // Prefer to not attack if very hurt
         }
 
-        if(this.enemy.getHealth(false) > 0.9) {
+        if(this.enemy!.getHealth(false) > 0.9) {
             strategyVote.save += 1; // Prefer to save if enemy is very healthy
         }
-        else if(this.enemy.getHealth(false) < 0.3) {
+        else if(this.enemy!.getHealth(false) < 0.3) {
             strategyVote.attack += 2; // Prefer to attack if enemy is very hurt
             strategyVote.save -= 1; // Prefer to not save if enemy is very hurt
         }
@@ -142,7 +151,7 @@ export class AIController {
      * @returns An array of units that contain the required tag.
      */
     private getUnitsByTag(requiredTag: string) : Array<{unitType: string, unitConfig: UnitProps}> {
-        return Array.from(this.player.selectedUnits.entries())
+        return Array.from(this.player!.selectedUnits.entries())
         .filter(([unitType, unitData]) => {
             return unitData.unitConfig.tags.includes(requiredTag);
         })
@@ -174,12 +183,12 @@ export class AIController {
     }
 
     idle(){ // Idle strategy - just ocassionally send unit out
-        if(this.player.ownUnitsPhysics.getChildren().length > 0){
+        if(this.player!.ownUnitsPhysics.getChildren().length > 0){
             return;
         }
         else{
             const unit = this.getBestUnitByStat('cost', false, this.getUnitsByTag('generic'));
-            this.player.canAfford(unit.unitConfig.cost) && this.player.addUnitToQueue(unit.unitType);
+            this.player!.canAfford(unit.unitConfig.cost) && this.player!.addUnitToQueue(unit.unitType);
         }
     }
 
@@ -193,7 +202,7 @@ export class AIController {
             }
         }
         const bestUnit = this.getBestUnitByStat('damage', true, units);
-        this.player.canAfford(bestUnit.unitConfig.cost) && this.player.addUnitToQueue(bestUnit.unitType);
+        this.player!.canAfford(bestUnit.unitConfig.cost) && this.player!.addUnitToQueue(bestUnit.unitType);
     }
 
     defend(){ // Defensive strategy - prioritize stalling
@@ -205,16 +214,16 @@ export class AIController {
             }
         }
         const bestUnit = this.getBestUnitByStat('maxHealth', true, units);
-        this.player.canAfford(bestUnit.unitConfig.cost) && this.player.addUnitToQueue(bestUnit.unitType);
+        this.player!.canAfford(bestUnit.unitConfig.cost) && this.player!.addUnitToQueue(bestUnit.unitType);
     }
 
     save(){ // Money saving strategy, do not summon units unless necessary
-        if(this.player.enemyUnitsPhysics.getChildren().length === 0){
+        if(this.player!.enemyUnitsPhysics.getChildren().length === 0){
             return;
         }
         else{
             const unit = this.getBestUnitByStat('cost', false, this.getUnitsByTag('generic'));
-            this.player.canAfford(unit.unitConfig.cost) && this.player.addUnitToQueue(unit.unitType);
+            this.player!.canAfford(unit.unitConfig.cost) && this.player!.addUnitToQueue(unit.unitType);
         }
     }
 }

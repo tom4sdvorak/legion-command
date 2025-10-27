@@ -126,10 +126,8 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         }
         
         // Reward player
-        if(this.unitProps.faction === 'red') this.scene.rewardPlayer('blue', 1);
-        else this.scene.rewardPlayer('red', this.unitProps.cost);
+        this.scene.rewardPlayer(this.unitProps.faction, this.unitProps.cost, this.unitProps.cost);
         eventsCenter.emit('unit-died', this.unitProps.faction);
-
         this.die();
     }
 

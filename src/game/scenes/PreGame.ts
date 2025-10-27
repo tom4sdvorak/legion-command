@@ -29,6 +29,9 @@ export class PreGame extends Scene
     moneyImage: GameObjects.Sprite;
     exitButton: GameObjects.BitmapText;
     readyButtonTween: Phaser.Tweens.Tween;
+    topY: number = 0;
+    botY: number = 0;
+    conBuyButton: FramedImage;
 
     constructor ()
     {
@@ -40,8 +43,10 @@ export class PreGame extends Scene
         this.potionSelected = false;
         this.gameWidth = this.game.config.width as number;
         this.gameHeight = this.game.config.height as number;
+        this.topY = this.gameHeight/2 - 64;
+        this.botY = this.gameHeight/2 + 192;
         this.largeWindowSize.w = (this.gameWidth/4*3);
-        this.largeWindowSize.h = this.gameHeight-128;
+        this.largeWindowSize.h = this.gameHeight-256;
         this.upgradeManager = UpgradeManager.getInstance();
         this.builtConstructions = [];
     }
@@ -51,7 +56,7 @@ export class PreGame extends Scene
         this.events.once('shutdown', () => this.shutdown());
         //Save game on entering pregame
         SaveManager.saveGame(this);
-        this.playerMoney = this.registry.get('coins');
+        
 
         this.add.image(0, 0, 'pregamelayer3').setDisplaySize(this.gameWidth, this.gameHeight).setOrigin(0, 0);
         this.add.image(0, 0, 'pregamelayer1').setDisplaySize(this.gameWidth, this.gameHeight).setOrigin(0, 0);
@@ -61,10 +66,11 @@ export class PreGame extends Scene
         this.readyCheckLogic();
 
         // Display UI elements
-        const layoutX = 96
-        const layoutY = 96;
+        const layoutX = 64
+        const layoutY = 64;
         this.add.rectangle(0, layoutY, this.gameWidth, 64, 0x000000).setOrigin(0, 0).setAlpha(0.5);
-        this.playerMoneyText = this.add.bitmapText(layoutX, layoutY, 'pixelFont', `${this.playerMoney}`, 64).setOrigin(0, 0).setTintFill(0xFFFF00).setDropShadow(3, 3, 0x000000, 1);
+        this.playerMoneyText = this.add.bitmapText(layoutX, layoutY, 'pixelFont', `    `, 64).setOrigin(0, 0).setTintFill(0xFFFF00).setDropShadow(3, 3, 0x000000, 1);
+        this.updateMoney();
         this.moneyImage = this.add.sprite(layoutX+this.playerMoneyText.width, layoutY+14, 'coin_gold').setOrigin(0, 0).setDisplaySize(36, 36);
         this.moneyImage.play('coin_gold_rotate');
         this.readyButton = this.add.bitmapText(this.gameWidth/2, layoutY, 'pixelFont', 'Selected 0/3', 64).setOrigin(0.5, 0).setTintFill(0xFFFF00).setDropShadow(3, 3, 0x000000, 1).setInteractive()
@@ -101,24 +107,66 @@ export class PreGame extends Scene
                 this.exitButton.setTintFill(0xFFFF00);
                 this.tweens.killTweensOf(this.exitButton);
             });
+        
+        /* Coordinates where selected units go*/
+        interface PlacementSlot {
+            id: number; 
+            x: number;
+            y: number;
+            isOccupied: boolean;
+            sprite: Phaser.GameObjects.Sprite | null;
+        }
+        type PlacementSlotList = Record<string, PlacementSlot>;
+        const unitPlacements: PlacementSlotList = {
+            'TOP': { 
+                id: 0, 
+                x: this.gameWidth-128, 
+                y: this.topY,
+                isOccupied: false,
+                sprite: null
+            },
+            'CENTER': { 
+                id: 1, 
+                x: this.gameWidth-128,  
+                y: Math.floor((this.botY + this.topY)/2),
+                isOccupied: false,
+                sprite: null
+            },
+            'BOT': { 
+                id: 2, 
+                x: this.gameWidth-128,  
+                y: this.botY,
+                isOccupied: false,
+                sprite: null
+            }
+        };
 
         const unitList : string[] = this.registry.get('allUnits');
         unitList.forEach(unit => {
-            const mySprite = this.add.sprite(200, 400, unit, 0).setScale(1).setRandomPosition(100, this.gameHeight/3, this.gameWidth*0.6, this.gameHeight/3).setOrigin(0.5).setInteractive({ pixelPerfect: true });
-            mySprite.on('pointerup', () => {
+            const mySprite = this.add.sprite(200, 400, unit, 0).setScale(1).setRandomPosition(128, this.gameHeight/2-64, this.gameWidth*0.6, 256).setOrigin(0.5, 1).setInteractive({ pixelPerfect: true });
+            mySprite.on('pointerup', () => { 
+                this.tweens.killTweensOf(mySprite);
                 let destX, destY, direction;
-                if(mySprite.x < (this.gameWidth*0.7)){
-                    if(this.unitsToTake.length >= 3) return;
-                    destX = Phaser.Math.Between(this.gameWidth*0.8, this.gameWidth*0.9);
-                    destY = Phaser.Math.Between(this.gameHeight/3, this.gameHeight*0.7);
-                    direction = 1;
-                    Phaser.Utils.Array.Add(this.unitsToTake, unit, 3);
-                }
-                else{
-                    destX = Phaser.Math.Between(this.gameWidth*0.1, this.gameWidth/2);
-                    destY = Phaser.Math.Between(this.gameHeight/3, this.gameHeight*0.7);
+                const foundSlot = Object.values(unitPlacements).find(slot => slot.sprite === mySprite);
+                if(foundSlot){ 
+                    destX = Phaser.Math.Between(128, (this.gameWidth*0.6)+128);
+                    destY = Phaser.Math.Between(this.gameHeight/2-64, this.gameHeight/2-64+256);
                     direction = -1;
                     Phaser.Utils.Array.Remove(this.unitsToTake, unit);
+                    foundSlot.isOccupied = false;
+                    foundSlot.sprite = null;
+                }
+                else{
+                    if(this.unitsToTake.length >= 3) return;
+                    const freeSlot = Object.values(unitPlacements).find(slot => !slot.isOccupied);
+                    if(!freeSlot) return;
+                    destX = freeSlot.x;
+                    destY = freeSlot.y;
+                    direction = 1;
+                    freeSlot.isOccupied = true;
+                    freeSlot.sprite = mySprite;
+                    direction = 1;
+                    Phaser.Utils.Array.Add(this.unitsToTake, unit, 3);                    
                 }
                 mySprite.setDepth(destY);
                 mySprite.flipX = direction === -1;
@@ -130,7 +178,9 @@ export class PreGame extends Scene
                     duration: 3000,
                     ease: 'Power2.InOut',
                     onComplete: () => {
-                        mySprite.play(`${mySprite.texture.key}_idle`);
+                        if (mySprite.x === destX && mySprite.y === destY) {
+                            mySprite.play(`${mySprite.texture.key}_idle`);   
+                        }                                 
                     }
                 });
             });
@@ -149,7 +199,7 @@ export class PreGame extends Scene
         this.builtConstructions = this.registry.get('builtConstructions') ?? [];
         this.alchemistLogic();
         this.redoPregameConstruction();
-        this.sawmill = this.add.sprite(300, 300, 'sawmill').play('sawmill_work').setDisplaySize(96, 96);
+        this.sawmill = this.add.sprite(100, this.topY, 'sawmill').play('sawmill_work').setDisplaySize(96, 96).setOrigin(0.5, 1);
         this.sawmill?.postFX.addGlow(0x000000, 2, 0, false, 1, 2);
         this.sawmill.setInteractive({ pixelPerfect: true }).on('pointerup', () => {
             this.showConstructionMenu();
@@ -186,7 +236,17 @@ export class PreGame extends Scene
             this.readyCheck?.setVisible(false);
             this.potionsMenu?.setVisible(false);
             this.constructionMenu?.destroy();
+            this.conBuyButton.setVisible(false);
         });
+    }
+
+    updateMoney(){
+        this.playerMoney = this.registry.get('coins');
+        let moneyString = this.playerMoney.toString();
+        while (moneyString.length < 5) {
+            moneyString = ' ' + moneyString;
+        }
+        this.playerMoneyText.setText(moneyString);
     }
     async handleQuit() {
         try {
@@ -211,6 +271,7 @@ export class PreGame extends Scene
         this.potionsMenu = undefined;
         this.constructionMenu?.destroy();
         this.constructionMenu = undefined;
+        this.conBuyButton?.destroy();
         this.campfire?.destroy();
         this.campfire = undefined;
         this.alchemist?.destroy();
@@ -218,13 +279,7 @@ export class PreGame extends Scene
         this.sawmill?.destroy();
         this.sawmill = undefined;
         this.tweens.killAll();
-        this.input.removeAllListeners();
-        
-    
-    
-    
-    
-    
+        this.input.removeAllListeners();  
     }
 
     redoPregameConstruction(){
@@ -320,8 +375,8 @@ export class PreGame extends Scene
 
     /* Handles this.sawmill sprite and construction upgrades */
     showConstructionMenu(){
-
-        this.constructionMenu = new UIComponent(this, (this.gameWidth-this.largeWindowSize.w/2-64), this.gameHeight/2, this.largeWindowSize.w, this.largeWindowSize.h, 0, true).setDepth(1001);
+        const menuTopLeftPadding = 160;
+        this.constructionMenu = new UIComponent(this, (menuTopLeftPadding+72+this.largeWindowSize.w/2), (menuTopLeftPadding+this.largeWindowSize.h/2), this.largeWindowSize.w, this.largeWindowSize.h, 0, true).setDepth(1001);
         this.add.existing(this.constructionMenu);
         this.constructionMenu.setInteractive();
 
@@ -336,21 +391,29 @@ export class PreGame extends Scene
         let lastClicked : FramedImage | undefined;
         const padding = 16;
         const title = this.add.bitmapText(0, 0, 'pixelFont', 'WORKSHOP', 64).setMaxWidth(this.constructionMenu.width-padding*2);
-        const conName = this.add.bitmapText(0, 0, 'pixelFont', ' ', 48).setMaxWidth(this.constructionMenu.width-padding*2);
-        const conText = this.add.bitmapText(0, 0, 'pixelFont', ' ', 32).setMaxWidth(this.constructionMenu.width-padding*2);
-        const conCostText = this.add.bitmapText(0, 0, 'pixelFont', `Cost:`, 48).setOrigin(0,0.5).setVisible(false);
-        const conCost = this.add.bitmapText(0, 0, 'pixelFont', `    `, 48).setOrigin(0,0.5);
+        const conName = this.add.bitmapText(0, 0, 'pixelFont', '', 48).setMaxWidth(this.constructionMenu.width-padding*2);
+        const conText = this.add.bitmapText(0, 0, 'pixelFont', '', 32).setMaxWidth(this.constructionMenu.width-padding*2);
+        //const conCostText = this.add.bitmapText(0, 0, 'pixelFont', `Cost:`, 48).setOrigin(0,0.5).setVisible(false);
+        const conCost = this.add.bitmapText(0, 0, 'pixelFont', ``, 48).setOrigin(0,0.5);
         const coinImage = this.add.image(0, 0, 'coin_gold').setOrigin(0,0.5).setVisible(false);
         const divider = this.add.line(0, 0, 0, 0, this.constructionMenu.width-padding*2, 0, 0x000000).setLineWidth(8);
-        const empty = this.add.zone(0,0,128,32);
-        const conBuyText = new FramedImage(this, 0, 0, 128, 48, 'square').setInteractive().setVisible(false);
-        conBuyText.putInside(this.add.bitmapText(0, 0, 'pixelFont', 'Build', 48));
-        conBuyText.on('pointerup', () => {
+        if(!this.conBuyButton){
+            this.conBuyButton = new FramedImage(this, menuTopLeftPadding, this.constructionMenu.y+this.constructionMenu.height/2-64, 128, 128, 'square').setInteractive();
+            console.log("Created conBuyButton");
+        }
+        else this.conBuyButton.setVisible(true);
+        this.conBuyButton.changeBorder(4, 0x333333);
+        this.conBuyButton.changeBackground(0xCCCCCC, 0.5);
+        this.conBuyButton.setDepth(1002);
+        this.add.existing(this.conBuyButton);
+        this.conBuyButton.putInside(this.add.bitmapText(0, 0, 'pixelFont', 'Build', 48));
+        this.conBuyButton.on('pointerup', () => {
             if(selectedCon){ // If a construction is selected
                 if(this.builtConstructions.includes(selectedCon.id)) return; // Skip if the construction is already built
                 if(selectedCon.prerequisites.length > 0 && !this.builtConstructions.includes(selectedCon.prerequisites[0])) return; // Skip if a prerequisite is not built
                 if(this.registry.get('coins') < selectedCon.cost) return; // Skip if not enough coins
                 this.registry.set('coins', this.registry.get('coins') - selectedCon.cost);
+                this.updateMoney();
                 this.builtConstructions.push(selectedCon.id);
                 this.registry.set('builtConstructions', this.builtConstructions);
                 this.constructionMenu?.destroy();
@@ -359,9 +422,9 @@ export class PreGame extends Scene
             }
         });
         this.constructionMenu.insertElement(title, true);
-        this.constructionMenu.insertElement(conName, true);
+        this.constructionMenu.insertElement([conName, coinImage, conCost], true);
         this.constructionMenu.insertElement(conText, true);
-        this.constructionMenu.insertElement([conCostText, conCost, coinImage, empty, conBuyText], true);
+        //this.constructionMenu.insertElement([conCostText, conCost, coinImage, empty, this.conBuyButton], true);
         this.constructionMenu.insertElement(divider, true);
 
         // Loop through construction upgrade types
@@ -392,10 +455,10 @@ export class PreGame extends Scene
                 }
                 conSlot.putInside(this.add.image(0, 0, 'icons', ICON_FRAMES[con.iconFrameKey]));
                 conSlot.changeBorder(4, devConfig.negativeColor); // Set all upgrades to not possible color
+                conSlot.setData('canBuild', false);
                 if(this.builtConstructions.includes(con.id)){ // Change those already built to neutral color
                     conSlot.changeBorder(4, 0x000000);
                     conSlot.setData('built', true);
-                    conSlot.setData('canBuild', false);
                     line.strokeColor = 0x000000;
                 }
                 else if(firstNotBuilt){ // On finding first upgrade not built, give it special color
@@ -403,34 +466,31 @@ export class PreGame extends Scene
                     conSlot.changeBorder(4, devConfig.positiveColor);
                     line.strokeColor = devConfig.positiveColor;
                     conSlot.setData('built', false);
-                    conSlot.setData('canBuild', true);
-                }
-                else{
-                    conSlot.setData('built', false);
-                    conSlot.setData('canBuild', false);
+                    if(this.playerMoney >= con.cost){
+                        conSlot.setData('canBuild', true);
+                    }
                 }
                 conSlot.on('pointerup', () => {
                     if (this.constructionMenu?.getWasDragged()) {
                         console.log("Click stopped because Was Dragged");
                         return;
                     }
-                    conCostText.setVisible(true);
+                    //conCostText.setVisible(true);
                     coinImage.setVisible(true);
                     if(lastClicked && lastClicked !== conSlot){
                         lastClicked.changeBorder(4);
                     }
                     if(conSlot.getData('built')){
-                        conBuyText.setVisible(false);
+                        this.conBuyButton.changeBorder(4, 0x333333);
+                        this.conBuyButton.changeBackground(0xCCCCCC, 0.5);
                     }
                     else if(!conSlot.getData('canBuild')){
-                        conBuyText.setVisible(true);
-                        conBuyText.changeBorder(4, devConfig.negativeColor);
-                        conBuyText.changeBackground(devConfig.negativeColorLight, 0.5);
+                        this.conBuyButton.changeBorder(4, devConfig.negativeColor);
+                        this.conBuyButton.changeBackground(devConfig.negativeColorLight, 0.5);
                     }
                     else{
-                        conBuyText.setVisible(true);
-                        conBuyText.changeBorder(4, devConfig.positiveColor);
-                        conBuyText.changeBackground(devConfig.positiveColorLight, 0.5);
+                        this.conBuyButton.changeBorder(4, devConfig.positiveColor);
+                        this.conBuyButton.changeBackground(devConfig.positiveColorLight, 0.5);
                     }
                     selectedCon = con; 
                     //conID = con.id;
@@ -441,16 +501,17 @@ export class PreGame extends Scene
                         preConID = 'none';
                     }*/
                     lastClicked = conSlot;
-                    conName.setText(`${con.name}`);
+                    conName.setText(`${con.name} (`);
                     conText.setText(`${con.description}`);
 
-                    // Turn cost number to 4 lenght string
+                    /*// Turn cost number to 4 lenght string
                     let costString = con.cost.toString();
-                    while(costString.length < 4){
+                    while(costString.length < 3){
                         costString = ' ' + costString;
-                    }
-                    conCost.setText(costString);
+                    }*/
+                    conCost.setText(` ${con.cost})`);
                     conSlot.changeBorder(8);
+                    this.constructionMenu!.positionElements(['left', 'top'], 0, 8, padding);
                 });
                 tempArray.push(line, conSlot);
             });
@@ -459,7 +520,7 @@ export class PreGame extends Scene
         }
         
         if(this.constructionMenu.getContentLength() <= 0) return;
-        this.constructionMenu.positionElements(['left', 'top'], 0, 16, padding);
+        this.constructionMenu.positionElements(['left', 'top'], 0, 8, padding);
 
 
     }
@@ -502,7 +563,7 @@ export class PreGame extends Scene
         });
         this.potionsMenu.positionElements(['left', 'top'], 0, 8);
 
-        this.alchemist = this.add.sprite(100, 300, 'alchemist').play('alchemist_idle').setScale(2);
+        this.alchemist = this.add.sprite(100, this.botY, 'alchemist').play('alchemist_idle').setScale(2).setOrigin(0.5, 1);
         this.alchemist.postFX.addGlow(0x000000, 2, 0, false, 1, 2);
         this.alchemist.setInteractive({ pixelPerfect: true }).on('pointerup', () => {
             if(this.potionSelected) return;

@@ -72,7 +72,8 @@ export class FramedImage extends Phaser.GameObjects.Container {
         this.inside.setScale(1.0);
         const scaleX = this.width / this.inside.width;
         const scaleY = this.height / this.inside.height;
-        let scaleFactor = Math.max(scaleX, scaleY);
+        
+        let scaleFactor = Math.min(scaleX, scaleY);
         if(this.shapeType === 'round'){
             scaleFactor = scaleFactor * 0.75;
             if(this.inside instanceof Phaser.GameObjects.BitmapText || this.inside instanceof Phaser.GameObjects.Text){

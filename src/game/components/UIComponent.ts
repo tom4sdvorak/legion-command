@@ -460,10 +460,7 @@ export class UIComponent extends Phaser.GameObjects.Container {
     private stopDrag(): void {
         this.isDragging = false;
         this.wasDragged = false;
-        if(this.scene.input){
-            this.scene.input.off('pointermove', this.doDrag, this);
-        }
-        
+        this.scene?.input?.off('pointermove', this.doDrag, this);
 
         // 2. Determine target X and Y positions
         let targetX = this.contentContainer.x;

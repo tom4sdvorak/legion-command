@@ -224,39 +224,35 @@ export class PlayerController {
     
     public spawnUnit (unitType: string) : Unit
     {
-        let unit : Unit;
+        let unit : Unit | null = null;
         let pool: Phaser.Physics.Arcade.Group;
         let projectilePool: Phaser.Physics.Arcade.Group | null;           
         switch (unitType) {
             case 'warrior':
                 pool = this.objectPool.units.warriors;
                 projectilePool = null;
-                unit = pool.get();
-                unit.setBodySize(64, 128, true);
                 break;
             case 'archer':
                 pool = this.objectPool.units.archers;
                 projectilePool = this.objectPool.projectiles.arrows;
-                unit = pool.get();
-                unit.setBodySize(64, 128, true);
                 break;
             case 'wizard':
                 pool = this.objectPool.units.wizards;
                 projectilePool = this.objectPool.projectiles.purpleBalls;
-                unit = pool.get();
                 break;
             case 'fireWorm':
                 pool = this.objectPool.units.fireWorms;
                 projectilePool = this.objectPool.projectiles.fireballs;
-                unit = pool.get();
                 break;
             case 'gorgon':
                 pool = this.objectPool.units.gorgons;
                 projectilePool = null;
-                unit = pool.get();
                 break;
             default:
                 throw new Error(`Unknown unit type: ${unitType}`);
+        }
+        while(!unit){
+            unit = pool.get();
         }
         if(unit){
             // Load updated unit stats

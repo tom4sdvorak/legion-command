@@ -39,7 +39,7 @@ export class GameOver extends Scene
             victoryString = 'Defeat';
             color = devConfig.negativeColor;
         }
-        const victoryText = this.add.bitmapText(0, 0, 'pixelFont', victoryString, 96).setOrigin(0.5, 0.5).setTintFill(color).setDropShadow(2, 2, 0x000000, 1);
+        const victoryText = this.add.bitmapText(0, 0, 'pixelFont', victoryString, 96).setOrigin(0.5, 0.5).setTintFill(color).setDropShadow(3, 3, 0x000000, 1);
         const formatedTime = [Math.floor(this.postGameData!.playTime / 60), ((this.postGameData!.playTime % 60).toFixed(0)).padStart(2, '0')].join(':');
         const playTimeText = this.add.bitmapText(0, 0, 'pixelFont', `Play Time: ${formatedTime}`, 48).setOrigin(0.5, 0.5);
 

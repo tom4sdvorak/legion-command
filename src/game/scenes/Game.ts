@@ -27,10 +27,10 @@ export class Game extends Scene
     worldWidth: number = 2200;
     worldHeight: number = 800;
     ground: Phaser.GameObjects.Image;
-    playerRed: Player;
-    playerBlue: AIPlayer;
-    baseRed: PlayerBase;
-    baseBlue: PlayerBase;
+    playerRed: Player | undefined
+    playerBlue: AIPlayer | undefined
+    baseRed: PlayerBase | undefined
+    baseBlue: PlayerBase | undefined
     redUnitsPhysics: Phaser.Physics.Arcade.Group;
     blueUnitsPhysics: Phaser.Physics.Arcade.Group;
     redProjectiles: Phaser.Physics.Arcade.Group;
@@ -42,14 +42,13 @@ export class Game extends Scene
     baseGroup: Phaser.GameObjects.Group;
     redConfigLoader: UnitConfigLoader;
     blueConfigLoader: UnitConfigLoader;
-    AIController: AIController;
+    AIController: AIController | undefined
     controls: Phaser.Cameras.Controls.SmoothedKeyControl;
     isDragging: boolean = false;
     lastPointerPosition : Phaser.Math.Vector2;
     globalOffsetY: number = -200;
     nextUnitContainer: Phaser.GameObjects.Container;
     nextUnit: Phaser.GameObjects.Image;
-
 
     constructor ()
     {
@@ -89,13 +88,16 @@ export class Game extends Scene
         this.blueConfigLoader = new UnitConfigLoader(unitDataJson);
 
         // Create and setup main player
-        const redPos = new Phaser.Math.Vector2(0, this.worldHeight+this.globalOffsetY);
+        const redPos = new Phaser.Math.Vector2(0, this.worldHeight+this.globalOffsetY); // Spawn position
+        /* Any sprites that create player's base*/
         this.add.sprite(50, redPos.y, 'tent').setOrigin(0,1).setScale(1.5).setDepth(11);
+
         this.baseRed = new PlayerBase(this, 'red', redPos, this.blueUnitsPhysics, this.redProjectiles);
         this.playerRed = new Player(this, this.baseRed, redPos, this.redUnitsPhysics, this.blueUnitsPhysics, 
             this.redProjectiles, this.objectPool, this.baseGroup, this.redConfigLoader, this.registry.get('playerUnits'));
-        this.playerRed.changePassiveIncome(1, true);
-        this.playerRed.addMoney(100);
+        this.playerRed!.changePassiveIncome(1, true); // Passive income
+        this.playerRed!.addMoney(100); // Initial money
+        this.playerRed!.setNextLevelXP(10); // First lvl XP needed
         this.applyPermaUpgrades();
 
         // Create and setup AI player
@@ -109,8 +111,8 @@ export class Game extends Scene
         this.baseBlue = new PlayerBase(this, 'blue', bluePos, this.redUnitsPhysics, this.blueProjectiles);
         this.playerBlue = new AIPlayer(this, this.baseBlue, bluePos, this.blueUnitsPhysics, this.redUnitsPhysics, 
             this.blueProjectiles, this.objectPool, this.baseGroup, this.blueConfigLoader, this.registry.get('allUnits'));
-        this.playerBlue.changePassiveIncome(1, true);
-        //this.playerBlue.addMoney(100);
+        this.playerBlue!.changePassiveIncome(1, true);
+        //this.playerBlue!.addMoney(100);
         if(devConfig.AI) this.AIController = new AIController(this.playerBlue, this.playerRed, 'EASY');
 
         this.baseGroup.add(this.baseRed);
@@ -129,10 +131,10 @@ export class Game extends Scene
             return upgrade && upgrade.type === 'walls'; // Return true if the upgrade exists AND its type is 'walls'
         });
         if(hasWallUpgrade){
-            this.baseRed.buildWalls();
+            this.baseRed!.buildWalls();
             const healthEffect = playerUpgrades.baseMaxHealth ?? { flat: 0, percent: 0 };
-            const newHealth = (this.baseRed.getMaxHealth() + healthEffect.flat) * (1 + healthEffect.percent);
-            this.baseRed.setMaxHealth(newHealth);
+            const newHealth = (this.baseRed!.getMaxHealth() + healthEffect.flat) * (1 + healthEffect.percent);
+            this.baseRed!.setMaxHealth(newHealth);
         }
 
         /* WATCHTOWER */
@@ -149,9 +151,12 @@ export class Game extends Scene
             type ProjectileKey = keyof ObjectPool['projectiles'];
             const key = projectilesEffect.specialValue as ProjectileKey;
             const projectileGroup = this.objectPool.projectiles[key];
-            if(projectileGroup === undefined) return;
+            if(projectileGroup === undefined) {
+                console.warn(`Watchtower upgrade failed: No projectile pool found for key "${key}"`);
+                return;
+            }
 
-            this.baseRed.enableWatchtower(damageEffect.flat*(1+damageEffect.percent), rangeEffect.flat*(1+rangeEffect.percent), projectileGroup);
+            this.baseRed!.enableWatchtower(damageEffect.flat*(1+damageEffect.percent), rangeEffect.flat*(1+rangeEffect.percent), projectileGroup);
         }
 
         /* All Unit buffing constructions */
@@ -159,14 +164,10 @@ export class Game extends Scene
             const upgrade = upgradeManager.getConstructionUpgradeByID(upgradeID);
             return upgrade && upgrade.target === 'unit'; // Keep the ID only if the upgrade exists AND is targetting units
         });
-        this.playerRed.addUpgrade('ALL', unitUpgrades);
+        this.playerRed!.addUpgrade('ALL', unitUpgrades);
 
         /* Potion */
-        this.playerRed.setPotion(this.registry.get('playerPotion'));
-    }
-
-    onUnitRemoved(unit: Unit){
-        this.redCollider.update();
+        this.playerRed!.setPotion(this.registry.get('playerPotion'));
     }
 
     handleUnitCollision(unit1: Unit, unit2: Unit){
@@ -261,8 +262,8 @@ export class Game extends Scene
         // Add collision between Projectiles and opposing units/bases
         this.physics.add.overlap(this.blueUnitsPhysics, this.redProjectiles,  this.onProjectileHit as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, this.beforeRedProjectileHit as unknown as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, this);
         this.physics.add.overlap(this.redUnitsPhysics, this.blueProjectiles, this.onProjectileHit as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, this.beforeBlueProjectileHit as unknown as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, this);
-        this.physics.add.overlap(this.baseBlue, this.redProjectiles, this.onProjectileHit as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, this.beforeRedProjectileHit as unknown as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, this);
-        this.physics.add.overlap(this.baseRed,this.blueProjectiles, this.onProjectileHit as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, this.beforeBlueProjectileHit as unknown as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, this);
+        this.physics.add.overlap(this.baseBlue!, this.redProjectiles, this.onProjectileHit as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, this.beforeRedProjectileHit as unknown as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, this);
+        this.physics.add.overlap(this.baseRed!,this.blueProjectiles, this.onProjectileHit as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, this.beforeBlueProjectileHit as unknown as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, this);
         
         // Add collision between friendly units
         this.redCollider = this.physics.add.collider(this.redUnitsPhysics, this.redUnitsPhysics, this.handleUnitCollision as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, undefined, this);
@@ -272,17 +273,20 @@ export class Game extends Scene
         this.hostileCollider = this.physics.add.collider(this.redUnitsPhysics, this.blueUnitsPhysics, this.handleUnitCollision as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, undefined, this);
 
         // Add collision with hostile base
-        this.physics.add.collider(this.redUnitsPhysics, this.baseBlue, this.handleBaseCollision as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, undefined, this);
-        this.physics.add.collider(this.blueUnitsPhysics, this.baseRed, this.handleBaseCollision as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, undefined, this);
+        this.physics.add.collider(this.redUnitsPhysics, this.baseBlue!, this.handleBaseCollision as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, undefined, this);
+        this.physics.add.collider(this.blueUnitsPhysics, this.baseRed!, this.handleBaseCollision as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, undefined, this);
     }
 
-    gameOver(faction: string){
-        this.playerBlue.destroy();
-    }
-
-    rewardPlayer(faction: string, money: number = 0, xp: number = 0){
-        if(faction === 'red') this.playerRed.addMoney(money);
-        else this.playerBlue.addMoney(money);
+    rewardPlayer(killedUnitFaction: string, unitCost: number = 0, xp?: number){
+        if(killedUnitFaction === 'blue'){ // Human Player
+            this.playerRed!.addMoney(unitCost);
+            this.playerRed!.unitsKilled++;
+            if(xp) this.playerRed!.gainXP(xp);
+            else this.playerRed!.gainXP(10);
+        }
+        else {  // AI
+            this.playerBlue!.addMoney(1);
+        }
     }
 
     getGlobalOffset(): Phaser.Math.Vector2{
@@ -296,15 +300,12 @@ export class Game extends Scene
     bindListeners(){
         eventsCenter.on('spawn-red-unit', (unitType : string) => {
             console.log(`%cTrying to spawn red ${unitType}`, "color: red");
-            this.playerRed.addUnitToQueue(unitType);
+            this.playerRed!.addUnitToQueue(unitType);
             
         });
         eventsCenter.on('spawn-blue-unit', (unitType : string) => {
             console.log(`%cTrying to spawn blue ${unitType}`, "color: blue");
-            this.playerBlue.addUnitToQueue(unitType);
-        });
-        eventsCenter.on('base-destroyed', (faction : string) => {
-            this.gameOver(faction);
+            this.playerBlue!.addUnitToQueue(unitType);
         });
 
         eventsCenter.on('resume', (gameSpeed : number) => {
@@ -317,6 +318,7 @@ export class Game extends Scene
 
     create ()
     {             
+        this.events.once('shutdown', () => this.shutdown());
         if(this.registry.get('playerUnits').length < 3 || this.registry.get('playerUnits').length > 3) throw new Error(`Player has wrong amount of units ${this.registry.get('playerUnits').length}`);
         // Setup the game screen
         this.camera = this.cameras.main;
@@ -371,6 +373,18 @@ export class Game extends Scene
         // Bind event listeners with delay
         this.time.delayedCall(1, this.bindListeners, [], this);
     }
+    shutdown() {
+        this.AIController?.destroy();
+        this.AIController = undefined;
+        this.playerBlue?.destroy();
+        this.playerBlue = undefined;
+        this.playerRed?.destroy();
+        this.playerRed = undefined;
+        this.baseRed?.destroy();
+        this.baseRed = undefined;
+        this.baseBlue?.destroy();
+        this.baseBlue = undefined;
+    }
 
     update(time: any, delta: number){
         this.controls.update(delta);
@@ -385,9 +399,9 @@ export class Game extends Scene
             this.lastPointerPosition.y = this.input.activePointer.y;
         }
         // Run update methods of each player
-        this.playerBlue.update(time, delta);
-        if(devConfig.AI) this.AIController.update(time);
-        this.playerRed.update(time, delta);
+        this.playerBlue?.update(time, delta);
+        if(devConfig.AI) this.AIController?.update(time);
+        this.playerRed?.update(time, delta);
         
     }
 }
