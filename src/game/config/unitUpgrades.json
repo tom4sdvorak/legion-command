@@ -1,62 +1,1589 @@
 [
-  {
-    "id": "generic_hp_percent",
-    "name": "Vitality Boost",
-    "description": "Increases max health by 5%.",
-    "rarity": "common",
-    "tags": ["health", "generic"],
-    "effects": [
-      { "stat": "maxHealth", "type": "percent", "value": 0.05 }
-    ]
-  },
-  {
-    "id": "generic_speed_percent",
-    "name": "Light Boots",
-    "description": "Increases movement speed by 5%.",
-    "rarity": "common",
-    "tags": ["speed", "generic"],
-    "effects": [
-      { "stat": "speed", "type": "percent", "value": 0.05 }
-    ]
-  },
-  {
-    "id": "generic_cost_reduction_percent",
-    "name": "Efficient Conscription",
-    "description": "Reduces unit cost by 10%",
-    "rarity": "common",
-    "tags": ["cost", "generic"],
-    "effects": [
-      { "stat": "cost", "type": "percent", "value": -0.10 }
-    ]
-  },
-  {
-    "id": "generic_damage_flat",
-    "name": "Sharpened Sword",
-    "description": "Increases attack damage by 5.",
-    "rarity": "common",
-    "tags": ["damage", "generic"],
-    "effects": [
-      { "stat": "damage", "type": "flat", "value": 5 }
-    ]
-  },
-  {
-    "id": "ranged_range_flat",
-    "name": "Eagle Eye",
-    "description": "Increases attack range by 50.",
-    "rarity": "common",
-    "tags": ["range", "ranged"],
-    "effects": [
-      { "stat": "attackRange", "type": "flat", "value": 50 }
-    ]
-  },
-  {
-    "id": "generic_attack_speed_percent",
-    "name": "Propellant Glands",
-    "description": "Increases attack speed by 10%.",
-    "rarity": "common",
-    "tags": ["actionSpeed", "generic"],
-    "effects": [
-      { "stat": "actionSpeed", "type": "percent", "value": -0.10 }
-    ]
-  }
+    {
+        "id": "archer_as_percent_common",
+        "name": "Bowstring Speed I",
+        "rarity": "common",
+        "tags": [
+            "archer",
+            "actionSpeed"
+        ],
+        "iconFrameKey": [
+            "ACTION_SPEED_UP"
+        ],
+        "description": "Archer attack speed +7%.",
+        "effects": [
+            {
+                "stat": "actionSpeed",
+                "type": "percent",
+                "value": -0.07
+            }
+        ]
+    },
+    {
+        "id": "archer_as_percent_epic",
+        "name": "Bowstring Speed III",
+        "rarity": "epic",
+        "tags": [
+            "archer",
+            "actionSpeed"
+        ],
+        "iconFrameKey": [
+            "ACTION_SPEED_UP"
+        ],
+        "description": "Archer attack speed +21%.",
+        "effects": [
+            {
+                "stat": "actionSpeed",
+                "type": "percent",
+                "value": -0.21
+            }
+        ]
+    },
+    {
+        "id": "archer_as_percent_rare",
+        "name": "Bowstring Speed II",
+        "rarity": "rare",
+        "tags": [
+            "archer",
+            "actionSpeed"
+        ],
+        "iconFrameKey": [
+            "ACTION_SPEED_UP"
+        ],
+        "description": "Archer attack speed +14%.",
+        "effects": [
+            {
+                "stat": "actionSpeed",
+                "type": "percent",
+                "value": -0.14
+            }
+        ]
+    },
+    {
+        "id": "archer_swift_recoil",
+        "name": "Lightened Draw",
+        "rarity": "rare",
+        "tags": [
+            "archer",
+            "actionSpeed",
+            "damage"
+        ],
+        "iconFrameKey": [
+            "ACTION_SPEED_UP",
+            "DMG_DOWN"
+        ],
+        "description": "Archer attack speed +20%, but reduces damage by 5%.",
+        "effects": [
+            {
+                "stat": "actionSpeed",
+                "type": "percent",
+                "value": -0.2
+            },
+            {
+                "stat": "damage",
+                "type": "percent",
+                "value": -0.05
+            }
+        ]
+    },
+    {
+        "id": "fireworm_special",
+        "name": "Explosive Demise",
+        "rarity": "legendary",
+        "tags": [
+            "fireWorm",
+            "specialEnabled"
+        ],
+        "iconFrameKey": [
+            "SPECIAL_POWER"
+        ],
+        "description": "Explodes on melee contact, damaging and applying burn to enemy.",
+        "effects": [
+            {
+                "stat": "specialEnabled",
+                "type": "true",
+                "value": -1
+            }
+        ]
+    },
+    {
+        "id": "fireworm_speed_percent_common",
+        "name": "Burrow Speed I",
+        "rarity": "common",
+        "tags": [
+            "fireWorm",
+            "speed"
+        ],
+        "iconFrameKey": [
+            "SPEED_UP"
+        ],
+        "description": "FireWorm movement speed +10%.",
+        "effects": [
+            {
+                "stat": "speed",
+                "type": "percent",
+                "value": 0.1
+            }
+        ]
+    },
+    {
+        "id": "fireworm_speed_percent_epic",
+        "name": "Burrow Speed III",
+        "rarity": "epic",
+        "tags": [
+            "fireWorm",
+            "speed"
+        ],
+        "iconFrameKey": [
+            "SPEED_UP"
+        ],
+        "description": "FireWorm movement speed +30%.",
+        "effects": [
+            {
+                "stat": "speed",
+                "type": "percent",
+                "value": 0.3
+            }
+        ]
+    },
+    {
+        "id": "fireworm_speed_percent_rare",
+        "name": "Burrow Speed II",
+        "rarity": "rare",
+        "tags": [
+            "fireWorm",
+            "speed"
+        ],
+        "iconFrameKey": [
+            "SPEED_UP"
+        ],
+        "description": "FireWorm movement speed +20%.",
+        "effects": [
+            {
+                "stat": "speed",
+                "type": "percent",
+                "value": 0.2
+            }
+        ]
+    },
+    {
+        "id": "generic_ARMOR_common",
+        "name": "Iron Hide I",
+        "rarity": "common",
+        "tags": [
+            "armor",
+            "generic"
+        ],
+        "iconFrameKey": [
+            "ARMOR_UP"
+        ],
+        "description": "Increases armor by 1",
+        "effects": [
+            {
+                "stat": "armor",
+                "type": "flat",
+                "value": 1
+            }
+        ]
+    },
+    {
+        "id": "generic_ARMOR_epic",
+        "name": "Iron Hide III",
+        "rarity": "epic",
+        "tags": [
+            "armor",
+            "generic"
+        ],
+        "iconFrameKey": [
+            "ARMOR_UP"
+        ],
+        "description": "Increases armor by 5.",
+        "effects": [
+            {
+                "stat": "armor",
+                "type": "flat",
+                "value": 5
+            }
+        ]
+    },
+    {
+        "id": "generic_ARMOR_rare",
+        "name": "Iron Hide II",
+        "rarity": "rare",
+        "tags": [
+            "armor",
+            "generic"
+        ],
+        "iconFrameKey": [
+            "ARMOR_UP"
+        ],
+        "description": "Increases armor by 2.",
+        "effects": [
+            {
+                "stat": "armor",
+                "type": "flat",
+                "value": 2
+            }
+        ]
+    },
+    {
+        "id": "generic_as_common",
+        "name": "Global Haste I",
+        "rarity": "common",
+        "tags": [
+            "actionSpeed",
+            "generic"
+        ],
+        "iconFrameKey": [
+            "ACTION_SPEED_UP"
+        ],
+        "description": "All unit attack speed +3%.",
+        "effects": [
+            {
+                "stat": "actionSpeed",
+                "type": "percent",
+                "value": -0.03
+            }
+        ]
+    },
+    {
+        "id": "generic_as_epic",
+        "name": "Global Haste III",
+        "rarity": "epic",
+        "tags": [
+            "actionSpeed",
+            "generic"
+        ],
+        "iconFrameKey": [
+            "ACTION_SPEED_UP"
+        ],
+        "description": "All unit attack speed +9%.",
+        "effects": [
+            {
+                "stat": "actionSpeed",
+                "type": "percent",
+                "value": -0.09
+            }
+        ]
+    },
+    {
+        "id": "generic_as_rare",
+        "name": "Global Haste II",
+        "rarity": "rare",
+        "tags": [
+            "actionSpeed",
+            "generic"
+        ],
+        "iconFrameKey": [
+            "ACTION_SPEED_UP"
+        ],
+        "description": "All unit attack speed +6%.",
+        "effects": [
+            {
+                "stat": "actionSpeed",
+                "type": "percent",
+                "value": -0.06
+            }
+        ]
+    },
+    {
+        "id": "generic_berserk_epic",
+        "name": "Unstable Fury II",
+        "rarity": "epic",
+        "tags": [
+            "damage",
+            "health",
+            "generic"
+        ],
+        "iconFrameKey": [
+            "DMG_UP",
+            "HP_DOWN"
+        ],
+        "description": "Increases damage by 100%, but reduces max health by 99%.",
+        "effects": [
+            {
+                "stat": "damage",
+                "type": "percent",
+                "value": 1
+            },
+            {
+                "stat": "maxHealth",
+                "type": "percent",
+                "value": -0.99
+            }
+        ]
+    },
+    {
+        "id": "generic_berserk_rare",
+        "name": "Unstable Fury I",
+        "rarity": "rare",
+        "tags": [
+            "damage",
+            "health",
+            "generic"
+        ],
+        "iconFrameKey": [
+            "DMG_UP",
+            "HP_DOWN"
+        ],
+        "description": "Increases damage by 50%, but reduces max health by 50%.",
+        "effects": [
+            {
+                "stat": "damage",
+                "type": "percent",
+                "value": 0.5
+            },
+            {
+                "stat": "maxHealth",
+                "type": "percent",
+                "value": -0.5
+            }
+        ]
+    },
+    {
+        "id": "generic_cheaper_prod",
+        "name": "Overburdened Foundry",
+        "rarity": "rare",
+        "tags": [
+            "cost",
+            "spawnTime",
+            "generic"
+        ],
+        "iconFrameKey": [
+            "COST_DOWN",
+            "SPAWN_UP"
+        ],
+        "description": "Reduces unit cost by 30%, but it takes twice as long to spawn",
+        "effects": [
+            {
+                "stat": "spawnTime",
+                "type": "percent",
+                "value": 1
+            },
+            {
+                "stat": "cost",
+                "type": "percent",
+                "value": -0.3
+            }
+        ]
+    },
+    {
+        "id": "generic_cost_common",
+        "name": "Mass Production I",
+        "rarity": "common",
+        "tags": [
+            "cost",
+            "generic"
+        ],
+        "iconFrameKey": [
+            "COST_DOWN"
+        ],
+        "description": "All unit cost -5%.",
+        "effects": [
+            {
+                "stat": "cost",
+                "type": "percent",
+                "value": -0.05
+            }
+        ]
+    },
+    {
+        "id": "generic_cost_epic",
+        "name": "Mass Production III",
+        "rarity": "epic",
+        "tags": [
+            "cost",
+            "generic"
+        ],
+        "iconFrameKey": [
+            "COST_DOWN"
+        ],
+        "description": "All unit cost -15%.",
+        "effects": [
+            {
+                "stat": "cost",
+                "type": "percent",
+                "value": -0.15
+            }
+        ]
+    },
+    {
+        "id": "generic_cost_rare",
+        "name": "Mass Production II",
+        "rarity": "rare",
+        "tags": [
+            "cost",
+            "generic"
+        ],
+        "iconFrameKey": [
+            "COST_DOWN"
+        ],
+        "description": "All unit cost -10%.",
+        "effects": [
+            {
+                "stat": "cost",
+                "type": "percent",
+                "value": -0.1
+            }
+        ]
+    },
+    {
+        "id": "generic_dmg_flat_common",
+        "name": "Focused Strike I",
+        "rarity": "common",
+        "tags": [
+            "damage",
+            "generic"
+        ],
+        "iconFrameKey": [
+            "DMG_UP"
+        ],
+        "description": "Increases damage by 2.",
+        "effects": [
+            {
+                "stat": "damage",
+                "type": "flat",
+                "value": 2
+            }
+        ]
+    },
+    {
+        "id": "generic_dmg_flat_epic",
+        "name": "Focused Strike III",
+        "rarity": "epic",
+        "tags": [
+            "damage",
+            "generic"
+        ],
+        "iconFrameKey": [
+            "DMG_UP"
+        ],
+        "description": "Increases damage by 6.",
+        "effects": [
+            {
+                "stat": "damage",
+                "type": "flat",
+                "value": 6
+            }
+        ]
+    },
+    {
+        "id": "generic_dmg_flat_rare",
+        "name": "Focused Strike II",
+        "rarity": "rare",
+        "tags": [
+            "damage",
+            "generic"
+        ],
+        "iconFrameKey": [
+            "DMG_UP"
+        ],
+        "description": "Increases damage by 4.",
+        "effects": [
+            {
+                "stat": "damage",
+                "type": "flat",
+                "value": 4
+            }
+        ]
+    },
+    {
+        "id": "generic_hp_common",
+        "name": "Vitality Boost I",
+        "rarity": "common",
+        "tags": [
+            "health",
+            "generic"
+        ],
+        "iconFrameKey": [
+            "HP_UP"
+        ],
+        "description": "Increases max health by 5%.",
+        "effects": [
+            {
+                "stat": "maxHealth",
+                "type": "percent",
+                "value": 0.05
+            }
+        ]
+    },
+    {
+        "id": "generic_hp_epic",
+        "name": "Vitality Boost III",
+        "rarity": "epic",
+        "tags": [
+            "health",
+            "generic"
+        ],
+        "iconFrameKey": [
+            "HP_UP"
+        ],
+        "description": "Increases max health by 15%.",
+        "effects": [
+            {
+                "stat": "maxHealth",
+                "type": "percent",
+                "value": 0.15
+            }
+        ]
+    },
+    {
+        "id": "generic_hp_rare",
+        "name": "Vitality Boost II",
+        "rarity": "rare",
+        "tags": [
+            "health",
+            "generic"
+        ],
+        "iconFrameKey": [
+            "HP_UP"
+        ],
+        "description": "Increases max health by 10%.",
+        "effects": [
+            {
+                "stat": "maxHealth",
+                "type": "percent",
+                "value": 0.1
+            }
+        ]
+    },
+    {
+        "id": "generic_rushed_prod",
+        "name": "Rapid Mobilization Tax",
+        "rarity": "rare",
+        "tags": [
+            "cost",
+            "spawnTime",
+            "generic"
+        ],
+        "iconFrameKey": [
+            "SPAWN_DOWN",
+            "COST_UP"
+        ],
+        "description": "Reduces spawn time by 30%, but increases unit cost by 5.",
+        "effects": [
+            {
+                "stat": "spawnTime",
+                "type": "percent",
+                "value": -0.3
+            },
+            {
+                "stat": "cost",
+                "type": "flat",
+                "value": 1
+            }
+        ]
+    },
+    {
+        "id": "generic_speed_common",
+        "name": "Marching Orders I",
+        "rarity": "common",
+        "tags": [
+            "speed",
+            "generic"
+        ],
+        "iconFrameKey": [
+            "SPEED_UP"
+        ],
+        "description": "All unit speed +5%.",
+        "effects": [
+            {
+                "stat": "speed",
+                "type": "percent",
+                "value": 0.05
+            }
+        ]
+    },
+    {
+        "id": "generic_speed_epic",
+        "name": "Marching Orders III",
+        "rarity": "epic",
+        "tags": [
+            "speed",
+            "generic"
+        ],
+        "iconFrameKey": [
+            "SPEED_UP"
+        ],
+        "description": "All unit speed +15%.",
+        "effects": [
+            {
+                "stat": "speed",
+                "type": "percent",
+                "value": 0.15
+            }
+        ]
+    },
+    {
+        "id": "generic_speed_rare",
+        "name": "Marching Orders II",
+        "rarity": "rare",
+        "tags": [
+            "speed",
+            "generic"
+        ],
+        "iconFrameKey": [
+            "SPEED_UP"
+        ],
+        "description": "All unit speed +10%.",
+        "effects": [
+            {
+                "stat": "speed",
+                "type": "percent",
+                "value": 0.1
+            }
+        ]
+    },
+    {
+        "id": "gorgon_dmg_hp_common",
+        "name": "Shrieking Rage I",
+        "rarity": "common",
+        "tags": [
+            "gorgon",
+            "damage",
+            "health"
+        ],
+        "iconFrameKey": [
+            "DMG_HP_UP"
+        ],
+        "description": "Gorgon damage +15%, Health +5%.",
+        "effects": [
+            {
+                "stat": "damage",
+                "type": "percent",
+                "value": 0.15
+            },
+            {
+                "stat": "maxHealth",
+                "type": "percent",
+                "value": 0.05
+            }
+        ]
+    },
+    {
+        "id": "gorgon_dmg_hp_epic",
+        "name": "Shrieking Rage III",
+        "rarity": "epic",
+        "tags": [
+            "gorgon",
+            "damage",
+            "health"
+        ],
+        "iconFrameKey": [
+            "DMG_HP_UP"
+        ],
+        "description": "Gorgon damage +45%, Health +15%.",
+        "effects": [
+            {
+                "stat": "damage",
+                "type": "percent",
+                "value": 0.45
+            },
+            {
+                "stat": "maxHealth",
+                "type": "percent",
+                "value": 0.15
+            }
+        ]
+    },
+    {
+        "id": "gorgon_dmg_hp_rare",
+        "name": "Shrieking Rage II",
+        "rarity": "rare",
+        "tags": [
+            "gorgon",
+            "damage",
+            "health"
+        ],
+        "iconFrameKey": [
+            "DMG_HP_UP"
+        ],
+        "description": "Gorgon damage +30%, Health +10%.",
+        "effects": [
+            {
+                "stat": "damage",
+                "type": "percent",
+                "value": 0.3
+            },
+            {
+                "stat": "maxHealth",
+                "type": "percent",
+                "value": 0.1
+            }
+        ]
+    },
+    {
+        "id": "gorgon_special",
+        "name": "Petrifying Gaze",
+        "rarity": "legendary",
+        "tags": [
+            "gorgon",
+            "specialEnabled"
+        ],
+        "iconFrameKey": [
+            "SPECIAL_POWER"
+        ],
+        "description": "On melee contact, turns enemy temporary to sandstone, stopping them from action and increasing damage taken.",
+        "effects": [
+            {
+                "stat": "specialEnabled",
+                "type": "true",
+                "value": -1
+            }
+        ]
+    },
+    {
+        "id": "melee_as_percent_common",
+        "name": "Furious Tempo I",
+        "rarity": "common",
+        "tags": [
+            "melee",
+            "actionSpeed"
+        ],
+        "iconFrameKey": [
+            "ACTION_SPEED_UP"
+        ],
+        "description": "Increases attack speed by 5%.",
+        "effects": [
+            {
+                "stat": "actionSpeed",
+                "type": "percent",
+                "value": -0.05
+            }
+        ]
+    },
+    {
+        "id": "melee_as_percent_epic",
+        "name": "Furious Tempo III",
+        "rarity": "epic",
+        "tags": [
+            "melee",
+            "actionSpeed"
+        ],
+        "iconFrameKey": [
+            "ACTION_SPEED_UP"
+        ],
+        "description": "Increases attack speed by 15%.",
+        "effects": [
+            {
+                "stat": "actionSpeed",
+                "type": "percent",
+                "value": -0.15
+            }
+        ]
+    },
+    {
+        "id": "melee_as_percent_rare",
+        "name": "Furious Tempo II",
+        "rarity": "rare",
+        "tags": [
+            "melee",
+            "actionSpeed"
+        ],
+        "iconFrameKey": [
+            "ACTION_SPEED_UP"
+        ],
+        "description": "Increases attack speed by 10%.",
+        "effects": [
+            {
+                "stat": "actionSpeed",
+                "type": "percent",
+                "value": -0.1
+            }
+        ]
+    },
+    {
+        "id": "melee_speed_armor_common",
+        "name": "Trench Boots I",
+        "rarity": "common",
+        "tags": [
+            "melee",
+            "speed",
+            "armor"
+        ],
+        "iconFrameKey": [
+            "ARMOR_SPEED_UP"
+        ],
+        "description": "Melee speed +5%, Armor +0.5.",
+        "effects": [
+            {
+                "stat": "speed",
+                "type": "percent",
+                "value": 0.05
+            },
+            {
+                "stat": "armor",
+                "type": "flat",
+                "value": 0.5
+            }
+        ]
+    },
+    {
+        "id": "melee_speed_armor_epic",
+        "name": "Trench Boots III",
+        "rarity": "epic",
+        "tags": [
+            "melee",
+            "speed",
+            "armor"
+        ],
+        "iconFrameKey": [
+            "ARMOR_SPEED_UP"
+        ],
+        "description": "Melee speed +15%, Armor +1.5.",
+        "effects": [
+            {
+                "stat": "speed",
+                "type": "percent",
+                "value": 0.15
+            },
+            {
+                "stat": "armor",
+                "type": "flat",
+                "value": 1.5
+            }
+        ]
+    },
+    {
+        "id": "melee_speed_armor_rare",
+        "name": "Trench Boots II",
+        "rarity": "rare",
+        "tags": [
+            "melee",
+            "speed",
+            "armor"
+        ],
+        "iconFrameKey": [
+            "ARMOR_SPEED_UP"
+        ],
+        "description": "Melee speed +10%, Armor +1.",
+        "effects": [
+            {
+                "stat": "speed",
+                "type": "percent",
+                "value": 0.1
+            },
+            {
+                "stat": "armor",
+                "type": "flat",
+                "value": 1
+            }
+        ]
+    },
+    {
+        "id": "ranged_as_range_common",
+        "name": "Snipers' Focus I",
+        "rarity": "common",
+        "tags": [
+            "ranged",
+            "actionSpeed",
+            "range"
+        ],
+        "iconFrameKey": [
+            "ACTION_SPEED_UP",
+            "RANGE_UP"
+        ],
+        "description": "Ranged attack speed +3%, Range +5.",
+        "effects": [
+            {
+                "stat": "actionSpeed",
+                "type": "percent",
+                "value": -0.03
+            },
+            {
+                "stat": "specialRange",
+                "type": "flat",
+                "value": 5
+            }
+        ]
+    },
+    {
+        "id": "ranged_as_range_epic",
+        "name": "Snipers' Focus III",
+        "rarity": "epic",
+        "tags": [
+            "ranged",
+            "actionSpeed",
+            "range"
+        ],
+        "iconFrameKey": [
+            "ACTION_SPEED_UP",
+            "RANGE_UP"
+        ],
+        "description": "Ranged attack speed +9%, Range +15.",
+        "effects": [
+            {
+                "stat": "actionSpeed",
+                "type": "percent",
+                "value": -0.09
+            },
+            {
+                "stat": "specialRange",
+                "type": "flat",
+                "value": 15
+            }
+        ]
+    },
+    {
+        "id": "ranged_as_range_rare",
+        "name": "Snipers' Focus II",
+        "rarity": "rare",
+        "tags": [
+            "ranged",
+            "actionSpeed",
+            "range"
+        ],
+        "iconFrameKey": [
+            "ACTION_SPEED_UP",
+            "RANGE_UP"
+        ],
+        "description": "Ranged attack speed +6%, Range +10.",
+        "effects": [
+            {
+                "stat": "actionSpeed",
+                "type": "percent",
+                "value": -0.06
+            },
+            {
+                "stat": "specialRange",
+                "type": "flat",
+                "value": 10
+            }
+        ]
+    },
+    {
+        "id": "ranged_dmg_percent_common",
+        "name": "Precise Hit I",
+        "rarity": "common",
+        "tags": [
+            "range",
+            "damage"
+        ],
+        "iconFrameKey": [
+            "DMG_UP"
+        ],
+        "description": "Increases damage by 10%.",
+        "effects": [
+            {
+                "stat": "damage",
+                "type": "percent",
+                "value": 0.1
+            }
+        ]
+    },
+    {
+        "id": "ranged_dmg_percent_epic",
+        "name": "Precise Hit III",
+        "rarity": "epic",
+        "tags": [
+            "range",
+            "damage"
+        ],
+        "iconFrameKey": [
+            "DMG_UP"
+        ],
+        "description": "Increases damage by 30%.",
+        "effects": [
+            {
+                "stat": "damage",
+                "type": "percent",
+                "value": 0.3
+            }
+        ]
+    },
+    {
+        "id": "ranged_dmg_percent_rare",
+        "name": "Precise Hit II",
+        "rarity": "rare",
+        "tags": [
+            "range",
+            "damage"
+        ],
+        "iconFrameKey": [
+            "DMG_UP"
+        ],
+        "description": "Increases damage by 20%.",
+        "effects": [
+            {
+                "stat": "damage",
+                "type": "percent",
+                "value": 0.2
+            }
+        ]
+    },
+    {
+        "id": "ranged_pv_common",
+        "name": "Quick Release I",
+        "rarity": "common",
+        "tags": [
+            "ranged",
+            "projectileVelocity"
+        ],
+        "iconFrameKey": [
+            "PROJECTILE_SPEED_UP"
+        ],
+        "description": "Increase projectile speed by 20%.",
+        "effects": [
+            {
+                "stat": "projectileVelocity",
+                "type": "percent",
+                "value": 0.2
+            }
+        ]
+    },
+    {
+        "id": "ranged_pv_epic",
+        "name": "Quick Release III",
+        "rarity": "epic",
+        "tags": [
+            "ranged",
+            "projectileVelocity"
+        ],
+        "iconFrameKey": [
+            "PROJECTILE_SPEED_UP"
+        ],
+        "description": "Increase projectile speed by 60%.",
+        "effects": [
+            {
+                "stat": "projectileVelocity",
+                "type": "percent",
+                "value": 0.6
+            }
+        ]
+    },
+    {
+        "id": "ranged_pv_rare",
+        "name": "Quick Release II",
+        "rarity": "rare",
+        "tags": [
+            "ranged",
+            "projectileVelocity"
+        ],
+        "iconFrameKey": [
+            "PROJECTILE_SPEED_UP"
+        ],
+        "description": "Increase projectile speed by 40%.",
+        "effects": [
+            {
+                "stat": "projectileVelocity",
+                "type": "percent",
+                "value": 0.4
+            }
+        ]
+    },
+    {
+        "id": "ranged_range_common",
+        "name": "Range Extender I",
+        "rarity": "common",
+        "tags": [
+            "ranged",
+            "range"
+        ],
+        "iconFrameKey": [
+            "RANGE_UP"
+        ],
+        "description": "Ranged attack range +10.",
+        "effects": [
+            {
+                "stat": "specialRange",
+                "type": "flat",
+                "value": 10
+            }
+        ]
+    },
+    {
+        "id": "ranged_range_epic",
+        "name": "Range Extender III",
+        "rarity": "epic",
+        "tags": [
+            "ranged",
+            "range"
+        ],
+        "iconFrameKey": [
+            "RANGE_UP"
+        ],
+        "description": "Ranged attack range +30.",
+        "effects": [
+            {
+                "stat": "specialRange",
+                "type": "flat",
+                "value": 30
+            }
+        ]
+    },
+    {
+        "id": "ranged_range_rare",
+        "name": "Range Extender II",
+        "rarity": "rare",
+        "tags": [
+            "ranged",
+            "range"
+        ],
+        "iconFrameKey": [
+            "RANGE_UP"
+        ],
+        "description": "Ranged attack range +20.",
+        "effects": [
+            {
+                "stat": "specialRange",
+                "type": "flat",
+                "value": 20
+            }
+        ]
+    },
+    {
+        "id": "support_as_common",
+        "name": "Support Efficiency I",
+        "rarity": "common",
+        "tags": [
+            "support",
+            "actionSpeed"
+        ],
+        "iconFrameKey": [
+            "ACTION_SPEED_UP"
+        ],
+        "description": "Support attack speed +5%.",
+        "effects": [
+            {
+                "stat": "actionSpeed",
+                "type": "percent",
+                "value": -0.05
+            }
+        ]
+    },
+    {
+        "id": "support_as_epic",
+        "name": "Support Efficiency III",
+        "rarity": "epic",
+        "tags": [
+            "support",
+            "actionSpeed"
+        ],
+        "iconFrameKey": [
+            "ACTION_SPEED_UP"
+        ],
+        "description": "Support attack speed +15%.",
+        "effects": [
+            {
+                "stat": "actionSpeed",
+                "type": "percent",
+                "value": -0.15
+            }
+        ]
+    },
+    {
+        "id": "support_as_rare",
+        "name": "Support Efficiency II",
+        "rarity": "rare",
+        "tags": [
+            "support",
+            "actionSpeed"
+        ],
+        "iconFrameKey": [
+            "ACTION_SPEED_UP"
+        ],
+        "description": "Support attack speed +10%.",
+        "effects": [
+            {
+                "stat": "actionSpeed",
+                "type": "percent",
+                "value": -0.1
+            }
+        ]
+    },
+    {
+        "id": "support_cost_common",
+        "name": "Streamlined Training I",
+        "rarity": "common",
+        "tags": [
+            "support",
+            "cost"
+        ],
+        "iconFrameKey": [
+            "COST_DOWN"
+        ],
+        "description": "Support unit cost -1.",
+        "effects": [
+            {
+                "stat": "cost",
+                "type": "flat",
+                "value": -1
+            }
+        ]
+    },
+    {
+        "id": "support_cost_epic",
+        "name": "Streamlined Training III",
+        "rarity": "epic",
+        "tags": [
+            "support",
+            "cost"
+        ],
+        "iconFrameKey": [
+            "COST_DOWN"
+        ],
+        "description": "Support unit cost -3.",
+        "effects": [
+            {
+                "stat": "cost",
+                "type": "flat",
+                "value": -3
+            }
+        ]
+    },
+    {
+        "id": "support_cost_rare",
+        "name": "Streamlined Training II",
+        "rarity": "rare",
+        "tags": [
+            "support",
+            "cost"
+        ],
+        "iconFrameKey": [
+            "COST_DOWN"
+        ],
+        "description": "Support unit cost -2.",
+        "effects": [
+            {
+                "stat": "cost",
+                "type": "flat",
+                "value": -2
+            }
+        ]
+    },
+    {
+        "id": "support_speed_hp_common",
+        "name": "Field Medic Gear I",
+        "rarity": "common",
+        "tags": [
+            "support",
+            "speed",
+            "health"
+        ],
+        "iconFrameKey": [
+            "SPEED_UP",
+            "HP_UP"
+        ],
+        "description": "Support speed +10%, Health +5%.",
+        "effects": [
+            {
+                "stat": "speed",
+                "type": "percent",
+                "value": 0.1
+            },
+            {
+                "stat": "maxHealth",
+                "type": "percent",
+                "value": 0.05
+            }
+        ]
+    },
+    {
+        "id": "support_speed_hp_epic",
+        "name": "Field Medic Gear III",
+        "rarity": "epic",
+        "tags": [
+            "support",
+            "speed",
+            "health"
+        ],
+        "iconFrameKey": [
+            "SPEED_UP",
+            "HP_UP"
+        ],
+        "description": "Support speed +30%, Health +15%.",
+        "effects": [
+            {
+                "stat": "speed",
+                "type": "percent",
+                "value": 0.3
+            },
+            {
+                "stat": "maxHealth",
+                "type": "percent",
+                "value": 0.15
+            }
+        ]
+    },
+    {
+        "id": "support_speed_hp_rare",
+        "name": "Field Medic Gear II",
+        "rarity": "rare",
+        "tags": [
+            "support",
+            "speed",
+            "health"
+        ],
+        "iconFrameKey": [
+            "SPEED_UP",
+            "HP_UP"
+        ],
+        "description": "Support speed +20%, Health +10%.",
+        "effects": [
+            {
+                "stat": "speed",
+                "type": "percent",
+                "value": 0.2
+            },
+            {
+                "stat": "maxHealth",
+                "type": "percent",
+                "value": 0.1
+            }
+        ]
+    },
+    {
+        "id": "warrior_ARMOR_flat_common",
+        "name": "Plating Reinforcement I",
+        "rarity": "common",
+        "tags": [
+            "warrior",
+            "armor"
+        ],
+        "iconFrameKey": [
+            "ARMOR_UP"
+        ],
+        "description": "Warrior armor +5.",
+        "effects": [
+            {
+                "stat": "armor",
+                "type": "flat",
+                "value": 5
+            }
+        ]
+    },
+    {
+        "id": "warrior_ARMOR_flat_epic",
+        "name": "Plating Reinforcement III",
+        "rarity": "epic",
+        "tags": [
+            "warrior",
+            "armor"
+        ],
+        "iconFrameKey": [
+            "ARMOR_UP"
+        ],
+        "description": "Warrior armor +15.",
+        "effects": [
+            {
+                "stat": "armor",
+                "type": "flat",
+                "value": 15
+            }
+        ]
+    },
+    {
+        "id": "warrior_ARMOR_flat_rare",
+        "name": "Plating Reinforcement II",
+        "rarity": "rare",
+        "tags": [
+            "warrior",
+            "armor"
+        ],
+        "iconFrameKey": [
+            "ARMOR_UP"
+        ],
+        "description": "Warrior armor +10.",
+        "effects": [
+            {
+                "stat": "armor",
+                "type": "flat",
+                "value": 10
+            }
+        ]
+    },
+    {
+        "id": "warrior_heavy_blow",
+        "name": "Reorientation",
+        "rarity": "epic",
+        "tags": [
+            "warrior",
+            "damage",
+            "armor"
+        ],
+        "iconFrameKey": [
+            "DMG_UP",
+            "ARMOR_DOWN"
+        ],
+        "description": "Warrior damage +50, but reduces armor by 100",
+        "effects": [
+            {
+                "stat": "damage",
+                "type": "percent",
+                "value": 0.75
+            },
+            {
+                "stat": "armor",
+                "type": "flat",
+                "value": -3
+            }
+        ]
+    },
+    {
+        "id": "warrior_hp_percent_common",
+        "name": "Shield Training I",
+        "rarity": "common",
+        "tags": [
+            "warrior",
+            "health"
+        ],
+        "iconFrameKey": [
+            "HP_UP"
+        ],
+        "description": "Warrior max health +7%.",
+        "effects": [
+            {
+                "stat": "maxHealth",
+                "type": "percent",
+                "value": 0.07
+            }
+        ]
+    },
+    {
+        "id": "warrior_hp_percent_epic",
+        "name": "Shield Training III",
+        "rarity": "epic",
+        "tags": [
+            "warrior",
+            "health"
+        ],
+        "iconFrameKey": [
+            "HP_UP"
+        ],
+        "description": "Warrior max health +21%.",
+        "effects": [
+            {
+                "stat": "maxHealth",
+                "type": "percent",
+                "value": 0.21
+            }
+        ]
+    },
+    {
+        "id": "warrior_hp_percent_rare",
+        "name": "Shield Training II",
+        "rarity": "rare",
+        "tags": [
+            "warrior",
+            "health"
+        ],
+        "iconFrameKey": [
+            "HP_UP"
+        ],
+        "description": "Warrior max health +14%.",
+        "effects": [
+            {
+                "stat": "maxHealth",
+                "type": "percent",
+                "value": 0.14
+            }
+        ]
+    },
+    {
+        "id": "warrior_spawn_common",
+        "name": "Rapid Deployment I",
+        "rarity": "common",
+        "tags": [
+            "warrior",
+            "spawnTime"
+        ],
+        "iconFrameKey": [
+            "SPAWN_DOWN"
+        ],
+        "description": "Warrior spawn time -100ms.",
+        "effects": [
+            {
+                "stat": "spawnTime",
+                "type": "flat",
+                "value": -100
+            }
+        ]
+    },
+    {
+        "id": "warrior_spawn_epic",
+        "name": "Rapid Deployment III",
+        "rarity": "epic",
+        "tags": [
+            "warrior",
+            "spawnTime"
+        ],
+        "iconFrameKey": [
+            "SPAWN_DOWN"
+        ],
+        "description": "Warrior spawn time -300ms.",
+        "effects": [
+            {
+                "stat": "spawnTime",
+                "type": "flat",
+                "value": -300
+            }
+        ]
+    },
+    {
+        "id": "warrior_spawn_rare",
+        "name": "Rapid Deployment II",
+        "rarity": "rare",
+        "tags": [
+            "warrior",
+            "spawnTime"
+        ],
+        "iconFrameKey": [
+            "SPAWN_DOWN"
+        ],
+        "description": "Warrior spawn time -200ms.",
+        "effects": [
+            {
+                "stat": "spawnTime",
+                "type": "flat",
+                "value": -200
+            }
+        ]
+    },
+    {
+        "id": "wizard_slow_cast",
+        "name": "Arcane Resonance",
+        "rarity": "epic",
+        "tags": [
+            "wizard",
+            "range",
+            "actionSpeed"
+        ],
+        "iconFrameKey": [
+            "RANGE_UP",
+            "ACTION_SPEED_DOWN"
+        ],
+        "description": "Wizard range +50, but slower attacks by 30%",
+        "effects": [
+            {
+                "stat": "specialRange",
+                "type": "flat",
+                "value": 50
+            },
+            {
+                "stat": "actionSpeed",
+                "type": "percent",
+                "value": 0.3
+            }
+        ]
+    },
+    {
+        "id": "wizard_special",
+        "name": "Speed Aura",
+        "rarity": "legendary",
+        "tags": [
+            "wizard",
+            "specialEnabled"
+        ],
+        "iconFrameKey": [
+            "SPECIAL_POWER"
+        ],
+        "description": "Instead of attacking, focuses to increase attack and move speed of units around it.",
+        "effects": [
+            {
+                "stat": "specialEnabled",
+                "type": "true",
+                "value": -1
+            }
+        ]
+    }
 ]

@@ -24,7 +24,8 @@ export interface UnitUpgrade {
     id: string; // Unique ID
     name: string; // Displayed name
     description: string; // Displayed description
-    rarity: string; // String for now, later any defined rarity
+    rarity: 'common' | 'rare' | 'epic' | 'legendary'; // Rarity of this upgrade
+    iconFrameKey: IconKey[]; // Frame name of the icon used for this upgrade
     tags: string[]; // Array of tags defining this upgrade (and what units it works on for example)
     effects: Effect[]; // Array of stat changes applied by this upgrade
 }

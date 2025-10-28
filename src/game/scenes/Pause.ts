@@ -2,8 +2,7 @@ import { Scene } from 'phaser';
 import { Player } from '../Player';
 import { UIComponent } from '../components/UIComponent';
 import eventsCenter from '../EventsCenter';
-import { UnitUpgrade } from '../helpers/UnitUpgrade';
-import { UpgradeManager } from '../helpers/UpgradeManager';
+import { UnitUpgrade, UpgradeManager } from '../helpers/UpgradeManager';
 
 export class Pause extends Scene {
     player: Player;
@@ -24,6 +23,22 @@ export class Pause extends Scene {
         this.upgradeManager = UpgradeManager.getInstance();
     }
 
+    private determineRarity(){
+        const playerLevel = this.player.getLevel();
+        // Return common if player level is 1-5
+        if(playerLevel <= 5) return 'common';
+        // Return common 90% of the time and rare 10% of the time if player level is 6-10
+        else if(playerLevel < 10) return Math.random() < 0.9 ? 'common' : 'rare';
+        // If player is exactly level 10, return legendary
+        else if(playerLevel === 10) return 'legendary';
+        // Return common 75% of the time, rare 15% of the time and epic 10% of the time if player level is 11-15
+        else if(playerLevel <= 15)return Math.random() < 0.75 ? 'common' : Math.random() < 0.9 ? 'rare' : 'epic';
+        // Return common 60% of the time, rare 30% of the time and epic 10% of the time if player level is 15-20
+        else if(playerLevel <= 20)return Math.random() < 0.6 ? 'common' : Math.random() < 0.3 ? 'rare' : 'epic';
+        // Above level 20, return common 55% of the time, rare 30% of the time, epic 10% of the time and legendary 5% of the time
+        else return Math.random() < 0.55 ? 'common' : Math.random() < 0.3 ? 'rare' : Math.random() < 0.1 ? 'epic' : 'legendary';
+    }
+
     public showLevelUp() : void {
         // Create level up UI
         const container = this.add.container(this.cameras.main.width/2, this.cameras.main.height/2);
@@ -34,7 +49,8 @@ export class Pause extends Scene {
 
         /* Will run for each selected unit (1-3) to display random upgrade for it */
         this.player.selectedUnits.forEach((selectedUnit, unitType) => {
-            const upgrade : UnitUpgrade = this.getRandomUpgrade(selectedUnit.unitConfig.tags);
+            const rarity = this.determineRarity();
+            const upgrade : UnitUpgrade = this.getRandomUpgrade(selectedUnit.unitConfig.tags, rarity);
             if(upgrade === undefined) return;
             const upgradeUIElement = new UIComponent(this, currentPosX+UIElementWidth/2, 0, UIElementWidth, UIElementHeight, 1);
             upgradeUIElement.setSize(UIElementWidth, UIElementHeight);
@@ -140,10 +156,33 @@ export class Pause extends Scene {
         this.scene.stop('Pause');
     }
 
-    private getRandomUpgrade(tags: string[]) : UnitUpgrade {
+    private getRandomUpgrade(tags: string[], filterByRarity?: 'common' | 'rare' | 'epic' | 'legendary') : UnitUpgrade {
         const upgradesByTags = this.upgradeManager.getUnitUpgradesByTags(tags);
-        const randomUpgradeIndex = Math.floor(Math.random() * upgradesByTags.length);
-        const randomUpgrade = upgradesByTags[randomUpgradeIndex];
+        let arrayToCheck : UnitUpgrade[] = upgradesByTags;
+        if (filterByRarity) {
+            let rarityFilteredUpgrades : UnitUpgrade[] = [];
+            while (rarityFilteredUpgrades.length === 0) {
+                rarityFilteredUpgrades = upgradesByTags.filter(upgrade => upgrade.rarity === filterByRarity);
+                // downgrade rarity
+                switch (filterByRarity) {
+                    case 'legendary':
+                        filterByRarity = 'epic';
+                        break;
+                    case 'epic':
+                        filterByRarity = 'rare';
+                        break;
+                    case 'rare':
+                        filterByRarity = 'common';
+                        break;
+                    default:
+                        if(rarityFilteredUpgrades.length === 0) throw new Error('No upgrades with rarity ' + filterByRarity);
+                        break;
+                }
+            }
+            arrayToCheck = rarityFilteredUpgrades;
+        }
+        const randomUpgradeIndex = Math.floor(Math.random() * arrayToCheck.length);
+        const randomUpgrade = arrayToCheck[randomUpgradeIndex];
         return randomUpgrade;
     }
 

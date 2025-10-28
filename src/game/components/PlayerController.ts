@@ -6,7 +6,6 @@ import { UnitConfigLoader } from "../helpers/UnitConfigLoader";
 import { ResourceComponent } from "./ResourceComponent";
 import eventsCenter from '../EventsCenter';
 import { UnitProps } from "../helpers/UnitProps";
-import { UnitUpgrade } from "../helpers/UnitUpgrade";
 import { TotalEffect, UpgradeManager } from "../helpers/UpgradeManager";
 
 export class PlayerController {   
@@ -55,11 +54,7 @@ export class PlayerController {
     }
 
     destroy() {
-        this.ownUnitsPhysics.getChildren().forEach(unit => {
-            if(unit instanceof Unit) {
-                unit.die();
-            }
-        });
+
     }
 
     public addUnitToQueue(unitType: string) {

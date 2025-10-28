@@ -15,7 +15,6 @@ import { FireWorm } from '../units/FireWorm';
 import { Fireball } from '../projectiles/Fireball';
 import { AIPlayer } from '../AIPlayer';
 import { Gorgon } from '../units/Gorgon';
-import { UnitUpgrade } from '../helpers/UnitUpgrade';
 import { FireArrow } from '../projectiles/FireArrow';
 import { PurpleBall } from '../projectiles/PurpleBall';
 import { Wizard } from '../units/Wizard';
@@ -97,7 +96,7 @@ export class Game extends Scene
             this.redProjectiles, this.objectPool, this.baseGroup, this.redConfigLoader, this.registry.get('playerUnits'));
         this.playerRed!.changePassiveIncome(1, true); // Passive income
         this.playerRed!.addMoney(100); // Initial money
-        this.playerRed!.setNextLevelXP(10); // First lvl XP needed
+        this.playerRed!.setNextLevelXP(1); // First lvl XP needed
         this.applyPermaUpgrades();
 
         // Create and setup AI player
