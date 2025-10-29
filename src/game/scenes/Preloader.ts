@@ -83,6 +83,10 @@ export class Preloader extends Scene
         this.load.image('archer_static', 'archer/static.png');
         this.load.spritesheet('wizard', 'wizard/sprite_sheet.png',{frameWidth: 231, frameHeight: 190});
         this.load.image('wizard_static', 'wizard/static.png');
+        this.load.spritesheet('minotaur', 'minotaur/sprite_sheet.png',{frameWidth: 128, frameHeight: 128});
+        this.load.image('minotaur_static', 'minotaur/static.png');
+        this.load.spritesheet('kitsune', 'kitsune/sprite_sheet.png',{frameWidth: 128, frameHeight: 128});
+        this.load.image('kitsune_static', 'kitsune/static.png');
         this.load.spritesheet('fireWorm', 'fireWorm/sprite_sheet.png',{frameWidth: 90, frameHeight: 90});
         this.load.image('fireWorm_static', 'fireWorm/static.png');
         this.load.spritesheet('gorgon', 'gorgon/sprite_sheet.png',{frameWidth: 128, frameHeight: 128});

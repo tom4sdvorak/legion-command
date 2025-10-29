@@ -2,7 +2,6 @@ import { PlayerController } from "./components/PlayerController";
 import eventsCenter from "./EventsCenter";
 import { ObjectPool } from "./helpers/ObjectPool";
 import { UnitConfigLoader } from "./helpers/UnitConfigLoader";
-import { UnitUpgrade } from "./helpers/UnitUpgrade";
 import { PlayerBase } from "./PlayerBase";
 
 

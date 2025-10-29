@@ -243,6 +243,14 @@ export class PlayerController {
                 pool = this.objectPool.units.gorgons;
                 projectilePool = null;
                 break;
+            case 'minotaur':
+                pool = this.objectPool.units.minotaurs;
+                projectilePool = this.objectPool.projectiles.purpleBalls;
+                break;
+            case 'kitsune':
+                pool = this.objectPool.units.kitsunes;
+                projectilePool = this.objectPool.projectiles.purpleBalls;
+                break;
             default:
                 throw new Error(`Unknown unit type: ${unitType}`);
         }

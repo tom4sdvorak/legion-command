@@ -5,6 +5,8 @@ export type ObjectPool = {
         archers: Phaser.Physics.Arcade.Group;
         warriors: Phaser.Physics.Arcade.Group;
         wizards: Phaser.Physics.Arcade.Group;
+        minotaurs: Phaser.Physics.Arcade.Group;
+        kitsunes: Phaser.Physics.Arcade.Group;
         fireWorms: Phaser.Physics.Arcade.Group;
         gorgons: Phaser.Physics.Arcade.Group;
     },

@@ -19,6 +19,8 @@ import { FireArrow } from '../projectiles/FireArrow';
 import { PurpleBall } from '../projectiles/PurpleBall';
 import { Wizard } from '../units/Wizard';
 import { TotalEffect, UpgradeManager } from '../helpers/UpgradeManager';
+import { Minotaur } from '../units/Minotaur';
+import { Kitsune } from '../units/Kitsune';
 
 export class Game extends Scene
 {
@@ -216,6 +218,16 @@ export class Game extends Scene
                 }),
                 wizards: this.physics.add.group({
                     classType: Wizard,
+                    maxSize: 50,
+                    runChildUpdate: false
+                }),
+                minotaurs: this.physics.add.group({
+                    classType: Minotaur,
+                    maxSize: 50,
+                    runChildUpdate: false
+                }),
+                kitsunes: this.physics.add.group({
+                    classType: Kitsune,
                     maxSize: 50,
                     runChildUpdate: false
                 }),

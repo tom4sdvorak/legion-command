@@ -186,7 +186,7 @@ export class RangedUnit extends Unit {
     
 
 
-    private fireProjectile(target: Unit | PlayerBase): void {
+    fireProjectile(target: Unit | PlayerBase): void {
         // Calculate Y position of sprite from which projectile should originate
         let yPos = this.y+this.unitProps.projectileOffsetY*this.unitProps.scale;
         let xPos = this.x+this.unitProps.bodyWidth/2;

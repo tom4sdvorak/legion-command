@@ -18,7 +18,7 @@ export class Boot extends Scene
     create ()
     {
         // Save list of all unit types
-        this.registry.set('allUnits', ['warrior', 'archer', 'wizard', 'fireWorm', 'gorgon']);
+        this.registry.set('allUnits', ['warrior', 'archer', 'wizard', 'minotaur', 'kitsune', 'fireWorm', 'gorgon']);
         this.scene.start('Preloader');
     }
 }

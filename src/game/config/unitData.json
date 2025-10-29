@@ -93,6 +93,16 @@
       "cost": 30,
       "bodyWidth": 96,
       "tags": ["gorgon", "disruptor"]
+    },
+
+    "minotaur": {
+      "extends": "meleeUnit",
+      "tags": ["minotaur", "dps"]
+    },
+
+    "kitsune": {
+      "extends": "rangedUnit",
+      "tags": ["kitsune", "debuffer"]
     }
   }
 }

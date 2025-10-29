@@ -47,6 +47,45 @@
       "repeat": 0
     }
   },
+  "minotaur": {
+    "idle": {
+      "key": "minotaur_idle",
+      "frames": {
+        "start": 0,
+        "count": 10
+      },
+      "frameRate": 10,
+      "repeat": -1,
+      "yoyo": true
+    },
+    "run": {
+      "key": "minotaur_run",
+      "frames": {
+        "start": 12,
+        "count": 12
+      },
+      "frameRate": 10,
+      "repeat": -1
+    },
+    "attack": {
+      "key": "minotaur_attack",
+      "frames": {
+        "start": 24,
+        "count": 5
+      },
+      "frameRate": 10,
+      "repeat": -1
+    },
+    "death": {
+      "key": "minotaur_death",
+      "frames": {
+        "start": 36,
+        "count": 5
+      },
+      "frameRate": 10,
+      "repeat": 0
+    }
+  },
   "archer": {
     "idle": {
       "key": "archer_idle",
@@ -231,6 +270,63 @@
       "frames": {
         "start": 95,
         "count": 19
+      },
+      "frameRate": 20,
+      "repeat": 0
+    }
+  },
+  "kitsune": {
+    "idle": {
+      "key": "kitsune_idle",
+      "frames": {
+        "start": 0,
+        "count": 8
+      },
+      "frameRate": 10,
+      "repeat": -1,
+      "yoyo": false
+    },
+    "run": {
+      "key": "kitsune_run",
+      "frames": {
+        "start": 10,
+        "count": 8
+      },
+      "frameRate": 10,
+      "repeat": -1
+    },
+    "shoot": {
+      "key": "kitsune_shoot",
+      "frames": {
+        "start": 30,
+        "count": 7
+      },
+      "frameRate": 10,
+      "repeat": -1
+    },
+    "attack": {
+      "key": "kitsune_attack",
+      "frames": {
+        "start": 20,
+        "count": 10
+      },
+      "frameRate": 10,
+      "repeat": -1
+    },
+    "death": {
+      "key": "kitsune_death",
+      "frames": {
+        "start": 50,
+        "count": 10
+      },
+      "frameRate": 10,
+      "repeat": 0
+    },
+    "special": {
+      "key": "kitsune_special",
+      "frames": {
+        "start": 40,
+        "count": 10
       },
       "frameRate": 20,
       "repeat": 0
