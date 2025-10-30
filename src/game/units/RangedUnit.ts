@@ -38,8 +38,8 @@ export class RangedUnit extends Unit {
         // Reinitialize proximity zone
         const zoneXOffset = (this.direction === -1) ? this.x-this.unitProps.attackRange-this.width/2 : this.x+this.width/2;
         this.proximityZone.setPosition(zoneXOffset, 0);
-        this.proximityZone.setSize(this.unitProps.attackRange, this.unitProps.bodyHeight);
-        (this.proximityZone.body as Phaser.Physics.Arcade.Body).setSize(this.unitProps.attackRange, this.unitProps.bodyHeight);
+        this.proximityZone.setSize(this.unitProps.attackRange, 128);
+        (this.proximityZone.body as Phaser.Physics.Arcade.Body).setSize(this.unitProps.attackRange, 128);
         this.proximityZone.setActive(true);
         this.proximityZone.setVisible(true);
         (this.proximityZone.body as Phaser.Physics.Arcade.Body).enable = true;

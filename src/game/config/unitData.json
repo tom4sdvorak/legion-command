@@ -1,52 +1,37 @@
 {
   "baseUnit": {
-    "speed": 100,
     "cost": 10,
+    "speed": 100,
     "maxHealth": 100,
     "armor": 0,
     "damage": 10,
     "meleeMultiplier": 1,
     "actionSpeed": 1000,
+    "attackRange": 100,
     "specialRange": 100,
-    "specialCooldown": 10000,
-    "specialEnabled": true,
+    "specialCooldown": -1,
+    "specialEnabled": false,
     "spawnTime": 1000,
     "scale": 1,
     "projectileOffsetY": 0,
-    "bodyWidth": 64,
-    "bodyHeight": 96,
     "projectileVelocity": 500,
+    "bodyWidth": 64,
     "tags": ["generic"]
   },
 
   "unitClasses": {
     "meleeUnit": {
       "extends": "baseUnit",
-      "maxHealth": 200,
-      "meleeMultiplier": 1,
-      "damage": 20,
-      "actionSpeed": 1000,
       "tags": ["melee"]
     },
 
     "rangedUnit": {
       "extends": "baseUnit",
-      "cost": 20,
-      "maxHealth": 80,
-      "meleeMultiplier": 0.2,
-      "damage": 50,
-      "attackRange": 200,
-      "actionSpeed": 1000,
       "tags": ["ranged"]
     },
 
     "supportUnit": {
       "extends": "rangedUnit",
-      "maxHealth": 100,
-      "cost": 30,
-      "meleeMultiplier": 0.5,
-      "damage": 10,
-      "specialRange": 100,
       "tags": ["support"]
     }
   },
@@ -56,7 +41,6 @@
       "extends": "meleeUnit",
       "cost": 10,
       "scale": 0.9,
-      "bodyWidth": 48,
       "tags": ["warrior", "tank"]
     },
 
@@ -72,16 +56,14 @@
       "cost": 30,
       "projectileOffsetY": -62,
       "projectileVelocity": 150,
-      "bodyWidth": 96,
       "scale": 0.8,
-      "tags": ["wizard"]
+      "tags": ["wizard", "buffer"]
     },
 
     "fireWorm": {
       "extends": "rangedUnit",
       "cost": 15,
       "scale": 1.4,
-      "bodyHeight": 80,
       "projectileOffsetY": -19,
       "projectileVelocity": 300,
       "specialCooldown": 999999,
@@ -91,8 +73,8 @@
     "gorgon": {
       "extends": "meleeUnit",
       "cost": 30,
-      "bodyWidth": 96,
-      "tags": ["gorgon", "disruptor"]
+      "scale": 0.9,
+      "tags": ["gorgon", "debuffer", "cc"]
     },
 
     "minotaur": {
@@ -102,6 +84,7 @@
 
     "kitsune": {
       "extends": "rangedUnit",
+      "projectileOffsetY": -45,
       "tags": ["kitsune", "debuffer"]
     }
   }

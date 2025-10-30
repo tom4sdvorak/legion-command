@@ -16,13 +16,9 @@ export class FireWorm extends RangedUnit {
         
         // If suicide attack is enabled
         if(this.unitProps.specialEnabled){
-            // If our current target is Unit, suicide and apply debuff
+            // If our current target is Unit, do special
             if(this.meleeTarget instanceof Unit && this.meleeTarget.active && this.meleeTarget.isAlive()){
-                this.play(`${this.unitType}_death_special`, true);
-                this.specialCooldown = 0;
-                this.meleeTarget.applyDebuff('burn');
-                this.meleeTarget.takeDamage(this.unitProps.damage);
-                super.onKilled(true);
+                this.doSpecial(this.meleeTarget);
             }
             else{
                 super.attackTarget();
@@ -31,5 +27,12 @@ export class FireWorm extends RangedUnit {
         else{
             super.attackTarget();
         }
+    }
+
+    public doSpecial(target: Unit): void {
+        this.play(`${this.unitType}_death_special`, true);
+        target?.applyDebuff('burn');
+        target?.takeDamage(this.unitProps.damage);
+        super.onKilled(true);
     }
 }

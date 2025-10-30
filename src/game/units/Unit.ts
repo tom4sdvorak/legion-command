@@ -22,9 +22,10 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
     actionDisabled: boolean = false;
     burningDebuff : {timer: Phaser.Time.TimerEvent | null, ticks: number, damage: number} | null = null;
     petrifyDebuff : {timer: Phaser.Time.TimerEvent | null, duration: number} | null = null;
-    speedBuffGlow: Phaser.FX.Glow | null = null;
+    buffDebuffGlow: {buffDebuff: string, glow: Phaser.FX.Glow | null} = {buffDebuff: '', glow: null};
     buffList: {buff: string, source: number}[] = [];
     private outlineSprite: Phaser.GameObjects.Sprite | null = null;
+    specialReady: boolean = false;
 
     constructor(scene: Game, unitType: string) {
         super(scene, -500, -500, unitType);
@@ -54,7 +55,8 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         this.colorMatrix.reset();
         this.actionCooldown = 0;
         this.buffList = [];
-        this.specialCooldown = this.unitProps.specialCooldown; // Reset special cooldown so special is available instantly
+        this.specialReady = false;
+        this.specialCooldown = this.unitProps.specialCooldown; // Reset special cooldown so cooldown based special is available instantly
         // Reinitialize the sprite's body
         this.setScale(unitProps.scale);        
         this.setActive(true);
@@ -72,7 +74,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         (this.body as Phaser.Physics.Arcade.Body).pushable = false;
         //console.log("Unit spawned at: " + this.x + " " + this.y);
         if(this.body){
-            this.setBodySize(unitProps.bodyWidth/unitProps.scale, unitProps.bodyHeight/unitProps.scale, true);
+            this.setBodySize(unitProps.bodyWidth/unitProps.scale, 128/unitProps.scale, true);
 
             /* Calculate offset of units body on Y axis by taking the bottom cooridinate of game screen 
             and minus current body location, height of the body, (negative) globatOffsetY defined in game scene
@@ -144,10 +146,11 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         this.burningDebuff = null;
         this.petrifyDebuff?.timer?.remove();
         this.petrifyDebuff = null;
-        if(this.speedBuffGlow !== null) {
-            this.postFX.remove(this.speedBuffGlow);
-            this.speedBuffGlow = null;
+        if(this.buffDebuffGlow.glow !== null) {
+            this.postFX.remove(this.buffDebuffGlow.glow);
+            this.buffDebuffGlow = {buffDebuff: '', glow: null};
         }
+        
 
         if (this.outlineSprite) {
             this.outlineSprite.destroy();
@@ -157,10 +160,9 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         this.setDepth(1);
         if(this.unitGroup) this.unitGroup.remove(this);
         this.anims.timeScale = 1;
-        
+        this.healthComponent.deactivate();
        // (this.body as Phaser.Physics.Arcade.Body).setEnable(false);
         this.scene.time.delayedCall(5000, () => {
-            this.healthComponent.deactivate();
             (this.body as Phaser.Physics.Arcade.Body).reset(-500, -500);
             if(this.unitPool) this.unitPool.killAndHide(this);
             this.unitGroup = null;
@@ -201,20 +203,29 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
                 this.outlineSprite.setFrame(this.anims.currentFrame!.frame.name);
             }
         }
-        // Only bother counting special cooldown up to 100s => Any unit with special of cooldown more than 100s means to use it just once
-        if(this.specialCooldown <= 100000) this.specialCooldown += delta;
+
+        /* Special abilities logic
+        * Count cooldown time if special is both enabled and units' set cooldown is above 0 (-1 means special is not using cooldown) up to 100s
+        * Once accumulating enough for cooldown, set specialReady to true (unless units base cooldown is -1) so unit can trigger special when situation allows
+        */
+        if(this.unitProps.specialEnabled && this.unitProps.specialCooldown > 0 && this.specialCooldown <= 100000) this.specialCooldown += delta;
+        if(this.unitProps.specialCooldown > 0 && this.specialCooldown >= this.unitProps.specialCooldown) this.specialReady = true;
+
         this.healthComponent.update();
         this.handleState();
         
     }
 
-    public takeDamage(damage: number): void {
+    public takeDamage(damage: number, ignoreArmor?: boolean): void {
         this.scene.time.delayedCall(100, () => {
             this.clearTint();
         }, undefined, this);
         this.setTintFill(0xffffff);
-        const damageToTake = Math.round(damage * (1 - this.unitProps.armor / 100.0));
-        this.healthComponent.takeDamage(damageToTake);
+        if(ignoreArmor) this.healthComponent.takeDamage(Math.round(damage));
+        else{
+            const damageToTake = Math.round(damage * (1 - this.unitProps.armor / 100.0));
+            this.healthComponent.takeDamage(damageToTake);
+        }
     }
 
     public applyBuff(buff: string, source: number) : void {
@@ -232,7 +243,9 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
             case 'speed':
                 this.buffList.push({buff: buff, source: source});
                 if(buffExistsAtAll) return; // Skip rest if any instance of the buff exists
-                if(this.speedBuffGlow === null) this.speedBuffGlow = this.postFX.addGlow(0x976EFF, 10, 0, false);
+                if(this.buffDebuffGlow.glow === null){
+                    this.buffDebuffGlow = {buffDebuff: buff, glow: this.postFX.addGlow(0x976EFF, 5, 0, false)};
+                }
                 this.unitProps.speed *= 2;
                 this.unitProps.actionSpeed /= 2;
                 break;
@@ -260,9 +273,9 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
             case 'speed':
                 this.unitProps.speed /= 2;
                 this.unitProps.actionSpeed *= 2;
-                if(this.speedBuffGlow !== null) {
-                    this.postFX.remove(this.speedBuffGlow);
-                    this.speedBuffGlow = null;
+                if(this.buffDebuffGlow.buffDebuff === buff && this.buffDebuffGlow.glow !== null){
+                    this.postFX.remove(this.buffDebuffGlow.glow);
+                    this.buffDebuffGlow = {buffDebuff: '', glow: null};
                 }
                 break;
         }
@@ -342,6 +355,13 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
                     loop: true
                 });
                 break;
+            case 'curse':
+                if(this.buffDebuffGlow.buffDebuff !== 'curse'){
+                    if(this.buffDebuffGlow.glow !== null) this.postFX.remove(this.buffDebuffGlow.glow);
+                    this.buffDebuffGlow = {buffDebuff: 'curse', glow: this.postFX.addGlow(0xF00A0E1, 5, 0, false)};
+                    this.unitProps.damage = Math.round(this.unitProps.damage * 0.25);
+                }
+                break;
             default:
                 throw new Error(`Unknown debuff: ${debuff}`);
         }
@@ -377,14 +397,14 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         }
     }
 
-    public attackTarget(): void {
+    public attackTarget(ignoreArmor?: boolean): void {
         if (!this.active || this.state === UnitStates.DEAD || this.state === UnitStates.WAITING) {
             return;
         }
         this.anims.timeScale = (this.anims?.currentAnim?.duration ?? 1) / (this.unitProps.actionSpeed + 100);
         if(this.meleeTarget instanceof Unit && this.meleeTarget.active && this.meleeTarget.isAlive()){
             let damage = this.unitProps.damage * this.unitProps.meleeMultiplier;
-            this.meleeTarget.takeDamage(damage);
+            this.meleeTarget.takeDamage(damage, ignoreArmor);
         }
         else if(this.meleeTarget instanceof PlayerBase && this.meleeTarget.active){
             this.meleeTarget.takeDamage(this.unitProps.damage);
