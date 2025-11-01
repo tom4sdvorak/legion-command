@@ -102,10 +102,26 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         this.scene.children.add(this.outlineSprite);
 
         // Add mouse/touch interaction
+        let savedGlowConfig = {
+            saved: false,
+            color: 0,
+            outerStrength: 0,
+            innerStrength: 0
+        };
+
         this.on('pointerover', () => {
-            this.postFX.addGlow(0xffff00, 10, 0, false, 1, 1);
+            if(this.buffDebuffGlow.glow !== null){
+                savedGlowConfig.saved = true;
+                savedGlowConfig.color = this.buffDebuffGlow.glow.color;
+                savedGlowConfig.outerStrength = this.buffDebuffGlow.glow.outerStrength;
+                savedGlowConfig.innerStrength = this.buffDebuffGlow.glow.innerStrength;
+                this.postFX.clear();
+                this.postFX.addGlow(0xffff00, 10, 0, false, 1, 1);
+            }
+            
         }).on('pointerout', () => {
             this.postFX.clear();
+            if(savedGlowConfig.saved) this.postFX.addGlow(savedGlowConfig.color, savedGlowConfig.outerStrength, savedGlowConfig.innerStrength);            
         }).on('pointerup', () => {
             console.log("%c ", "color:green", "Clicked unit:");
             console.log(this.state);

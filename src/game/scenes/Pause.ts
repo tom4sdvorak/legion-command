@@ -34,7 +34,9 @@ export class Pause extends Scene {
         // Return common 75% of the time, rare 15% of the time and epic 10% of the time if player level is 11-15
         else if(playerLevel <= 15)return Math.random() < 0.75 ? 'common' : Math.random() < 0.9 ? 'rare' : 'epic';
         // Return common 60% of the time, rare 30% of the time and epic 10% of the time if player level is 15-20
-        else if(playerLevel <= 20)return Math.random() < 0.6 ? 'common' : Math.random() < 0.3 ? 'rare' : 'epic';
+        else if(playerLevel < 20)return Math.random() < 0.6 ? 'common' : Math.random() < 0.3 ? 'rare' : 'epic';
+        // If player is exactly level 20, return legendary
+        else if(playerLevel === 20) return 'legendary';
         // Above level 20, return common 55% of the time, rare 30% of the time, epic 10% of the time and legendary 5% of the time
         else return Math.random() < 0.55 ? 'common' : Math.random() < 0.3 ? 'rare' : Math.random() < 0.1 ? 'epic' : 'legendary';
     }

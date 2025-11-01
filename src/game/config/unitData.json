@@ -1,17 +1,17 @@
 {
   "baseUnit": {
-    "cost": 10,
-    "speed": 100,
-    "maxHealth": 100,
+    "maxHealth": 70,
     "armor": 0,
     "damage": 10,
     "meleeMultiplier": 1,
     "actionSpeed": 1000,
-    "attackRange": 100,
-    "specialRange": 100,
+    "speed": 100,
+    "cost": 10,
+    "spawnTime": 5000,
+    "attackRange": 128,
+    "specialRange": 128,
     "specialCooldown": -1,
     "specialEnabled": false,
-    "spawnTime": 1000,
     "scale": 1,
     "projectileOffsetY": 0,
     "projectileVelocity": 500,
@@ -39,51 +39,82 @@
   "unitTypes": {
     "warrior": {
       "extends": "meleeUnit",
-      "cost": 10,
+      "maxHealth": "2x",
+      "armor": 30,
+      "damage": "0.5x",
       "scale": 0.9,
       "tags": ["warrior", "tank"]
     },
 
     "archer": {
       "extends": "rangedUnit",
-      "cost": 20,
+      "maxHealth": "0.5x",
+      "damage": "1.5x",
+      "meleeMultiplier": 0.5,
+      "actionSpeed": "1.3x",
+      "cost": "2x",
+      "spawnTime": 6000,
+      "attackRange": 160,
       "projectileOffsetY": -60,
       "tags": ["archer", "dps"]
     },
 
     "wizard": {
       "extends": "supportUnit",
-      "cost": 30,
+      "maxHealth": "0.5x",
+      "damage": "0.2x",
+      "actionSpeed": "1.3x",
+      "speed": "0.8x",
+      "cost": "2x",
+      "spawnTime": 6000,
+      "attackRange": 224,
+      "specialRange": 128,
       "projectileOffsetY": -62,
-      "projectileVelocity": 150,
       "scale": 0.8,
       "tags": ["wizard", "buffer"]
     },
 
     "fireWorm": {
       "extends": "rangedUnit",
-      "cost": 15,
+      "maxHealth": "0.5x",
+      "damage": "0.5x",
+      "actionSpeed": "1.5x",
+      "cost": "0.5x",
+      "spawnTime": 3000,
       "scale": 1.4,
       "projectileOffsetY": -19,
-      "projectileVelocity": 300,
       "specialCooldown": 999999,
       "tags": ["fireWorm", "dps"]
     },
 
     "gorgon": {
       "extends": "meleeUnit",
-      "cost": 30,
+      "damage": "1.2x",
+      "speed": "0.8x",
+      "cost": "3x",
+      "spawnTime": 8000,
       "scale": 0.9,
       "tags": ["gorgon", "debuffer", "cc"]
     },
 
     "minotaur": {
       "extends": "meleeUnit",
+      "armor": 15,
+      "damage": "1.5x",
+      "speed": "1.2x",
+      "cost": "2x",
+      "spawnTime": 6000,
       "tags": ["minotaur", "dps"]
     },
 
     "kitsune": {
       "extends": "rangedUnit",
+      "maxHealth": "0.5x",
+      "damage": "0.2x",
+      "speed": "0.8x",
+      "cost": "3x",
+      "spawnTime": 8000,
+      "attackRange": 288,
       "projectileOffsetY": -45,
       "tags": ["kitsune", "debuffer"]
     }

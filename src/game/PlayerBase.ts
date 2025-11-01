@@ -29,7 +29,7 @@ export class PlayerBase extends Phaser.Physics.Arcade.Sprite{
     spawnPosition: Phaser.Math.Vector2;
     watchTowerProjectileSpawnPoint: Phaser.Math.Vector2;
 
-    constructor(scene: Game, faction: 'red' | 'blue', spawnPosition: Phaser.Math.Vector2, enemyUnitsPhysics: Phaser.Physics.Arcade.Group, projectiles: Phaser.Physics.Arcade.Group) {
+    constructor(scene: Game, faction: 'red' | 'blue', maxHealth: number, spawnPosition: Phaser.Math.Vector2, enemyUnitsPhysics: Phaser.Physics.Arcade.Group, projectiles: Phaser.Physics.Arcade.Group) {
         super(scene, spawnPosition.x, spawnPosition.y, 'single_pixel');
         this.spawnPosition = spawnPosition;
         const offsetX = (faction === 'blue') ? spawnPosition.x-this.sizeW-48 : spawnPosition.x+48;
@@ -46,7 +46,7 @@ export class PlayerBase extends Phaser.Physics.Arcade.Sprite{
         this.body?.setOffset(0,-this.sizeH/2);
 
         // Add healthbar
-        this.healthComponent = new HealthComponent(this, 1000, false, this.sizeW, 20, spawnPosition.y-this.sizeH/2);
+        this.healthComponent = new HealthComponent(this, maxHealth, false, this.sizeW, 20, spawnPosition.y-this.sizeH/2);
         this.on('death', this.die, this);
         //this.healthBar = this.scene.add.rectangle(this.x, this.y-this.height/2, this.width, 20, 0x00ff00).setDepth(1).setAlpha(1);       
     }

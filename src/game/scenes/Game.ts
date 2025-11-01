@@ -93,7 +93,7 @@ export class Game extends Scene
         /* Any sprites that create player's base*/
         this.add.sprite(50, redPos.y, 'tent').setOrigin(0,1).setScale(1.5).setDepth(11);
 
-        this.baseRed = new PlayerBase(this, 'red', redPos, this.blueUnitsPhysics, this.redProjectiles);
+        this.baseRed = new PlayerBase(this, 'red', 2100, redPos, this.blueUnitsPhysics, this.redProjectiles);
         this.playerRed = new Player(this, this.baseRed, redPos, this.redUnitsPhysics, this.blueUnitsPhysics, 
             this.redProjectiles, this.objectPool, this.baseGroup, this.redConfigLoader, this.registry.get('playerUnits'));
         this.playerRed!.changePassiveIncome(1, true); // Passive income
@@ -109,7 +109,7 @@ export class Game extends Scene
             this.add.sprite(this.worldWidth-10, this.worldHeight+this.globalOffsetY+35, 'mineBase', 'mine_bg').setOrigin(1,1).setScale(1.1),
             this.add.sprite(this.worldWidth-10, this.worldHeight+this.globalOffsetY+35, 'mineBase', 'mine_fg').setOrigin(1,1).setDepth(10).setScale(1.1),
         ];
-        this.baseBlue = new PlayerBase(this, 'blue', bluePos, this.redUnitsPhysics, this.blueProjectiles);
+        this.baseBlue = new PlayerBase(this, 'blue', 2100, bluePos, this.redUnitsPhysics, this.blueProjectiles);
         this.playerBlue = new AIPlayer(this, this.baseBlue, bluePos, this.blueUnitsPhysics, this.redUnitsPhysics, 
             this.blueProjectiles, this.objectPool, this.baseGroup, this.blueConfigLoader, this.registry.get('allUnits'));
         this.playerBlue!.changePassiveIncome(1, true);
