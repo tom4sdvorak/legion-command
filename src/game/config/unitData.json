@@ -4,6 +4,7 @@
     "armor": 0,
     "damage": 10,
     "meleeMultiplier": 1,
+    "armorIgnore": 0,
     "actionSpeed": 1000,
     "speed": 100,
     "cost": 10,

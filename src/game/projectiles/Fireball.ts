@@ -12,11 +12,10 @@ export class Fireball extends Projectile {
         this.play(`fireball_move`, true);
     }
 
-    onHit(target: Unit | PlayerBase): void {
+    despawn(){
         this.play(`fireball_explode`, true);
-        super.onHit(target);
         this.scene.time.delayedCall(1000, () => {
-            this.despawn();
-        }, undefined, this);     
+            super.despawn();
+        }, undefined, this);   
     }
 }

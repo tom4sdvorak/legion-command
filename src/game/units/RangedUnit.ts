@@ -191,7 +191,7 @@ export class RangedUnit extends Unit {
         let yPos = this.y+this.unitProps.projectileOffsetY*this.unitProps.scale;
         let xPos = this.x+this.unitProps.bodyWidth/2;
         if(!this.projectiles || !this.projectilePool || !this.unitGroup) return;
-        const projectile = this.projectilePool.get(xPos, yPos) as Projectile;
+        const projectile = this.getProjectile(xPos, yPos);
         if (!projectile) return;
         projectile.setFlipX(this.direction === -1); 
         if(projectile instanceof Projectile){
@@ -203,8 +203,11 @@ export class RangedUnit extends Unit {
         //projectile.rotation = projectileAngle;
         projectile.enableBody(true, xPos, yPos, true, true);
         projectile.setVelocityX(this.unitProps.projectileVelocity * this.direction);
-        //projectile.setVelocityY(10);
+        projectile.setVelocityY(20);
         //this.scene.physics.moveTo(projectile, target.x, yPos, 300);
+    }
+    getProjectile(xPos: number, yPos: number) : Projectile{
+        return this.projectilePool?.get(xPos, yPos) as Projectile;
     }
 
     public stopShooting(): void {

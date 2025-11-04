@@ -16,8 +16,8 @@ export class Gorgon extends MeleeUnit {
     }
 
     public doSpecial(): void {
-        if(this.meleeTarget instanceof Unit && this.meleeTarget.active && this.meleeTarget.isAlive()){
-            this.meleeTarget.applyDebuff('petrify');
+        if(this.meleeTarget.target instanceof Unit && this.meleeTarget.target.isAlive() && this.meleeTarget.id === this.meleeTarget.target.unitProps.unitID){
+            this.meleeTarget.target.applyDebuff('petrify');
             this.specialCooldown = 0;
             this.specialReady = false;                
         }

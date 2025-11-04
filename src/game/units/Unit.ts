@@ -4,6 +4,7 @@ import { PlayerBase } from "../PlayerBase";
 import { HealthComponent } from "../components/HealthComponent";
 import { Game } from "../scenes/Game";
 import eventsCenter from "../EventsCenter";
+import { devConfig } from "../helpers/DevConfig";
 
 
 export class Unit extends Phaser.Physics.Arcade.Sprite {
@@ -17,7 +18,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
     unitPool: Phaser.Physics.Arcade.Group | null = null;
     healthComponent: HealthComponent;
     declare scene: Game;
-    meleeTarget: Unit | PlayerBase | null = null;
+    meleeTarget: { target: Unit | PlayerBase | null, id: number} = {target: null, id: -1};
     colorMatrix: Phaser.FX.ColorMatrix;
     actionDisabled: boolean = false;
     burningDebuff : {timer: Phaser.Time.TimerEvent | null, ticks: number, damage: number} | null = null;
@@ -56,6 +57,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         this.actionCooldown = 0;
         this.buffList = [];
         this.specialReady = false;
+        this.meleeTarget = {target: null, id: -1};
         this.specialCooldown = this.unitProps.specialCooldown; // Reset special cooldown so cooldown based special is available instantly
         // Reinitialize the sprite's body
         this.setScale(unitProps.scale);        
@@ -72,7 +74,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         (this.body as Phaser.Physics.Arcade.Body).enable = true;
         (this.body as Phaser.Physics.Arcade.Body).reset(newPositionX, unitProps.y);
         (this.body as Phaser.Physics.Arcade.Body).pushable = false;
-        //console.log("Unit spawned at: " + this.x + " " + this.y);
+
         if(this.body){
             this.setBodySize(unitProps.bodyWidth/unitProps.scale, 128/unitProps.scale, true);
 
@@ -123,6 +125,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
             this.postFX.clear();
             if(savedGlowConfig.saved) this.postFX.addGlow(savedGlowConfig.color, savedGlowConfig.outerStrength, savedGlowConfig.innerStrength);            
         }).on('pointerup', () => {
+            if(!devConfig.consoleLog) return;
             console.log("%c ", "color:green", "Clicked unit:");
             console.log(this.state);
             console.log(this.unitProps);
@@ -177,6 +180,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         if(this.unitGroup) this.unitGroup.remove(this);
         this.anims.timeScale = 1;
         this.healthComponent.deactivate();
+        this.meleeTarget = {target: null, id: -1};
        // (this.body as Phaser.Physics.Arcade.Body).setEnable(false);
         this.scene.time.delayedCall(5000, () => {
             (this.body as Phaser.Physics.Arcade.Body).reset(-500, -500);
@@ -204,7 +208,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
             this.actionCooldown += delta;
         }
 
-        if(this.state === UnitStates.ATTACKING && this.meleeTarget){
+        if(this.state === UnitStates.ATTACKING && this.meleeTarget.target){
             if(this.actionCooldown >= this.unitProps.actionSpeed){
                 this.attackTarget();
                 this.actionCooldown -= this.unitProps.actionSpeed; 
@@ -232,19 +236,18 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         
     }
 
-    public takeDamage(damage: number, ignoreArmor?: boolean): void {
+    public takeDamage(damage: number, armorIgnore: number = 0): void {
         this.scene.time.delayedCall(100, () => {
             this.clearTint();
         }, undefined, this);
         this.setTintFill(0xffffff);
-        if(ignoreArmor) this.healthComponent.takeDamage(Math.round(damage));
-        else{
-            const damageToTake = Math.round(damage * (1 - this.unitProps.armor / 100.0));
-            this.healthComponent.takeDamage(damageToTake);
-        }
+        let armor = this.unitProps.armor - armorIgnore;
+        if(armor < 0) armor = 0;
+        const damageToTake = Math.round(damage * (1 - armor / 100.0));
+        this.healthComponent.takeDamage(damageToTake);
     }
 
-    public applyBuff(buff: string, source: number) : void {
+    public applyBuff(buff: string, source: number, multiplier: number = 1) : void {
         const buffExistsFromSource = this.buffList.some(item => 
             item.buff === buff && item.source === source
         );
@@ -262,8 +265,8 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
                 if(this.buffDebuffGlow.glow === null){
                     this.buffDebuffGlow = {buffDebuff: buff, glow: this.postFX.addGlow(0x976EFF, 5, 0, false)};
                 }
-                this.unitProps.speed *= 2;
-                this.unitProps.actionSpeed /= 2;
+                this.unitProps.speed = this.unitProps.speed * (1+multiplier);
+                this.unitProps.actionSpeed = this.unitProps.actionSpeed / (1+multiplier);
                 break;
         }
     }
@@ -396,11 +399,13 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
             }
         } // On colision with enemy unit or base, unit should start attacking
         else if(target instanceof Unit && target.unitProps.faction !== this.unitProps.faction){
-            this.meleeTarget = target;
+            this.meleeTarget.target = target;
+            this.meleeTarget.id = target.unitProps.unitID;
             this.changeState(UnitStates.ATTACKING);            
         }
         else if(target instanceof PlayerBase && target.faction !== this.unitProps.faction){
-            this.meleeTarget = target;
+            this.meleeTarget.target = target;
+            this.meleeTarget.id = -1;
             if(this.unitProps.tags.includes('melee')){
                 this.changeState(UnitStates.ATTACKING); 
             }
@@ -413,52 +418,30 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         }
     }
 
-    public attackTarget(ignoreArmor?: boolean): void {
+    public attackTarget(): void {
         if (!this.active || this.state === UnitStates.DEAD || this.state === UnitStates.WAITING) {
             return;
         }
-        this.anims.timeScale = (this.anims?.currentAnim?.duration ?? 1) / (this.unitProps.actionSpeed + 100);
-        if(this.meleeTarget instanceof Unit && this.meleeTarget.active && this.meleeTarget.isAlive()){
-            let damage = this.unitProps.damage * this.unitProps.meleeMultiplier;
-            this.meleeTarget.takeDamage(damage, ignoreArmor);
+        if(!this.meleeTarget.target || !this.meleeTarget.target.active){
+            this.meleeTarget = {target: null, id: -1};
+            this.stopAttacking();
+            return;
         }
-        else if(this.meleeTarget instanceof PlayerBase && this.meleeTarget.active){
-            this.meleeTarget.takeDamage(this.unitProps.damage);
+
+        this.anims.timeScale = (this.anims?.currentAnim?.duration ?? 1) / (this.unitProps.actionSpeed + 100);
+        if(this.meleeTarget.target instanceof Unit && this.meleeTarget.target.isAlive() && this.meleeTarget.id === this.meleeTarget.target.unitProps.unitID){
+            let damage = this.unitProps.damage * this.unitProps.meleeMultiplier;
+            this.meleeTarget.target.takeDamage(damage, this.unitProps.armorIgnore);
+        }
+        else if(this.meleeTarget.target instanceof PlayerBase){
+            this.meleeTarget.target.takeDamage(this.unitProps.damage);
         }
         else{
-            this.meleeTarget = null;
+            this.meleeTarget = {target: null, id: -1};
             this.stopAttacking();
             return;
         }
     }
-
-    /*public startAttackingTarget(): void {
-        if (this.attackingTimer) return;
-        if (!this.meleeTarget) return;
-
-        this.attackingTimer = this.scene.time.addEvent({
-            delay: this.unitProps.actionSpeed,
-            callback: () => {
-                if (!this.active || this.state === UnitStates.DEAD || this.state === UnitStates.WAITING) {
-                    return;
-                }
-                this.anims.timeScale = (this.anims?.currentAnim?.duration ?? 1) / (this.unitProps.actionSpeed + 100);
-                if(this.meleeTarget instanceof Unit && this.meleeTarget.active && this.meleeTarget.isAlive()){
-                    this.meleeTarget.takeDamage(this.unitProps.damage);
-                }
-                else if(this.meleeTarget instanceof PlayerBase && this.meleeTarget.active){
-                    this.meleeTarget.takeDamage(this.unitProps.damage);
-                }
-                else{
-                    this.meleeTarget = null;
-                    this.stopAttacking();
-                    return;
-                }
-            },
-            callbackScope: this,
-            loop: true
-        });
-    }*/
 
     /* General unit state handling
         IDLE, it plays an idle animation and transitions to WALKING if it's not blocked.
@@ -485,7 +468,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
                 }
                 break;
             case UnitStates.ATTACKING:                              
-                if(!this.meleeTarget || !this.meleeTarget.active){
+                if(!this.meleeTarget.target || !this.meleeTarget.target.active){
                     this.stopAttacking();
                     this.changeState(UnitStates.IDLE);
                 }
@@ -499,7 +482,6 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         if(newState === this.state) return;
         if(this.state === UnitStates.DEAD) return;
         if(this.actionDisabled) return;
-        //console.log("Changing state from " + this.state + " to " + newState);
 
         // Handle state changes based on previous
         switch (this.state){

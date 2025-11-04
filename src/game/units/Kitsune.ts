@@ -36,8 +36,8 @@ export class Kitsune extends RangedUnit {
     }
 
     public attackTarget(): void {
-        super.attackTarget(false);
-        if(this.specialReady) this.doSpecial(this.meleeTarget);
+        super.attackTarget();
+        if(this.specialReady) this.doSpecial(this.meleeTarget.target);
     }
 
     fireProjectile(target: Unit | PlayerBase){

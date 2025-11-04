@@ -7,6 +7,7 @@ export interface UnitProps {
     armor: number;
     damage: number;
     meleeMultiplier: number;
+    armorIgnore: number;
     actionSpeed: number;
     attackRange: number;
     specialRange: number;

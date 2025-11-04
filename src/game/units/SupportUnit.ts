@@ -1,6 +1,5 @@
 import { UnitProps } from "../helpers/UnitProps";
 import { UnitStates } from "../helpers/UnitStates";
-import { PlayerBase } from "../PlayerBase";
 import { Game } from "../scenes/Game";
 import { RangedUnit } from "./RangedUnit";
 import { Unit } from "./Unit";
@@ -25,7 +24,6 @@ export class SupportUnit extends RangedUnit {
     spawn(unitProps: UnitProps, unitGroup: Phaser.Physics.Arcade.Group, unitPool: Phaser.Physics.Arcade.Group, enemyGroup: Phaser.Physics.Arcade.Group, baseGroup: Phaser.GameObjects.Group, projectiles: Phaser.Physics.Arcade.Group, projectilePool: Phaser.Physics.Arcade.Group):void{
         super.spawn(unitProps, unitGroup, unitPool, enemyGroup, baseGroup, projectiles, projectilePool);
         this.alliesInRange = [];
-        this.meleeTarget = null;
         this.buffedAllies = [];
         
         // Reinitialize proximity zone
@@ -47,7 +45,6 @@ export class SupportUnit extends RangedUnit {
         (this.supportZone.body as Phaser.Physics.Arcade.Body).reset(0, 0);
         
         // Null all temporary information
-        this.meleeTarget = null;
         this.alliesInRange = [];
         super.die();
     }

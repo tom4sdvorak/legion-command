@@ -12,11 +12,10 @@ export class PurpleBall extends Projectile {
         this.play(`purpleBall_move`, true);
     }
 
-    onHit(target: Unit | PlayerBase): void {
+    despawn(){
         this.play(`purpleBall_explode`, true);
-        super.onHit(target);
         this.scene.time.delayedCall(1000, () => {
-            this.despawn();
-        }, undefined, this);     
+            super.despawn();
+        }, undefined, this);   
     }
 }
