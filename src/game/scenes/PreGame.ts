@@ -5,6 +5,7 @@ import { devConfig } from '../helpers/DevConfig';
 import { ConstructionUpgrade, Potion, UpgradeManager } from '../helpers/UpgradeManager';
 import { FramedImage } from '../components/FramedImage';
 import { ICON_FRAMES } from '../helpers/IconKeys';
+import { GameLevel, GameManager } from '../helpers/GameManager';
 
 export class PreGame extends Scene
 {
@@ -12,13 +13,15 @@ export class PreGame extends Scene
     readyCheck: UIComponent | undefined;
     gameWidth : number;
     gameHeight : number;
-    readyButton: Phaser.GameObjects.BitmapText| undefined;
+    levelButton: Phaser.GameObjects.BitmapText| undefined;
+    selectedLevel: GameLevel | undefined;
     overlay: GameObjects.Rectangle| undefined;
     potionsMenu: UIComponent| undefined;
     constructionMenu: UIComponent| undefined;
     potionSelected: boolean = false;
     largeWindowSize: {w: number, h: number} = {w: 0, h: 0};
     upgradeManager: UpgradeManager;
+    gameManager: GameManager;
     builtConstructions: string[] = [];
     campfire: Phaser.GameObjects.Sprite| undefined;
     alchemist: Phaser.GameObjects.Sprite| undefined;
@@ -28,10 +31,13 @@ export class PreGame extends Scene
     playerMoneyText: GameObjects.BitmapText;
     moneyImage: GameObjects.Sprite;
     exitButton: GameObjects.BitmapText;
-    readyButtonTween: Phaser.Tweens.Tween;
+    levelButtonTween: Phaser.Tweens.Tween;
     topY: number = 0;
     botY: number = 0;
     conBuyButton: FramedImage;
+    levelMenu: UIComponent;
+    readyButton: GameObjects.BitmapText;
+    readyButtonTween: Phaser.Tweens.Tween;
 
     constructor ()
     {
@@ -48,6 +54,8 @@ export class PreGame extends Scene
         this.largeWindowSize.w = (this.gameWidth/4*3);
         this.largeWindowSize.h = this.gameHeight-256;
         this.upgradeManager = UpgradeManager.getInstance();
+        this.gameManager = GameManager.getInstance();
+        this.selectedLevel = undefined;
         this.builtConstructions = [];
     }
 
@@ -63,6 +71,7 @@ export class PreGame extends Scene
         this.add.image(0, 0, 'pregamelayer2').setDisplaySize(this.gameWidth, this.gameHeight).setOrigin(0, 0);
         this.add.image(0, 0, 'pregamelayer4').setDisplaySize(this.gameWidth, this.gameHeight).setOrigin(0, 0);
         this.add.image(0, 0, 'pregamelayer5').setDisplaySize(this.gameWidth, this.gameHeight).setOrigin(0, 0);
+        this.gameLevelSelector();
         this.readyCheckLogic();
 
         // Display UI elements
@@ -73,18 +82,27 @@ export class PreGame extends Scene
         this.updateMoney();
         this.moneyImage = this.add.sprite(layoutX+this.playerMoneyText.width, layoutY+14, 'coin_gold').setOrigin(0, 0).setDisplaySize(36, 36);
         this.moneyImage.play('coin_gold_rotate');
-        this.readyButton = this.add.bitmapText(this.gameWidth/2, layoutY, 'pixelFont', 'Selected 0/3', 64).setOrigin(0.5, 0).setTintFill(0xFFFF00).setDropShadow(3, 3, 0x000000, 1).setInteractive()
+        this.levelButton = this.add.bitmapText(this.gameWidth/2, layoutY, 'pixelFont', 'Select Stage', 64).setOrigin(0.5, 0).setTintFill(0xFFFF00).setDropShadow(3, 3, 0x000000, 1).setInteractive()
             .on('pointerover', () => {
-                if(this.unitsToTake.length < 3) return;
-                this.readyButton?.setTintFill(devConfig.positiveColor);
+                //if(this.unitsToTake.length < 3) return;
+                this.levelButton?.setTintFill(devConfig.positiveColor);
             })
             .on('pointerout', () => {
-                this.readyButton?.setTintFill(0xFFFF00);
+                this.levelButton?.setTintFill(0xFFFF00);
             })
             .on('pointerup', () => {
-                if(this.unitsToTake.length < 3) return;
+                //if(this.unitsToTake.length < 3) return;
                 this.overlay?.setVisible(true);
-                this.readyCheck?.setVisible(true);
+                this.levelMenu?.setVisible(true);
+        });
+        this.levelButtonTween = this.tweens.add({
+            targets: this.levelButton,
+            ease: 'power2.inOut',
+            duration: 200,
+            scaleX: { start: 1.0, to: 1.05 }, 
+            scaleY: { start: 1.0, to: 1.05 },
+            yoyo: true,
+            repeat: -1
         });
         this.exitButton = this.add.bitmapText(this.gameWidth-layoutX, layoutY, 'pixelFont', 'QUIT', 64).setOrigin(1, 0).setTintFill(0xFFFF00).setDropShadow(3, 3, 0x000000, 1).setInteractive()
             .on('pointerup', () => {
@@ -107,6 +125,21 @@ export class PreGame extends Scene
                 this.exitButton.setTintFill(0xFFFF00);
                 this.tweens.killTweensOf(this.exitButton);
             });
+
+        this.add.rectangle(0, this.gameHeight-layoutY, this.gameWidth, 64, 0x000000).setOrigin(0, 1).setAlpha(0.5);
+        this.readyButton = this.add.bitmapText(this.gameWidth/2, this.gameHeight-layoutY, 'pixelFont', 'Units selected (0/3)', 64).setOrigin(0.5, 1).setTintFill(0xFFFF00).setDropShadow(3, 3, 0x000000, 1).setInteractive()
+            .on('pointerover', () => {
+                if(this.unitsToTake.length < 3) return;
+                this.readyButton?.setTintFill(devConfig.positiveColor);
+            })
+            .on('pointerout', () => {
+                this.readyButton?.setTintFill(0xFFFF00);
+            })
+            .on('pointerup', () => {
+                if(this.unitsToTake.length < 3) return;
+                this.overlay?.setVisible(true);
+                this.readyCheck?.setVisible(true);
+        });
         
         /* Coordinates where selected units go*/
         interface PlacementSlot {
@@ -236,7 +269,8 @@ export class PreGame extends Scene
             this.readyCheck?.setVisible(false);
             this.potionsMenu?.setVisible(false);
             this.constructionMenu?.destroy();
-            this.conBuyButton.setVisible(false);
+            this.conBuyButton?.setVisible(false);
+            this.levelMenu?.setVisible(false);
         });
     }
 
@@ -263,8 +297,8 @@ export class PreGame extends Scene
     shutdown() {
         this.readyCheck?.destroy();
         this.readyCheck = undefined;
-        this.readyButton?.destroy();
-        this.readyButton = undefined;
+        this.levelButton?.destroy();
+        this.levelButton = undefined;
         this.overlay?.destroy();
         this.overlay = undefined;
         this.potionsMenu?.destroy();
@@ -295,6 +329,53 @@ export class PreGame extends Scene
             else this.campfire = this.add.sprite(this.gameWidth/2, this.gameHeight/2, 'campfire_pot').setDisplaySize(64,64);
             this.campfire.play('campfire_pot_burning');
         }
+    }
+
+    /* Game Level Selector */
+    gameLevelSelector(){
+        this.levelMenu = new UIComponent(this, this.gameWidth/2, this.gameHeight/2, this.gameWidth-128, this.gameHeight/2, 1, true).setVisible(false).setDepth(1001);
+        this.levelMenu.setInteractive();
+        this.add.existing(this.levelMenu);
+        const lastStageWon = this.registry.get('lastStageWon') || 0;
+        const title = this.add.bitmapText(0, 0, 'pixelFont', 'Select Stage', 64);
+        const unitText = this.add.bitmapText(0, 0, 'pixelFont', 'Enemy units:', 48);
+        const units : Phaser.GameObjects.Image[] = [this.add.image(0, 0, 'single_pixel'), this.add.image(0, 0, 'single_pixel'), this.add.image(0, 0, 'single_pixel'), this.add.image(0, 0, 'single_pixel'), this.add.image(0, 0, 'single_pixel'), this.add.image(0, 0, 'single_pixel')];
+        let tempArray : any[] = [];
+        this.gameManager.getAllLevels().forEach(level => {
+            const levelIcon = new FramedImage(this, 0, 0, 64, 64, "circle");
+            levelIcon.changeBorder(4, devConfig.negativeColor);
+            levelIcon.changeBackground(devConfig.negativeColorLight, 0.5);
+            const line : Phaser.GameObjects.Line = this.add.line(0, 0, 0, 0, 64, 0, devConfig.negativeColor).setLineWidth(8);
+            if(level.level === lastStageWon+1){
+                levelIcon.changeBorder(4, devConfig.positiveColor);
+                levelIcon.changeBackground(devConfig.positiveColorLight, 0.5);
+                line.strokeColor = devConfig.positiveColor;
+            }
+            else if(level.level <= lastStageWon){
+                levelIcon.changeBorder(4, 0x000000);
+                levelIcon.changeBackground(0x000000, 0.5);
+                line.strokeColor = 0x000000;
+            }
+            levelIcon.putInside(this.add.bitmapText(0, 0, 'pixelFont', `${level.level}`, 64).setOrigin(0.5, 0.5));
+            levelIcon.setInteractive();
+            levelIcon.on('pointerup', () => {
+                title.setText(`Stage ${level.level} (${level.difficulty})`);
+                level.units.forEach((unit, index) => {
+                    units[index].setTexture(`${unit}_static`).setScale(0.5).setOrigin(0.5, 1);
+                });
+                this.selectedLevel = level;
+                this.levelButton?.setText(`Stage ${level.level}`);
+                this.levelMenu.positionElements(['center', 'top'], 0, 8, 16);
+            });
+            tempArray.push(line, levelIcon);
+        });
+        tempArray.splice(0,1);
+        this.levelMenu.insertElement(title, true);
+        this.levelMenu.insertElement([unitText, ...units], true);
+        this.levelMenu.insertElement(tempArray);
+
+        if(this.levelMenu.getContentLength() <= 0) return;
+        this.levelMenu.positionElements(['center', 'top'], 0, 8, 16);
     }
 
     /* Handles ready check window */
@@ -367,7 +448,12 @@ export class PreGame extends Scene
             console.error("Invalid number of units to take");
             return;
         }
+        if(!this.selectedLevel){
+            console.error("No level selected");
+            return;
+        }
         this.registry.set('playerUnits', this.unitsToTake);
+        this.registry.set('stage', this.selectedLevel.level);
         this.registry.get('gamesPlayed') ? this.registry.set('gamesPlayed', this.registry.get('gamesPlayed') + 1) : this.registry.set('gamesPlayed', 1);
         SaveManager.saveGame(this);
         this.scene.start('Game');
@@ -632,12 +718,14 @@ export class PreGame extends Scene
     }
 
     update(){
-        
+        if(this.selectedLevel){
+            this.tweens.killTweensOf(this.levelButton!);
+        }
         if (this.unitsToTake.length === 3) {
             this.readyButton?.setText(`READY?`);
             if(this.readyButtonTween && this.readyButtonTween.isPlaying()) return;
             this.readyButtonTween = this.tweens.add({
-                targets: this.readyButton,
+                targets: this.levelButton,
                 ease: 'power2.inOut',
                 duration: 200,
                 scaleX: { start: 1.0, to: 1.2 }, 
@@ -647,7 +735,7 @@ export class PreGame extends Scene
             });
         }
         else{
-            this.readyButton?.setText(`Selected ${this.unitsToTake.length}/3`);
+            this.readyButton?.setText(`Units selected (${this.unitsToTake.length}/3)`);
             this.tweens.killTweensOf(this.readyButton!);
         }
     }

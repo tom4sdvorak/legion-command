@@ -1,0 +1,982 @@
+[
+    {
+        "level": 1,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "warrior",
+            "wizard"
+        ]
+    },
+    {
+        "level": 2,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "minotaur",
+            "warrior"
+        ]
+    },
+    {
+        "level": 3,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "kitsune",
+            "warrior"
+        ]
+    },
+    {
+        "level": 4,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "fireWorm",
+            "warrior"
+        ]
+    },
+    {
+        "level": 5,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "gorgon",
+            "warrior"
+        ]
+    },
+    {
+        "level": 6,
+        "difficulty": "EASY",
+        "units": [
+            "minotaur",
+            "warrior",
+            "wizard"
+        ]
+    },
+    {
+        "level": 7,
+        "difficulty": "EASY",
+        "units": [
+            "kitsune",
+            "warrior",
+            "wizard"
+        ]
+    },
+    {
+        "level": 8,
+        "difficulty": "EASY",
+        "units": [
+            "fireWorm",
+            "warrior",
+            "wizard"
+        ]
+    },
+    {
+        "level": 9,
+        "difficulty": "EASY",
+        "units": [
+            "gorgon",
+            "warrior",
+            "wizard"
+        ]
+    },
+    {
+        "level": 10,
+        "difficulty": "EASY",
+        "units": [
+            "kitsune",
+            "minotaur",
+            "warrior"
+        ]
+    },
+    {
+        "level": 11,
+        "difficulty": "EASY",
+        "units": [
+            "fireWorm",
+            "minotaur",
+            "warrior"
+        ]
+    },
+    {
+        "level": 12,
+        "difficulty": "EASY",
+        "units": [
+            "gorgon",
+            "minotaur",
+            "warrior"
+        ]
+    },
+    {
+        "level": 13,
+        "difficulty": "EASY",
+        "units": [
+            "fireWorm",
+            "kitsune",
+            "warrior"
+        ]
+    },
+    {
+        "level": 14,
+        "difficulty": "EASY",
+        "units": [
+            "gorgon",
+            "kitsune",
+            "warrior"
+        ]
+    },
+    {
+        "level": 15,
+        "difficulty": "EASY",
+        "units": [
+            "fireWorm",
+            "gorgon",
+            "warrior"
+        ]
+    },
+    {
+        "level": 16,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "minotaur",
+            "wizard"
+        ]
+    },
+    {
+        "level": 17,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "kitsune",
+            "wizard"
+        ]
+    },
+    {
+        "level": 18,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "fireWorm",
+            "wizard"
+        ]
+    },
+    {
+        "level": 19,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "gorgon",
+            "wizard"
+        ]
+    },
+    {
+        "level": 20,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "kitsune",
+            "minotaur"
+        ]
+    },
+    {
+        "level": 21,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "fireWorm",
+            "minotaur"
+        ]
+    },
+    {
+        "level": 22,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "gorgon",
+            "minotaur"
+        ]
+    },
+    {
+        "level": 23,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "fireWorm",
+            "kitsune"
+        ]
+    },
+    {
+        "level": 24,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "gorgon",
+            "kitsune"
+        ]
+    },
+    {
+        "level": 25,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "fireWorm",
+            "gorgon"
+        ]
+    },
+    {
+        "level": 26,
+        "difficulty": "EASY",
+        "units": [
+            "kitsune",
+            "minotaur",
+            "wizard"
+        ]
+    },
+    {
+        "level": 27,
+        "difficulty": "EASY",
+        "units": [
+            "fireWorm",
+            "minotaur",
+            "wizard"
+        ]
+    },
+    {
+        "level": 28,
+        "difficulty": "EASY",
+        "units": [
+            "gorgon",
+            "minotaur",
+            "wizard"
+        ]
+    },
+    {
+        "level": 29,
+        "difficulty": "EASY",
+        "units": [
+            "fireWorm",
+            "kitsune",
+            "wizard"
+        ]
+    },
+    {
+        "level": 30,
+        "difficulty": "EASY",
+        "units": [
+            "gorgon",
+            "kitsune",
+            "wizard"
+        ]
+    },
+    {
+        "level": 31,
+        "difficulty": "EASY",
+        "units": [
+            "fireWorm",
+            "gorgon",
+            "wizard"
+        ]
+    },
+    {
+        "level": 32,
+        "difficulty": "EASY",
+        "units": [
+            "fireWorm",
+            "kitsune",
+            "minotaur"
+        ]
+    },
+    {
+        "level": 33,
+        "difficulty": "EASY",
+        "units": [
+            "gorgon",
+            "kitsune",
+            "minotaur"
+        ]
+    },
+    {
+        "level": 34,
+        "difficulty": "EASY",
+        "units": [
+            "fireWorm",
+            "gorgon",
+            "minotaur"
+        ]
+    },
+    {
+        "level": 35,
+        "difficulty": "EASY",
+        "units": [
+            "fireWorm",
+            "gorgon",
+            "kitsune"
+        ]
+    },
+    {
+        "level": 36,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "minotaur",
+            "warrior",
+            "wizard"
+        ]
+    },
+    {
+        "level": 37,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "kitsune",
+            "warrior",
+            "wizard"
+        ]
+    },
+    {
+        "level": 38,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "fireWorm",
+            "warrior",
+            "wizard"
+        ]
+    },
+    {
+        "level": 39,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "gorgon",
+            "warrior",
+            "wizard"
+        ]
+    },
+    {
+        "level": 40,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "kitsune",
+            "minotaur",
+            "warrior"
+        ]
+    },
+    {
+        "level": 41,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "fireWorm",
+            "minotaur",
+            "warrior"
+        ]
+    },
+    {
+        "level": 42,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "gorgon",
+            "minotaur",
+            "warrior"
+        ]
+    },
+    {
+        "level": 43,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "fireWorm",
+            "kitsune",
+            "warrior"
+        ]
+    },
+    {
+        "level": 44,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "gorgon",
+            "kitsune",
+            "warrior"
+        ]
+    },
+    {
+        "level": 45,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "fireWorm",
+            "gorgon",
+            "warrior"
+        ]
+    },
+    {
+        "level": 46,
+        "difficulty": "EASY",
+        "units": [
+            "kitsune",
+            "minotaur",
+            "warrior",
+            "wizard"
+        ]
+    },
+    {
+        "level": 47,
+        "difficulty": "EASY",
+        "units": [
+            "fireWorm",
+            "minotaur",
+            "warrior",
+            "wizard"
+        ]
+    },
+    {
+        "level": 48,
+        "difficulty": "EASY",
+        "units": [
+            "gorgon",
+            "minotaur",
+            "warrior",
+            "wizard"
+        ]
+    },
+    {
+        "level": 49,
+        "difficulty": "EASY",
+        "units": [
+            "fireWorm",
+            "kitsune",
+            "warrior",
+            "wizard"
+        ]
+    },
+    {
+        "level": 50,
+        "difficulty": "EASY",
+        "units": [
+            "gorgon",
+            "kitsune",
+            "warrior",
+            "wizard"
+        ]
+    },
+    {
+        "level": 51,
+        "difficulty": "EASY",
+        "units": [
+            "fireWorm",
+            "gorgon",
+            "warrior",
+            "wizard"
+        ]
+    },
+    {
+        "level": 52,
+        "difficulty": "EASY",
+        "units": [
+            "fireWorm",
+            "kitsune",
+            "minotaur",
+            "warrior"
+        ]
+    },
+    {
+        "level": 53,
+        "difficulty": "EASY",
+        "units": [
+            "gorgon",
+            "kitsune",
+            "minotaur",
+            "warrior"
+        ]
+    },
+    {
+        "level": 54,
+        "difficulty": "EASY",
+        "units": [
+            "fireWorm",
+            "gorgon",
+            "minotaur",
+            "warrior"
+        ]
+    },
+    {
+        "level": 55,
+        "difficulty": "EASY",
+        "units": [
+            "fireWorm",
+            "gorgon",
+            "kitsune",
+            "warrior"
+        ]
+    },
+    {
+        "level": 56,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "kitsune",
+            "minotaur",
+            "wizard"
+        ]
+    },
+    {
+        "level": 57,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "fireWorm",
+            "minotaur",
+            "wizard"
+        ]
+    },
+    {
+        "level": 58,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "gorgon",
+            "minotaur",
+            "wizard"
+        ]
+    },
+    {
+        "level": 59,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "fireWorm",
+            "kitsune",
+            "wizard"
+        ]
+    },
+    {
+        "level": 60,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "gorgon",
+            "kitsune",
+            "wizard"
+        ]
+    },
+    {
+        "level": 61,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "fireWorm",
+            "gorgon",
+            "wizard"
+        ]
+    },
+    {
+        "level": 62,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "fireWorm",
+            "kitsune",
+            "minotaur"
+        ]
+    },
+    {
+        "level": 63,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "gorgon",
+            "kitsune",
+            "minotaur"
+        ]
+    },
+    {
+        "level": 64,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "fireWorm",
+            "gorgon",
+            "minotaur"
+        ]
+    },
+    {
+        "level": 65,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "fireWorm",
+            "gorgon",
+            "kitsune"
+        ]
+    },
+    {
+        "level": 66,
+        "difficulty": "EASY",
+        "units": [
+            "fireWorm",
+            "kitsune",
+            "minotaur",
+            "wizard"
+        ]
+    },
+    {
+        "level": 67,
+        "difficulty": "EASY",
+        "units": [
+            "gorgon",
+            "kitsune",
+            "minotaur",
+            "wizard"
+        ]
+    },
+    {
+        "level": 68,
+        "difficulty": "EASY",
+        "units": [
+            "fireWorm",
+            "gorgon",
+            "minotaur",
+            "wizard"
+        ]
+    },
+    {
+        "level": 69,
+        "difficulty": "EASY",
+        "units": [
+            "fireWorm",
+            "gorgon",
+            "kitsune",
+            "wizard"
+        ]
+    },
+    {
+        "level": 70,
+        "difficulty": "EASY",
+        "units": [
+            "fireWorm",
+            "gorgon",
+            "kitsune",
+            "minotaur"
+        ]
+    },
+    {
+        "level": 71,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "kitsune",
+            "minotaur",
+            "warrior",
+            "wizard"
+        ]
+    },
+    {
+        "level": 72,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "fireWorm",
+            "minotaur",
+            "warrior",
+            "wizard"
+        ]
+    },
+    {
+        "level": 73,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "gorgon",
+            "minotaur",
+            "warrior",
+            "wizard"
+        ]
+    },
+    {
+        "level": 74,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "fireWorm",
+            "kitsune",
+            "warrior",
+            "wizard"
+        ]
+    },
+    {
+        "level": 75,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "gorgon",
+            "kitsune",
+            "warrior",
+            "wizard"
+        ]
+    },
+    {
+        "level": 76,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "fireWorm",
+            "gorgon",
+            "warrior",
+            "wizard"
+        ]
+    },
+    {
+        "level": 77,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "fireWorm",
+            "kitsune",
+            "minotaur",
+            "warrior"
+        ]
+    },
+    {
+        "level": 78,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "gorgon",
+            "kitsune",
+            "minotaur",
+            "warrior"
+        ]
+    },
+    {
+        "level": 79,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "fireWorm",
+            "gorgon",
+            "minotaur",
+            "warrior"
+        ]
+    },
+    {
+        "level": 80,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "fireWorm",
+            "gorgon",
+            "kitsune",
+            "warrior"
+        ]
+    },
+    {
+        "level": 81,
+        "difficulty": "EASY",
+        "units": [
+            "fireWorm",
+            "kitsune",
+            "minotaur",
+            "warrior",
+            "wizard"
+        ]
+    },
+    {
+        "level": 82,
+        "difficulty": "EASY",
+        "units": [
+            "gorgon",
+            "kitsune",
+            "minotaur",
+            "warrior",
+            "wizard"
+        ]
+    },
+    {
+        "level": 83,
+        "difficulty": "EASY",
+        "units": [
+            "fireWorm",
+            "gorgon",
+            "minotaur",
+            "warrior",
+            "wizard"
+        ]
+    },
+    {
+        "level": 84,
+        "difficulty": "EASY",
+        "units": [
+            "fireWorm",
+            "gorgon",
+            "kitsune",
+            "warrior",
+            "wizard"
+        ]
+    },
+    {
+        "level": 85,
+        "difficulty": "EASY",
+        "units": [
+            "fireWorm",
+            "gorgon",
+            "kitsune",
+            "minotaur",
+            "warrior"
+        ]
+    },
+    {
+        "level": 86,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "fireWorm",
+            "kitsune",
+            "minotaur",
+            "wizard"
+        ]
+    },
+    {
+        "level": 87,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "gorgon",
+            "kitsune",
+            "minotaur",
+            "wizard"
+        ]
+    },
+    {
+        "level": 88,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "fireWorm",
+            "gorgon",
+            "minotaur",
+            "wizard"
+        ]
+    },
+    {
+        "level": 89,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "fireWorm",
+            "gorgon",
+            "kitsune",
+            "wizard"
+        ]
+    },
+    {
+        "level": 90,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "fireWorm",
+            "gorgon",
+            "kitsune",
+            "minotaur"
+        ]
+    },
+    {
+        "level": 91,
+        "difficulty": "EASY",
+        "units": [
+            "fireWorm",
+            "gorgon",
+            "kitsune",
+            "minotaur",
+            "wizard"
+        ]
+    },
+    {
+        "level": 92,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "fireWorm",
+            "kitsune",
+            "minotaur",
+            "warrior",
+            "wizard"
+        ]
+    },
+    {
+        "level": 93,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "gorgon",
+            "kitsune",
+            "minotaur",
+            "warrior",
+            "wizard"
+        ]
+    },
+    {
+        "level": 94,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "fireWorm",
+            "gorgon",
+            "minotaur",
+            "warrior",
+            "wizard"
+        ]
+    },
+    {
+        "level": 95,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "fireWorm",
+            "gorgon",
+            "kitsune",
+            "warrior",
+            "wizard"
+        ]
+    },
+    {
+        "level": 96,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "fireWorm",
+            "gorgon",
+            "kitsune",
+            "minotaur",
+            "warrior"
+        ]
+    },
+    {
+        "level": 97,
+        "difficulty": "EASY",
+        "units": [
+            "fireWorm",
+            "gorgon",
+            "kitsune",
+            "minotaur",
+            "warrior",
+            "wizard"
+        ]
+    },
+    {
+        "level": 98,
+        "difficulty": "EASY",
+        "units": [
+            "archer",
+            "fireWorm",
+            "gorgon",
+            "kitsune",
+            "minotaur",
+            "wizard"
+        ]
+    }
+]

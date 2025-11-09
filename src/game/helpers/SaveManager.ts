@@ -13,6 +13,7 @@ export interface SaveData {
         coins: number;
         gamesPlayed: number;
         gamesWon: number;
+        lastStageWon: number;
     }
 };
 
@@ -30,7 +31,8 @@ export default class SaveManager {
             unlockedUnits: [],
             coins: 100,
             gamesPlayed: 0,
-            gamesWon: 0
+            gamesWon: 0,
+            lastStageWon: 0
         }
     };
 
@@ -58,6 +60,7 @@ export default class SaveManager {
         newSave.playerData.coins = scene.registry.get('coins');
         newSave.playerData.gamesPlayed = scene.registry.get('gamesPlayed');
         newSave.playerData.gamesWon = scene.registry.get('gamesWon');
+        newSave.playerData.lastStageWon = scene.registry.get('lastStageWon');
         return newSave;
     }
 
@@ -139,6 +142,7 @@ export default class SaveManager {
             scene.registry.set('coins', saveData.playerData.coins);
             scene.registry.set('gamesPlayed', saveData.playerData.gamesPlayed);
             scene.registry.set('gamesWon', saveData.playerData.gamesWon);
+            scene.registry.set('lastStageWon', saveData.playerData.lastStageWon);
             console.log("Loaded game from " + saveSlot);
             return true;
         }

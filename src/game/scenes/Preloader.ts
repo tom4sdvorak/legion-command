@@ -1,5 +1,6 @@
 import { Scene } from 'phaser';
 import { UpgradeManager } from '../helpers/UpgradeManager';
+import { GameManager } from '../helpers/GameManager';
 
 export class Preloader extends Scene
 {
@@ -36,6 +37,7 @@ export class Preloader extends Scene
         this.load.json('unitUpgrades', 'unitUpgrades.json');
         this.load.json('potionData', 'potionData.json');
         this.load.json('constructionData', 'constructionData.json');
+        this.load.json('gameLevels', 'gameLevels.json');
 
         this.load.setPath('assets');
         this.load.bitmapFont('pixelFont', 'fonts/BoldPixels.png', 'fonts/BoldPixels.xml');
@@ -152,6 +154,10 @@ export class Preloader extends Scene
         /* Transfering data from JSONs to UpgradeManager to hold them as Maps */
         const upgradeManager = UpgradeManager.getInstance();
         upgradeManager.init(this.cache.json.get('unitUpgrades'), this.cache.json.get('constructionData'), this.cache.json.get('potionData'));
+
+        /* Same for game levels*/
+        const gameManager = GameManager.getInstance();
+        gameManager.init(this.cache.json.get('gameLevels'));
 
         //  Move to the MainMenu. You could also swap this for a Scene Transition, such as a camera fade.
         this.scene.start('MainMenu');

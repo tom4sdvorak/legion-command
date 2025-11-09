@@ -9,6 +9,7 @@ import { UI } from "../scenes/UI";
      * @param width The width of the component.
      * @param height The height of the component.
      * @param background A number indicating the background image to use, 0 for the lighter one and 1 for the darker one.
+     * @param scrollable A boolean indicating whether the component should be scrollable or not.
      */
 export class UIComponent extends Phaser.GameObjects.Container {
     private border: Phaser.GameObjects.NineSlice;
@@ -96,7 +97,7 @@ export class UIComponent extends Phaser.GameObjects.Container {
 
     private createMask(){
         if(this.contentMaskGraphics) this.contentMaskGraphics.clear();
-        //this.contentMaskGraphics.fillStyle(0x000000, 0.5).setDepth(9999999);
+        this.contentMaskGraphics.fillStyle(0x000000, 0);
         this.contentMaskGraphics.fillRect(
             -this.sizeW / 2 + this.padding,
             -this.sizeH / 2 + this.padding,

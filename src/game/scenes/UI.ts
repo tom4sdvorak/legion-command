@@ -401,6 +401,7 @@ export class UI extends Scene
         let rewardMoney = 0;
         if(faction === this.player!.faction) { // On player's victory
             this.registry.set('gamesWon', this.registry.get('gamesWon') + 1);
+            this.registry.set('lastStageWon', this.registry.get('stage'));
             rewardMoney = 100 + this.player.getMoney() * 0.1; // Victory reward is always 100 + 10% of owned coins
             let totalMoney = this.registry.get('coins') + Math.floor(rewardMoney);
             this.registry.set('coins', totalMoney);
