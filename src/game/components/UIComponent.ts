@@ -33,6 +33,14 @@ export class UIComponent extends Phaser.GameObjects.Container {
     private scrollLimitsY: { minY: number, maxY: number } = { minY: 0, maxY: 0 };
     private scrollLimitsX: { minX: number, maxX: number } = { minX: 0, maxX: 0 };
     private dragThreshold: number = 8;
+    private scrollbarTrackV: Phaser.GameObjects.Graphics | null = null;
+    private scrollbarThumbV: Phaser.GameObjects.Graphics | null = null;
+    private scrollbarTrackH: Phaser.GameObjects.Graphics | null = null;
+    private scrollbarThumbH: Phaser.GameObjects.Graphics | null = null;
+    private scrollbarWidth: number = 8;
+    private scrollbarPadding: number = 4;
+    public trackColor = 0x2d3436;
+    public thumbColor = 0xFFFF00;
 
     private order: ['left' | 'center' | 'right', 'top' | 'center' | 'bottom'] = ['center', 'center'];
     private marginBottom: number = 16;
@@ -82,6 +90,7 @@ export class UIComponent extends Phaser.GameObjects.Container {
             this.createMask();
             this.setInteractive(new Phaser.Geom.Rectangle(0, 0, width, height), Phaser.Geom.Rectangle.Contains);
             this.on('pointerdown', this.startDrag, this);
+            this.createScrollbar();
         }
     }
 
@@ -91,6 +100,10 @@ export class UIComponent extends Phaser.GameObjects.Container {
         this.borderStroke.destroy(fromScene);
         if (this.contentMaskGraphics) this.contentMaskGraphics.destroy(fromScene);
         this.contentContainer.destroy(fromScene);
+        if (this.scrollbarTrackV) this.scrollbarTrackV.destroy(fromScene);
+        if (this.scrollbarThumbV) this.scrollbarThumbV.destroy(fromScene);
+        if (this.scrollbarTrackH) this.scrollbarTrackH.destroy(fromScene);
+        if (this.scrollbarThumbH) this.scrollbarThumbH.destroy(fromScene);
         this.removeAllListeners();
         super.destroy(fromScene);
     }
@@ -107,6 +120,183 @@ export class UIComponent extends Phaser.GameObjects.Container {
         this.contentMaskGraphics.setPosition(this.x, this.y);
         const mask = this.contentMaskGraphics.createGeometryMask();
         this.contentContainer.setMask(mask);
+    }
+
+    private createScrollbar(): void {
+        if (!this.scrollable) return;
+
+        const contentW = this.sizeW - this.padding * 2;
+        const contentH = this.sizeH - this.padding * 2;
+        
+        // 1. Vertical Scrollbar (Right Side)
+        const trackVX = this.sizeW / 2 - this.padding - this.scrollbarPadding - this.scrollbarWidth;
+        const trackVY = -this.sizeH / 2 + this.padding;
+        
+        this.scrollbarTrackV = this.scene.add.graphics({ fillStyle: { color: this.trackColor, alpha: 0.1 } });
+        this.scrollbarTrackV.fillRect(trackVX, trackVY, this.scrollbarWidth, contentH);
+        this.add(this.scrollbarTrackV);
+        
+        this.scrollbarThumbV = this.scene.add.graphics({ fillStyle: { color: this.thumbColor, alpha: 0.8 }, lineStyle: { color: 0x000000, width: 8 } });
+        this.scrollbarThumbV.fillRect(trackVX, trackVY, this.scrollbarWidth, this.scrollbarWidth * 2);
+        this.scrollbarThumbV.strokeRect(trackVX, trackVY, this.scrollbarWidth, this.scrollbarWidth * 2); 
+        this.add(this.scrollbarThumbV);
+
+        this.fixedContent.push(this.scrollbarTrackV);
+        this.fixedContent.push(this.scrollbarThumbV);
+
+        // 2. Horizontal Scrollbar (Bottom Side)
+        const trackHX = -this.sizeW / 2 + this.padding;
+        const trackHY = this.sizeH / 2 - this.padding - this.scrollbarPadding - this.scrollbarWidth;
+
+        this.scrollbarTrackH = this.scene.add.graphics({ fillStyle: { color: this.trackColor, alpha: 0.1 } });
+        this.scrollbarTrackH.fillRect(trackHX, trackHY, contentW, this.scrollbarWidth);
+        this.add(this.scrollbarTrackH);
+
+        this.scrollbarThumbH = this.scene.add.graphics({ fillStyle: { color: this.thumbColor, alpha: 0.8 }, lineStyle: { color: 0x000000, width: 2 } });
+        this.scrollbarThumbH.fillRect(trackHX, trackHY, this.scrollbarWidth * 2, this.scrollbarWidth);
+        this.scrollbarThumbH.strokeRect(trackHX, trackHY, this.scrollbarWidth * 2, this.scrollbarWidth); 
+        this.add(this.scrollbarThumbH);
+
+        this.fixedContent.push(this.scrollbarTrackH);
+        this.fixedContent.push(this.scrollbarThumbH);
+        
+        this.updateScrollbar();
+    }
+
+    private updateScrollbar(): void {
+        if (!this.scrollable || !this.scrollbarThumbV || !this.scrollbarTrackV || !this.scrollbarThumbH || !this.scrollbarTrackH) return;
+        
+        const availableWidth = this.sizeW - (this.padding * 2);
+        const availableHeight = this.sizeH - (this.padding * 2);
+
+        const totalContentHeight = this.calculateTotalContentHeight();
+        const totalContentWidth = this.calculateTotalContentWidth();
+
+        const scrollableY = totalContentHeight > availableHeight;
+        const scrollableX = totalContentWidth > availableWidth;
+        
+        // Determine effective track size based on whether the other scrollbar is visible
+        const trackHeightV = availableHeight - (scrollableX ? this.scrollbarWidth + this.scrollbarPadding : 0);
+        const trackWidthH = availableWidth - (scrollableY ? this.scrollbarWidth + this.scrollbarPadding : 0);
+        
+        /*const thumbColor = 0x34d399; // Green (Tailwind emerald)
+        const trackColor = 0x2d3436; // Dark gray*/
+
+        // 1. Update Vertical Scrollbar (Y)
+        if (scrollableY) {
+            this.scrollbarThumbV.setVisible(true);
+            this.scrollbarTrackV.setVisible(true);
+
+            // Redraw Vertical Track based on new height
+            const trackVX = this.sizeW / 2 - this.padding - this.scrollbarPadding - this.scrollbarWidth;
+            const trackVY = -this.sizeH / 2 + this.padding;
+            
+            this.scrollbarTrackV.clear();
+            this.scrollbarTrackV.fillStyle(this.trackColor, 0.1);
+            this.scrollbarTrackV.fillRect(trackVX, trackVY, this.scrollbarWidth, trackHeightV);
+
+            // Calculate proportional thumb height
+            const scrollRangeY = this.scrollLimitsY.minY; // This is a negative value
+            const minThumbHeight = this.scrollbarWidth * 2;
+            const proportionalHeight = (availableHeight / totalContentHeight) * trackHeightV;
+            const thumbHeight = Math.max(proportionalHeight, minThumbHeight);
+            
+            // Calculate proportional position
+            const scrollRatioY = Phaser.Math.Clamp(-this.contentContainer.y / -scrollRangeY, 0, 1);
+            const thumbYOffset = scrollRatioY * (trackHeightV - thumbHeight);
+            
+            // Redraw Thumb V
+            this.scrollbarThumbV.clear();
+            this.scrollbarThumbV.fillStyle(this.thumbColor, 0.8);
+            this.scrollbarThumbV.lineStyle(1, 0x000000);
+            this.scrollbarThumbV.fillRect(trackVX, trackVY + thumbYOffset, this.scrollbarWidth, thumbHeight);
+            this.scrollbarThumbV.strokeRect(trackVX, trackVY + thumbYOffset, this.scrollbarWidth, thumbHeight);
+
+        } else {
+            this.scrollbarThumbV.setVisible(false);
+            this.scrollbarTrackV.setVisible(false);
+        }
+
+        // 2. Update Horizontal Scrollbar (X)
+        if (scrollableX) {
+            this.scrollbarThumbH.setVisible(true);
+            this.scrollbarTrackH.setVisible(true);
+            
+            // Redraw Horizontal Track based on new width
+            const trackHX = -this.sizeW / 2 + this.padding;
+            const trackHY = this.sizeH / 2 - this.padding - this.scrollbarPadding - this.scrollbarWidth;
+            
+            this.scrollbarTrackH.clear();
+            this.scrollbarTrackH.fillStyle(this.trackColor, 0.1);
+            this.scrollbarTrackH.fillRect(trackHX, trackHY, trackWidthH, this.scrollbarWidth);
+
+            // Calculate proportional thumb width
+            const scrollRangeX = this.scrollLimitsX.minX; // This is a negative value
+            const minThumbWidth = this.scrollbarWidth * 2;
+            const proportionalWidth = (availableWidth / totalContentWidth) * trackWidthH;
+            const thumbWidth = Math.max(proportionalWidth, minThumbWidth);
+
+            // Calculate proportional position
+            const scrollRatioX = Phaser.Math.Clamp(-this.contentContainer.x / -scrollRangeX, 0, 1);
+            const thumbXOffset = scrollRatioX * (trackWidthH - thumbWidth);
+
+            // Redraw Thumb H
+            this.scrollbarThumbH.clear();
+            this.scrollbarThumbH.fillStyle(this.thumbColor, 0.8);
+            this.scrollbarThumbH.lineStyle(1, 0x000000);
+            this.scrollbarThumbH.fillRect(trackHX + thumbXOffset, trackHY, thumbWidth, this.scrollbarWidth);
+            this.scrollbarThumbH.strokeRect(trackHX + thumbXOffset, trackHY, thumbWidth, this.scrollbarWidth);
+
+        } else {
+            this.scrollbarThumbH.setVisible(false);
+            this.scrollbarTrackH.setVisible(false);
+        }
+    }
+
+    private calculateTotalContentHeight(): number {
+        const itemCount = this.content.length;
+        return this.content.reduce((height, obj) => {
+            // Helper function for typescript to check element properties/methods
+            function isLayoutElement(element: any): element is { displayHeight: number } {
+                return 'displayHeight' in element;
+            }
+            
+            const item = Array.isArray(obj) ? obj[0] : obj;
+            if(isLayoutElement(item)){
+                return height + item.displayHeight;
+            }
+            else{
+                return height;
+            }
+        }, 0) + (itemCount - 1) * this.marginBottom;
+    }
+
+    private calculateTotalContentWidth(): number {
+        return this.content.reduce((width, obj) => {
+            function isLayoutElement(element: any): element is { displayWidth: number } {
+                return 'displayWidth' in element;
+            }
+
+            if(Array.isArray(obj)){
+                let rowWidth = 0;
+                for(const item of obj){
+                    if(isLayoutElement(item)){
+                        rowWidth += item.displayWidth;
+                    }
+                }
+                // Add margin only between elements in the row
+                const rowTotalWidth = rowWidth + (obj.length > 0 ? (obj.length - 1) * this.marginRight : 0);
+                return Math.max(width, rowTotalWidth);
+            }
+            else{
+                if(isLayoutElement(obj)){
+                    return Math.max(width, obj.displayWidth);
+                }
+                else{
+                    return width;
+                }
+            }
+        }, 0);
     }
 
     public getWidth(): number {
@@ -247,55 +437,20 @@ export class UIComponent extends Phaser.GameObjects.Container {
         }*/
 
         // Calculate height of all (non-fixed) elements
-        const totalContentHeight = this.content.reduce((height, obj) => {
-            // Check if the current item is an array and use the first element if it is
-            const item = Array.isArray(obj) ? obj[0] : obj;
-            if(isLayoutElement(item)){
-                return height + item.displayHeight;
-            }
-            else{
-                console.error('UIComponent: positionElements() called with invalid element!');
-                return height;
-            }
-        }, 0) + (itemCount - 1) * this.marginBottom;
+        const totalContentHeight = this.calculateTotalContentHeight();
 
         // Calculate width of largestnon-fixed element (or sum of elements if they are inside array)
-        const totalContentWidth = this.content.reduce((width, obj) => {
-            if(Array.isArray(obj)){
-                let rowWidth = 0;
-                for(const item of obj){
-                    if(isLayoutElement(item)){
-                        rowWidth += item.displayWidth;
-                    }
-                    else{
-                        console.error('UIComponent: positionElements() called with invalid element!');
-                        return width;
-                    }
-                }
-                return Math.max(width, rowWidth+(obj.length-1)*this.marginRight);
-            }
-            else{
-                if(isLayoutElement(obj)){
-                    return Math.max(width, obj.displayWidth);
-                }
-                else{
-                    console.error('UIComponent: positionElements() called with invalid element!');
-                    return width;
-                }
-            }
-        }, 0);
+        const totalContentWidth = this.calculateTotalContentWidth();
 
         if(this.scrollable){
             const availableHeight = this.sizeH - (this.padding * 2);
             this.scrollLimitsY.maxY = 0; 
             if (totalContentHeight > availableHeight) {
                 this.scrollLimitsY.minY = availableHeight - totalContentHeight;
-                this.contentContainer.y = 0; 
+                this.contentContainer.y = Phaser.Math.Clamp(this.contentContainer.y, this.scrollLimitsY.minY, this.scrollLimitsY.maxY);
             } else {
                 this.scrollLimitsY.minY = 0;
-                if (position[1] === 'center') {
-                    //this.contentContainer.y = -totalContentHeight / 2 + availableHeight / 2;
-                }
+                this.contentContainer.y = 0;
             }
             this.contentContainer.y = Phaser.Math.Clamp(this.contentContainer.y, this.scrollLimitsY.minY, this.scrollLimitsY.maxY);
 
@@ -312,6 +467,10 @@ export class UIComponent extends Phaser.GameObjects.Container {
         // Calculate height of any fixed content
         const fixedContentHeight = this.fixedContent.reduce((height, obj) => {
             const item = Array.isArray(obj) ? obj[0] : obj;
+
+            // Skip the scrollbar when calculating fixed content height
+            if (item === this.scrollbarTrackV || item === this.scrollbarThumbV || item === this.scrollbarTrackH || item === this.scrollbarThumbH) return height;
+
             if(isLayoutElement(item)){
                 return height + item.displayHeight + this.marginBottom;
             }
@@ -356,6 +515,9 @@ export class UIComponent extends Phaser.GameObjects.Container {
         const allContent = [...this.fixedContent, ...this.content];
         // Loop thrugh all elements positioning them correctly
         allContent.forEach((element, index) => {
+            // Check if element is the scrollbar and skip position for it as it's handled separately
+            if(element === this.scrollbarTrackV || element === this.scrollbarThumbV || element === this.scrollbarTrackH || element === this.scrollbarThumbH) return;
+
             // If element is instead array of elements, position them next to each other on current Y position, respecting horizontal align (left, center, right)
             if(Array.isArray(element)){
                 if(element.length <= 0){
@@ -434,6 +596,8 @@ export class UIComponent extends Phaser.GameObjects.Container {
             }
         
         });
+
+        this.updateScrollbar();
     }
 
     private getLocalY(globalY: number): number {
@@ -489,23 +653,36 @@ export class UIComponent extends Phaser.GameObjects.Container {
                 y: targetY,
                 duration: 300,
                 ease: 'Quart.easeOut',
+                onUpdate: () => this.updateScrollbar() 
             });
         }
     }
 
     private doDrag(pointer: Phaser.Input.Pointer): void {
         if (!this.isDragging) return;
+
+        const currentLocalY = this.getLocalY(pointer.y);
+        const deltaY = currentLocalY - this.dragStartY;
+        const currentLocalX = this.getLocalX(pointer.x);
+        const deltaX = currentLocalX - this.dragStartX;
+        
+        // Check drag threshold
+        if (Math.abs(deltaY) > this.dragThreshold || Math.abs(deltaX) > this.dragThreshold) {
+            this.wasDragged = true;
+        }
+        if (!this.wasDragged) return;
+
         // --- X-Axis Logic ---
         const isScrollableX = this.scrollLimitsX.minX < 0;
         if (isScrollableX) {
-            const currentLocalX = this.getLocalX(pointer.x);
+            /*const currentLocalX = this.getLocalX(pointer.x);
             const deltaX = currentLocalX - this.dragStartX;
 
             // Only allow dragging if the drag distance is greater than the threshold
             if (Math.abs(deltaX) > this.dragThreshold) {
                 this.wasDragged = true;
             }
-            if (!this.wasDragged) return;
+            if (!this.wasDragged) return;*/
 
             let newX = this.dragStartScrollX + deltaX;
             
@@ -523,8 +700,8 @@ export class UIComponent extends Phaser.GameObjects.Container {
         // --- Y-Axis Logic ---
         const isScrollableY = this.scrollLimitsY.minY < 0;
         if (isScrollableY) {
-            const currentLocalY = this.getLocalY(pointer.y);
-            const deltaY = currentLocalY - this.dragStartY;
+            /*const currentLocalY = this.getLocalY(pointer.y);
+            const deltaY = currentLocalY - this.dragStartY;*/
 
             // Calculate new Y position, applying it to the scroll container
             let newY = this.dragStartScrollY + deltaY;
@@ -536,6 +713,9 @@ export class UIComponent extends Phaser.GameObjects.Container {
                 const undershoot = this.scrollLimitsY.minY - newY;
                 newY = this.scrollLimitsY.minY - undershoot * 0.5;
             }
+            this.contentContainer.y = newY;
         }
+
+        this.updateScrollbar();
     }
 }

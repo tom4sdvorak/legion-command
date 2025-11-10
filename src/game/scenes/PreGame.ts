@@ -14,7 +14,7 @@ export class PreGame extends Scene
     gameWidth : number;
     gameHeight : number;
     levelButton: Phaser.GameObjects.BitmapText| undefined;
-    selectedLevel: GameLevel | undefined;
+    selectedLevel: number;
     overlay: GameObjects.Rectangle| undefined;
     potionsMenu: UIComponent| undefined;
     constructionMenu: UIComponent| undefined;
@@ -35,9 +35,10 @@ export class PreGame extends Scene
     topY: number = 0;
     botY: number = 0;
     conBuyButton: FramedImage;
-    levelMenu: UIComponent;
+    levelMenu: UIComponent | undefined;
     readyButton: GameObjects.BitmapText;
     readyButtonTween: Phaser.Tweens.Tween;
+    stageSelectButton: FramedImage;
 
     constructor ()
     {
@@ -55,7 +56,7 @@ export class PreGame extends Scene
         this.largeWindowSize.h = this.gameHeight-256;
         this.upgradeManager = UpgradeManager.getInstance();
         this.gameManager = GameManager.getInstance();
-        this.selectedLevel = undefined;
+        this.selectedLevel = 0;
         this.builtConstructions = [];
     }
 
@@ -84,14 +85,12 @@ export class PreGame extends Scene
         this.moneyImage.play('coin_gold_rotate');
         this.levelButton = this.add.bitmapText(this.gameWidth/2, layoutY, 'pixelFont', 'Select Stage', 64).setOrigin(0.5, 0).setTintFill(0xFFFF00).setDropShadow(3, 3, 0x000000, 1).setInteractive()
             .on('pointerover', () => {
-                //if(this.unitsToTake.length < 3) return;
                 this.levelButton?.setTintFill(devConfig.positiveColor);
             })
             .on('pointerout', () => {
                 this.levelButton?.setTintFill(0xFFFF00);
             })
             .on('pointerup', () => {
-                //if(this.unitsToTake.length < 3) return;
                 this.overlay?.setVisible(true);
                 this.levelMenu?.setVisible(true);
         });
@@ -129,14 +128,14 @@ export class PreGame extends Scene
         this.add.rectangle(0, this.gameHeight-layoutY, this.gameWidth, 64, 0x000000).setOrigin(0, 1).setAlpha(0.5);
         this.readyButton = this.add.bitmapText(this.gameWidth/2, this.gameHeight-layoutY, 'pixelFont', 'Units selected (0/3)', 64).setOrigin(0.5, 1).setTintFill(0xFFFF00).setDropShadow(3, 3, 0x000000, 1).setInteractive()
             .on('pointerover', () => {
-                if(this.unitsToTake.length < 3) return;
+                if(this.unitsToTake.length < 3 || this.selectedLevel < 1) return;
                 this.readyButton?.setTintFill(devConfig.positiveColor);
             })
             .on('pointerout', () => {
                 this.readyButton?.setTintFill(0xFFFF00);
             })
             .on('pointerup', () => {
-                if(this.unitsToTake.length < 3) return;
+                if(this.unitsToTake.length < 3 || this.selectedLevel < 1) return;
                 this.overlay?.setVisible(true);
                 this.readyCheck?.setVisible(true);
         });
@@ -264,12 +263,13 @@ export class PreGame extends Scene
         
 
         this.overlay = this.add.rectangle(0, 0, this.cameras.main.width, this.cameras.main.height, 0x000000).setOrigin(0, 0).setAlpha(0.5).setInteractive().setDepth(1000).setVisible(false);
-        this.overlay.on('pointerup', () => {
+        this.overlay.on('pointerdown', () => {
             this.overlay?.setVisible(false);
             this.readyCheck?.setVisible(false);
             this.potionsMenu?.setVisible(false);
             this.constructionMenu?.destroy();
             this.conBuyButton?.setVisible(false);
+            this.stageSelectButton?.setVisible(false);
             this.levelMenu?.setVisible(false);
         });
     }
@@ -305,7 +305,10 @@ export class PreGame extends Scene
         this.potionsMenu = undefined;
         this.constructionMenu?.destroy();
         this.constructionMenu = undefined;
+        this.levelMenu?.destroy();
+        this.levelMenu = undefined;
         this.conBuyButton?.destroy();
+        this.stageSelectButton?.destroy();
         this.campfire?.destroy();
         this.campfire = undefined;
         this.alchemist?.destroy();
@@ -338,44 +341,87 @@ export class PreGame extends Scene
         this.add.existing(this.levelMenu);
         const lastStageWon = this.registry.get('lastStageWon') || 0;
         const title = this.add.bitmapText(0, 0, 'pixelFont', 'Select Stage', 64);
-        const unitText = this.add.bitmapText(0, 0, 'pixelFont', 'Enemy units:', 48);
-        const units : Phaser.GameObjects.Image[] = [this.add.image(0, 0, 'single_pixel'), this.add.image(0, 0, 'single_pixel'), this.add.image(0, 0, 'single_pixel'), this.add.image(0, 0, 'single_pixel'), this.add.image(0, 0, 'single_pixel'), this.add.image(0, 0, 'single_pixel')];
+        const unitText = this.add.bitmapText(0, 0, 'pixelFont', 'Enemy units:', 48).setVisible(false);
+        const divider = this.add.line(0, 0, 0, 0, this.levelMenu.width-16*2, 0, 0x000000).setLineWidth(8);
+        const units : Phaser.GameObjects.Image[] = [this.add.image(0, 0, 'single_pixel').setDisplaySize(16,16), this.add.image(0, 0, 'single_pixel'), this.add.image(0, 0, 'single_pixel'), this.add.image(0, 0, 'single_pixel'), this.add.image(0, 0, 'single_pixel'), this.add.image(0, 0, 'single_pixel')];
+        const empty = this.add.rectangle(0, 0, 16, 16, 0x000000).setVisible(false);
+        this.stageSelectButton = new FramedImage(this, this.gameWidth/2, this.levelMenu.y+this.levelMenu.height/2+36, 256, 64, 'square').setInteractive();
+        this.stageSelectButton.setVisible(false);
+        this.stageSelectButton.changeBorder(4, devConfig.positiveColor);
+        this.stageSelectButton.changeBackground(devConfig.positiveColorLight, 0.5);
+        this.stageSelectButton.setDepth(1002);
+        this.add.existing(this.stageSelectButton);
+        this.stageSelectButton.putInside(this.add.bitmapText(0, 0, 'pixelFont', 'Confirm', 48));
+        this.stageSelectButton.on('pointerup', () => {
+            this.selectedLevel = lastClicked?.getData('level');
+            this.levelButton?.setText(`Stage ${this.selectedLevel}`);
+            this.levelMenu?.setVisible(false);
+            this.stageSelectButton.setVisible(false);
+            this.overlay?.setVisible(false);
+        });
+
         let tempArray : any[] = [];
+        let lastClicked : FramedImage | undefined;
         this.gameManager.getAllLevels().forEach(level => {
             const levelIcon = new FramedImage(this, 0, 0, 64, 64, "circle");
             levelIcon.changeBorder(4, devConfig.negativeColor);
             levelIcon.changeBackground(devConfig.negativeColorLight, 0.5);
             const line : Phaser.GameObjects.Line = this.add.line(0, 0, 0, 0, 64, 0, devConfig.negativeColor).setLineWidth(8);
-            if(level.level === lastStageWon+1){
-                levelIcon.changeBorder(4, devConfig.positiveColor);
-                levelIcon.changeBackground(devConfig.positiveColorLight, 0.5);
-                line.strokeColor = devConfig.positiveColor;
-            }
-            else if(level.level <= lastStageWon){
+            
+            if(level.level <= lastStageWon){
                 levelIcon.changeBorder(4, 0x000000);
                 levelIcon.changeBackground(0x000000, 0.5);
+                levelIcon.setData('playable', true);
                 line.strokeColor = 0x000000;
+            }
+            else if(level.level <= lastStageWon+10){
+                levelIcon.changeBorder(4, devConfig.positiveColor);
+                levelIcon.changeBackground(devConfig.positiveColorLight, 0.5);
+                levelIcon.setData('playable', true);
+                line.strokeColor = devConfig.positiveColor;
+            }
+            else{
+                levelIcon.setData('playable', false);
             }
             levelIcon.putInside(this.add.bitmapText(0, 0, 'pixelFont', `${level.level}`, 64).setOrigin(0.5, 0.5));
             levelIcon.setInteractive();
             levelIcon.on('pointerup', () => {
+                if (this.constructionMenu?.getWasDragged()) {
+                    console.log("Click stopped because Was Dragged");
+                    return;
+                }
+                if(lastClicked && lastClicked !== levelIcon){
+                    lastClicked.changeBorder(4);
+                }
+                levelIcon.setData('level', level.level);
+                lastClicked = levelIcon;
+                levelIcon.changeBorder(8);
+                unitText.setVisible(true);
                 title.setText(`Stage ${level.level} (${level.difficulty})`);
                 level.units.forEach((unit, index) => {
-                    units[index].setTexture(`${unit}_static`).setScale(0.5).setOrigin(0.5, 1);
+                    units[index].setTexture(`${unit}_static`).setOrigin(0.5, 1);
+                    units[index].setScale(0.8);
                 });
-                this.selectedLevel = level;
-                this.levelButton?.setText(`Stage ${level.level}`);
-                this.levelMenu.positionElements(['center', 'top'], 0, 8, 16);
+                if(levelIcon.getData('playable')){
+                    this.stageSelectButton.setVisible(true);
+                }
+                else{
+                    this.stageSelectButton.setVisible(false);
+                }
+                this.levelMenu?.positionElements(['center', 'top'], 0, 16, 16);
             });
             tempArray.push(line, levelIcon);
         });
-        tempArray.splice(0,1);
+        //tempArray.splice(0,1);
         this.levelMenu.insertElement(title, true);
         this.levelMenu.insertElement([unitText, ...units], true);
+        this.levelMenu.insertElement(empty, true);
+        this.levelMenu.insertElement(divider, true);
+        this.levelMenu.insertElement(empty);
         this.levelMenu.insertElement(tempArray);
-
+        
         if(this.levelMenu.getContentLength() <= 0) return;
-        this.levelMenu.positionElements(['center', 'top'], 0, 8, 16);
+        this.levelMenu.positionElements(['center', 'top'], 0, 16, 16);
     }
 
     /* Handles ready check window */
@@ -448,12 +494,12 @@ export class PreGame extends Scene
             console.error("Invalid number of units to take");
             return;
         }
-        if(!this.selectedLevel){
+        if(this.selectedLevel < 1){
             console.error("No level selected");
             return;
         }
         this.registry.set('playerUnits', this.unitsToTake);
-        this.registry.set('stage', this.selectedLevel.level);
+        this.registry.set('stage', this.selectedLevel);
         this.registry.get('gamesPlayed') ? this.registry.set('gamesPlayed', this.registry.get('gamesPlayed') + 1) : this.registry.set('gamesPlayed', 1);
         SaveManager.saveGame(this);
         this.scene.start('Game');
@@ -485,7 +531,6 @@ export class PreGame extends Scene
         const divider = this.add.line(0, 0, 0, 0, this.constructionMenu.width-padding*2, 0, 0x000000).setLineWidth(8);
         if(!this.conBuyButton){
             this.conBuyButton = new FramedImage(this, menuTopLeftPadding, this.constructionMenu.y+this.constructionMenu.height/2-64, 128, 128, 'square').setInteractive();
-            console.log("Created conBuyButton");
         }
         else this.conBuyButton.setVisible(true);
         this.conBuyButton.changeBorder(4, 0x333333);
@@ -718,14 +763,14 @@ export class PreGame extends Scene
     }
 
     update(){
-        if(this.selectedLevel){
+        if(this.selectedLevel > 0){
             this.tweens.killTweensOf(this.levelButton!);
         }
-        if (this.unitsToTake.length === 3) {
+        if (this.unitsToTake.length === 3 && this.selectedLevel > 0) {
             this.readyButton?.setText(`READY?`);
             if(this.readyButtonTween && this.readyButtonTween.isPlaying()) return;
             this.readyButtonTween = this.tweens.add({
-                targets: this.levelButton,
+                targets: this.readyButton,
                 ease: 'power2.inOut',
                 duration: 200,
                 scaleX: { start: 1.0, to: 1.2 }, 
