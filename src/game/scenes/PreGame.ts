@@ -351,7 +351,7 @@ export class PreGame extends Scene
         this.add.existing(this.levelMenu);
         const lastStageWon = this.registry.get('lastStageWon') || 0;
         const title = this.add.bitmapText(0, 0, 'pixelFont', 'Select Stage', 64);
-        const unitText = this.add.bitmapText(0, 0, 'pixelFont', 'Enemy units:', 48).setVisible(false);
+        const unitText = this.add.bitmapText(0, 0, 'pixelFont', 'Enemy units: ', 48).setVisible(false);
         const divider = this.add.line(0, 0, 0, 0, this.levelMenu.width-16*2, 0, 0x000000).setLineWidth(8);
         const units : Phaser.GameObjects.Image[] = [this.add.image(0, 0, 'single_pixel').setDisplaySize(16,16), this.add.image(0, 0, 'single_pixel'), this.add.image(0, 0, 'single_pixel'), this.add.image(0, 0, 'single_pixel'), this.add.image(0, 0, 'single_pixel'), this.add.image(0, 0, 'single_pixel')];
         const empty = this.add.rectangle(0, 0, 16, 16, 0x000000).setVisible(false);

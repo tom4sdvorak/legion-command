@@ -3,6 +3,8 @@ import { Player } from '../Player';
 import { UIComponent } from '../components/UIComponent';
 import eventsCenter from '../EventsCenter';
 import { UnitUpgrade, UpgradeManager } from '../helpers/UpgradeManager';
+import { devConfig } from '../helpers/DevConfig';
+import { FramedImage } from '../components/FramedImage';
 
 export class Pause extends Scene {
     player: Player;
@@ -58,14 +60,24 @@ export class Pause extends Scene {
             upgradeUIElement.setSize(UIElementWidth, UIElementHeight);
             const upgradeName = this.add.bitmapText(0, (32-UIElementHeight/2), 'pixelFont', upgrade.name, 32).setOrigin(0.5, 0).setMaxWidth(UIElementWidth-32);
             const upgradeDescription = this.add.bitmapText(0, (-UIElementHeight/4), 'pixelFont', upgrade.description, 16).setOrigin(0.5, 0).setMaxWidth(UIElementWidth-32);
-            const unitSprite = this.add.sprite(0, UIElementHeight/2, `${unitType}_static`).setOrigin(0, 1);
+            const tempArray : FramedImage[] = [];
+            const unit = new FramedImage(this, 0, 0, 48, 48, `square`);
+            unit.putInside(this.add.image(0, 0, `${unitType}_static`));
+            tempArray.push(unit);
+            upgrade.iconFrameKey.forEach((frameKey, index) => {
+                const upgradeIcon = new FramedImage(this, 0, 0, 48, 48, "square");
+                upgradeIcon.putInside(this.add.image(0, 0, frameKey));
+                tempArray.push(upgradeIcon);
+            });
+
+            /*const unitSprite = this.add.sprite(0, UIElementHeight/2, `${unitType}_static`).setOrigin(0, 1);
             const scaleY = 48 / unitSprite.height;
-            unitSprite.setScale(scaleY, scaleY);
+            unitSprite.setScale(scaleY, scaleY);*/
 
             upgradeUIElement.insertElement(upgradeName);
             upgradeUIElement.insertElement(upgradeDescription);
-            upgradeUIElement.insertElement(unitSprite);
-            upgradeUIElement.positionElements(['center', 'top'], 0, 32, 16);
+            upgradeUIElement.insertElement(tempArray);
+            upgradeUIElement.positionElements(['center', 'top'], 8, 32, 16);
 
             container.add(upgradeUIElement);
             currentPosX += UIElementWidth + gap;
@@ -142,15 +154,29 @@ export class Pause extends Scene {
         this.menu.setDepth(1001);
         this.add.existing(this.menu);
 
+        resumeButton.setDropShadow(2, 2, devConfig.positiveColor, 1);
+        giveUpButton.setDropShadow(2, 2, devConfig.negativeColor, 1);
+
+
         interactableGroup.getChildren().forEach(child => {
-            child.setInteractive();
             child.on('pointerover', () => {
-                (child as any).postFX.addGlow(0xFFFF00, 1, 0, false);
                 this.input.setDefaultCursor('pointer');
+                this.tweens.killTweensOf(interactableGroup.getChildren());
+                (child as Phaser.GameObjects.BitmapText).setScale(1.0);
+                this.tweens.add({
+                    targets: child,
+                    ease: 'power2.inOut',
+                    duration: 200,
+                    scaleX: { start: 1.0, to: 1.2 }, 
+                    scaleY: { start: 1.0, to: 1.2 },
+                    yoyo: true,
+                    repeat: -1
+                });
             }, this);
             child.on('pointerout', ()=>{
-                (child as any).postFX.clear();
                 this.input.setDefaultCursor('default');
+                this.tweens.killTweensOf(interactableGroup.getChildren());
+                (child as Phaser.GameObjects.BitmapText).setScale(1.0);
             }, this);
         });
     }

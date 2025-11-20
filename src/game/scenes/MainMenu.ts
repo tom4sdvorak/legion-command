@@ -298,10 +298,16 @@ export class MainMenu extends Scene
         if(!this.creditsUI){
             this.creditsUI = new UIComponent(this, (this.game.config.width as number)/2, (this.game.config.height as number)/2, (this.game.config.width as number)*0.6, (this.game.config.height as number)*0.9, 0, true).setDepth(1000);
             this.add.existing(this.creditsUI);
+            const developText = this.add.bitmapText(0, 0, 'pixelFont', 'DEVELOPED BY', 48);
+            const developer = this.add.bitmapText(0, 0, 'pixelFont', 'Tomas Dvorak', 32);
+            const artText = this.add.bitmapText(0, 0, 'pixelFont', 'ART BY:', 48);
+            this.creditsUI!.insertElement(developText);
+            this.creditsUI!.insertElement(developer);
+            this.creditsUI!.insertElement(artText);
             const credits : {creator: string, link: string}[] = this.cache.json.get('credits');
             credits.forEach(credit => {
-                const creditText = this.add.bitmapText(0, 0, 'pixelFont', credit.creator, 32).setOrigin(0.5, 0.5);
-                const creditLink = this.add.bitmapText(0, 0, 'pixelFont', credit.link, 16).setOrigin(0.5, 0.5).setInteractive()
+                const creditText = this.add.bitmapText(0, 0, 'pixelFont', credit.creator, 32);
+                const creditLink = this.add.bitmapText(0, 0, 'pixelFont', credit.link, 16).setInteractive()
                     .on('pointerup', () => window.open(credit.link, '_blank'))
                     .on('pointerover', () => {
                         this.input.setDefaultCursor('pointer');
@@ -312,7 +318,7 @@ export class MainMenu extends Scene
                 this.creditsUI!.insertElement(creditText);
                 this.creditsUI!.insertElement(creditLink); 
             });
-            this.creditsUI!.positionElements(['left', 'top'], 8, 8, 16);
+            this.creditsUI!.positionElements(['left', 'top'], 8, 0, 16);
 
         }
         else{

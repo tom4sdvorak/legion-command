@@ -110,10 +110,7 @@ export class Preloader extends Scene
         this.load.spritesheet('sawmill', 'sawmill/sprite_sheet.png',{frameWidth: 64, frameHeight: 64});
         this.load.spritesheet('icons', 'icons/sprite_sheet.png',{frameWidth: 64, frameHeight: 64});
         this.load.spritesheet('coin_silver', 'silver_coin/sprite_sheet.png',{frameWidth: 32, frameHeight: 32});
-        this.load.spritesheet('coin_gold', 'gold_coin/sprite_sheet.png',{frameWidth: 32, frameHeight: 32});
-
-        // Icons
-        
+        this.load.spritesheet('coin_gold', 'gold_coin/sprite_sheet.png',{frameWidth: 32, frameHeight: 32});      
         
     }
 
