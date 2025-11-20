@@ -18,6 +18,7 @@ export interface UnitProps {
     spawnTime: number;
     scale: number;
     projectileOffsetY: number;
+    specialValue: number;
     bodyWidth: number;
     projectileVelocity: number;
     tags: string[];

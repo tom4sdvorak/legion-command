@@ -38,6 +38,7 @@ export class Preloader extends Scene
         this.load.json('potionData', 'potionData.json');
         this.load.json('constructionData', 'constructionData.json');
         this.load.json('gameLevels', 'gameLevels.json');
+        this.load.json('credits', 'credits.json');
 
         this.load.setPath('assets');
         this.load.bitmapFont('pixelFont', 'fonts/BoldPixels.png', 'fonts/BoldPixels.xml');

@@ -31,7 +31,7 @@ export class FireWorm extends RangedUnit {
 
     public doSpecial(target: Unit): void { 
         target?.applyDebuff('burn');
-        target?.takeDamage(this.unitProps.damage*10);
+        target?.takeDamage(this.unitProps.damage*(this.unitProps.specialValue*5));
         this.takeDamage(9999999999);
     }
 

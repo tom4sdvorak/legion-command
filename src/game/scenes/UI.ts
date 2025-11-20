@@ -176,8 +176,10 @@ export class UI extends Scene
         }).on('pointerover', () => {
             this.settingsImage?.postFX.remove(settingsImageGlow);
             this.settingsImage?.postFX.addGlow(0xffffff, 10, 0, false, 1, 1);
+            this.input.setDefaultCursor('pointer');
         }).on('pointerout', () => {
             this.settingsImage?.postFX.clear();
+            this.input.setDefaultCursor('default');
             settingsImageGlow = this.settingsImage!.postFX.addGlow(0xA8A9AD, 10, 1, false, 1, 1);
         })
 
@@ -235,10 +237,12 @@ export class UI extends Scene
                     let buttonBorder : Phaser.GameObjects.NineSlice = spawnButtonUI.getBorder();
                     if(currentGlow) buttonBorder.postFX.remove(currentGlow);
                     currentGlow = buttonBorder.postFX.addGlow(0xffff00, 10, 0, false, 1, 1);
+                    this.input.setDefaultCursor('pointer');
                 })
                 .on('pointerout', () => {
                     let buttonBorder : Phaser.GameObjects.NineSlice = spawnButtonUI.getBorder();
                     if(currentGlow) buttonBorder.postFX.remove(currentGlow);
+                    this.input.setDefaultCursor('default');
                 })
                 .on('pointerup', () => {
                     if(this.isSpawning || this.player!.getUnitQueue().length >= this.unitLimit || !spawnButtonUI.getData('canAfford')) return;

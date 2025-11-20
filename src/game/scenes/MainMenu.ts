@@ -8,6 +8,7 @@ import { FramedImage } from '../components/FramedImage';
 export class MainMenu extends Scene
 {
     mainMenu: UIComponent;
+    creditsUI: UIComponent | undefined;
     overlay: OverlayComponent;
     saveSlotsContainer: GameObjects.Container;
 
@@ -53,6 +54,7 @@ export class MainMenu extends Scene
 
         interactableGroup.getChildren().forEach(child => {
             child.on('pointerover', () => {
+                this.input.setDefaultCursor('pointer');
                 this.tweens.killTweensOf(interactableGroup.getChildren());
                 (child as Phaser.GameObjects.BitmapText).setScale(1.0); 
                 menuTween = this.tweens.add({
@@ -66,6 +68,7 @@ export class MainMenu extends Scene
                 });
             }, this);
             child.on('pointerout', ()=>{
+                this.input.setDefaultCursor('default');
                 if (menuTween && menuTween.isPlaying()) {
                     menuTween.stop();
                 }
@@ -77,6 +80,8 @@ export class MainMenu extends Scene
         this.tweens.killAll();
         this.hideSaveSlots();
         this.overlay.destroy();
+        this.mainMenu.destroy();
+        this.creditsUI?.destroy();
     }
 
     public showSaveSlots() : void {
@@ -125,11 +130,13 @@ export class MainMenu extends Scene
                         if (saveSlotDeleteButtonTween && saveSlotDeleteButtonTween.isPlaying()) {
                             saveSlotDeleteButtonTween.stop();
                         }
+                        this.input.setDefaultCursor('default');
                         saveSlotDeleteButton.setScale(1.0);
                         saveSlotUIElement.changeTint(-1, -1);
                     })
                     .on('pointerover', () => {
                         this.tweens.killTweensOf(saveSlotDeleteButton);
+                        this.input.setDefaultCursor('pointer');
                         saveSlotDeleteButton.setScale(1.0); 
                         saveSlotDeleteButtonTween = this.tweens.add({
                             targets: saveSlotDeleteButton,
@@ -151,9 +158,11 @@ export class MainMenu extends Scene
             saveSlotUIElement.setInteractive()
                 .on('pointerover', () => {
                     saveSlotUIElement.changeTint(devConfig.positiveColor, devConfig.positiveColorLight);
+                    this.input.setDefaultCursor('pointer');
                 })
                 .on('pointerout', () => {
                     saveSlotUIElement.changeTint(-1, -1);
+                    this.input.setDefaultCursor('default');
                 })
                 .on('pointerup', () => {
                     this.chooseSaveSlot(saveSlot,isNew);
@@ -198,6 +207,7 @@ export class MainMenu extends Scene
             })
             .on('pointerover', () => {
                 this.tweens.killTweensOf([deleteText, cancelText]);
+                this.input.setDefaultCursor('pointer');
                 deleteText.setScale(1.0); 
                 yesNoTween = this.tweens.add({
                     targets: deleteText,
@@ -214,6 +224,7 @@ export class MainMenu extends Scene
                 if (yesNoTween && yesNoTween.isPlaying()) {
                     yesNoTween.stop();
                 }
+                this.input.setDefaultCursor('default');
                 deleteText.setScale(1.0);
                 deleteCheck.changeTint(-1);
             });
@@ -227,6 +238,7 @@ export class MainMenu extends Scene
             })
             .on('pointerover', () => {
                 this.tweens.killTweensOf([deleteText, cancelText]);
+                this.input.setDefaultCursor('pointer');
                 cancelText.setScale(1.0); 
                 yesNoTween = this.tweens.add({
                     targets: cancelText,
@@ -242,6 +254,7 @@ export class MainMenu extends Scene
                 if (yesNoTween && yesNoTween.isPlaying()) {
                     yesNoTween.stop();
                 }
+                this.input.setDefaultCursor('default');
                 cancelText.setScale(1.0);
                 deleteCheck.changeTint(-1);
             });
@@ -274,7 +287,38 @@ export class MainMenu extends Scene
     }
 
     showCredits() {
-        throw new Error('Method not implemented.');
+        // Create credits menu if its not already existing
+        const overlay = new OverlayComponent(this, 0x000000, 0.9);
+        overlay.show(false);
+        overlay.changeDepth(900);
+        overlay.on('overlay-clicked', () => {
+            overlay.destroy();
+            this.creditsUI?.setVisible(false);
+        });
+        if(!this.creditsUI){
+            this.creditsUI = new UIComponent(this, (this.game.config.width as number)/2, (this.game.config.height as number)/2, (this.game.config.width as number)*0.6, (this.game.config.height as number)*0.9, 0, true).setDepth(1000);
+            this.add.existing(this.creditsUI);
+            const credits : {creator: string, link: string}[] = this.cache.json.get('credits');
+            credits.forEach(credit => {
+                const creditText = this.add.bitmapText(0, 0, 'pixelFont', credit.creator, 32).setOrigin(0.5, 0.5);
+                const creditLink = this.add.bitmapText(0, 0, 'pixelFont', credit.link, 16).setOrigin(0.5, 0.5).setInteractive()
+                    .on('pointerup', () => window.open(credit.link, '_blank'))
+                    .on('pointerover', () => {
+                        this.input.setDefaultCursor('pointer');
+                    })
+                    .on('pointerout', () => {
+                        this.input.setDefaultCursor('default');
+                    });
+                this.creditsUI!.insertElement(creditText);
+                this.creditsUI!.insertElement(creditLink); 
+            });
+            this.creditsUI!.positionElements(['left', 'top'], 8, 8, 16);
+
+        }
+        else{
+            this.creditsUI.setVisible(true);
+        }
+
     }
 
 }

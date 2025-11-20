@@ -21,6 +21,7 @@ import { Wizard } from '../units/Wizard';
 import { TotalEffect, UpgradeManager } from '../helpers/UpgradeManager';
 import { Minotaur } from '../units/Minotaur';
 import { Kitsune } from '../units/Kitsune';
+import { GameLevel, GameManager } from '../helpers/GameManager';
 
 export class Game extends Scene
 {
@@ -50,6 +51,8 @@ export class Game extends Scene
     globalOffsetY: number = -200;
     nextUnitContainer: Phaser.GameObjects.Container;
     nextUnit: Phaser.GameObjects.Image;
+    gameManager: GameManager;
+    levelInfo: GameLevel | undefined;
 
     constructor ()
     {
@@ -58,9 +61,23 @@ export class Game extends Scene
 
     init(){
         this.isDragging = false;
+        this.gameManager = GameManager.getInstance();
+        const stage = this.registry.get('stage');
+        this.levelInfo = this.gameManager.getInfoForLevel(stage);
     }
 
-    createPlayers(){  
+    createPlayers(){
+        
+        if(!this.levelInfo){
+            throw Error('Could not find game level');
+        }
+        const levelMultiplier = 1 + (this.levelInfo.level / 100);
+
+        this.redUnitsPhysics = this.physics.add.group({
+            classType: Unit,
+            runChildUpdate: true,
+            allowGravity: false,
+        });
         this.blueUnitsPhysics = this.physics.add.group({
             classType: Unit,
             runChildUpdate: true,
@@ -97,8 +114,8 @@ export class Game extends Scene
         this.playerRed = new Player(this, this.baseRed, redPos, this.redUnitsPhysics, this.blueUnitsPhysics, 
             this.redProjectiles, this.objectPool, this.baseGroup, this.redConfigLoader, this.registry.get('playerUnits'));
         this.playerRed!.changePassiveIncome(1, true); // Passive income
-        this.playerRed!.addMoney(100); // Initial money
-        this.playerRed!.setNextLevelXP(1); // First lvl XP needed
+        this.playerRed!.addMoney(10); // Initial money
+        this.playerRed!.setNextLevelXP(20); // First lvl XP needed
         this.applyPermaUpgrades();
 
         // Create and setup AI player
@@ -109,12 +126,12 @@ export class Game extends Scene
             this.add.sprite(this.worldWidth-10, this.worldHeight+this.globalOffsetY+35, 'mineBase', 'mine_bg').setOrigin(1,1).setScale(1.1),
             this.add.sprite(this.worldWidth-10, this.worldHeight+this.globalOffsetY+35, 'mineBase', 'mine_fg').setOrigin(1,1).setDepth(10).setScale(1.1),
         ];
-        this.baseBlue = new PlayerBase(this, 'blue', 2100, bluePos, this.redUnitsPhysics, this.blueProjectiles);
+        this.baseBlue = new PlayerBase(this, 'blue', 500*levelMultiplier, bluePos, this.redUnitsPhysics, this.blueProjectiles);
         this.playerBlue = new AIPlayer(this, this.baseBlue, bluePos, this.blueUnitsPhysics, this.redUnitsPhysics, 
-            this.blueProjectiles, this.objectPool, this.baseGroup, this.blueConfigLoader, this.registry.get('allUnits'));
-        this.playerBlue!.changePassiveIncome(1, true);
+            this.blueProjectiles, this.objectPool, this.baseGroup, this.blueConfigLoader, this.levelInfo.units);
+        this.playerBlue!.changePassiveIncome(2*levelMultiplier, true);
         //this.playerBlue!.addMoney(100);
-        if(devConfig.AI) this.AIController = new AIController(this.playerBlue, this.playerRed, 'EASY');
+        if(devConfig.AI) this.AIController = new AIController(this.playerBlue, this.playerRed, this.levelInfo.difficulty);
 
         this.baseGroup.add(this.baseRed);
         this.baseGroup.add(this.baseBlue);

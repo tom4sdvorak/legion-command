@@ -245,7 +245,7 @@ export class PlayerController {
                 break;
             case 'minotaur':
                 pool = this.objectPool.units.minotaurs;
-                projectilePool = this.objectPool.projectiles.purpleBalls;
+                projectilePool = null;
                 break;
             case 'kitsune':
                 pool = this.objectPool.units.kitsunes;

@@ -75,10 +75,12 @@ export class Pause extends Scene {
                     let buttonBorder : Phaser.GameObjects.NineSlice = upgradeUIElement.list[2] as Phaser.GameObjects.NineSlice;
                     if(currentGlow) buttonBorder.postFX.remove(currentGlow);
                     currentGlow = buttonBorder.postFX.addGlow(0xffffff, 4, 0, false, 1, 5);
+                    this.input.setDefaultCursor('pointer');
                 })
                 .on('pointerout', () => {
                     let buttonBorder : Phaser.GameObjects.NineSlice = upgradeUIElement.list[2] as Phaser.GameObjects.NineSlice;
                     if(currentGlow) buttonBorder.postFX.remove(currentGlow);
+                    this.input.setDefaultCursor('default');
                 })
                 .on('pointerup', () => {
                     this.levelUp(unitType, upgrade.id);
@@ -144,9 +146,11 @@ export class Pause extends Scene {
             child.setInteractive();
             child.on('pointerover', () => {
                 (child as any).postFX.addGlow(0xFFFF00, 1, 0, false);
+                this.input.setDefaultCursor('pointer');
             }, this);
             child.on('pointerout', ()=>{
                 (child as any).postFX.clear();
+                this.input.setDefaultCursor('default');
             }, this);
         });
     }

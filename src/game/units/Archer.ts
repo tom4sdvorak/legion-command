@@ -10,7 +10,7 @@ export class Archer extends RangedUnit {
     getProjectile(xPos: number, yPos: number) : Projectile{
         const projectile = super.getProjectile(xPos, yPos);
         if(this.unitProps.specialEnabled){
-            projectile.penCap++;
+            projectile.penCap += this.unitProps.specialValue;
         }
         return projectile;
     }

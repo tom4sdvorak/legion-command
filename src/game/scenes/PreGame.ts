@@ -86,9 +86,11 @@ export class PreGame extends Scene
         this.levelButton = this.add.bitmapText(this.gameWidth/2, layoutY, 'pixelFont', 'Select Stage', 64).setOrigin(0.5, 0).setTintFill(0xFFFF00).setDropShadow(3, 3, 0x000000, 1).setInteractive()
             .on('pointerover', () => {
                 this.levelButton?.setTintFill(devConfig.positiveColor);
+                this.input.setDefaultCursor('pointer');
             })
             .on('pointerout', () => {
                 this.levelButton?.setTintFill(0xFFFF00);
+                this.input.setDefaultCursor('default');
             })
             .on('pointerup', () => {
                 this.overlay?.setVisible(true);
@@ -109,6 +111,7 @@ export class PreGame extends Scene
             })
             .on('pointerover', () => {
                 this.tweens.killTweensOf(this.exitButton);
+                this.input.setDefaultCursor('pointer');
                 this.exitButton.setTintFill(devConfig.negativeColor);
                 this.tweens.add({
                     targets: this.exitButton,
@@ -122,6 +125,7 @@ export class PreGame extends Scene
             })
             .on('pointerout', () => {
                 this.exitButton.setTintFill(0xFFFF00);
+                this.input.setDefaultCursor('default');
                 this.tweens.killTweensOf(this.exitButton);
             });
 
@@ -130,9 +134,11 @@ export class PreGame extends Scene
             .on('pointerover', () => {
                 if(this.unitsToTake.length < 3 || this.selectedLevel < 1) return;
                 this.readyButton?.setTintFill(devConfig.positiveColor);
+                this.input.setDefaultCursor('pointer');
             })
             .on('pointerout', () => {
                 this.readyButton?.setTintFill(0xFFFF00);
+                this.input.setDefaultCursor('default');
             })
             .on('pointerup', () => {
                 if(this.unitsToTake.length < 3 || this.selectedLevel < 1) return;
@@ -218,9 +224,11 @@ export class PreGame extends Scene
             });
             mySprite.on('pointerover', () => {
                 mySprite.postFX.clear();
+                this.input.setDefaultCursor('pointer');
                 mySprite.postFX.addGlow(0xffff00, 10, 0, false, 1, 1);
             }).on('pointerout', () => {
                 mySprite.postFX.clear();
+                this.input.setDefaultCursor('default');
                 mySprite.postFX.addGlow(0x000000, 2, 0, false, 1, 2);
             });
             mySprite.postFX.addGlow(0x000000, 2, 0, false, 1, 2);
@@ -239,9 +247,11 @@ export class PreGame extends Scene
         });
         this.sawmill.on('pointerover', () => {
             this.sawmill?.postFX.clear();
+            this.input.setDefaultCursor('pointer');
             this.sawmill?.postFX.addGlow(0x00FFFF, 10, 0, false, 1, 1);
         }).on('pointerout', () => {
             this.sawmill?.postFX.clear();
+            this.input.setDefaultCursor('default');
             this.sawmill?.postFX.addGlow(0x000000, 2, 0, false, 1, 2);
         });
 
@@ -358,6 +368,12 @@ export class PreGame extends Scene
             this.levelMenu?.setVisible(false);
             this.stageSelectButton.setVisible(false);
             this.overlay?.setVisible(false);
+        })
+        .on('pointerover', () => {
+            this.input.setDefaultCursor('pointer');
+        })
+        .on('pointerout', () => {
+            this.input.setDefaultCursor('default');
         });
 
         let tempArray : any[] = [];
@@ -409,6 +425,12 @@ export class PreGame extends Scene
                     this.stageSelectButton.setVisible(false);
                 }
                 this.levelMenu?.positionElements(['center', 'top'], 0, 16, 16);
+            })
+            .on('pointerover', () => {
+                this.input.setDefaultCursor('pointer');
+            })
+            .on('pointerout', () => {
+                this.input.setDefaultCursor('default');
             });
             tempArray.push(line, levelIcon);
         });
@@ -436,6 +458,7 @@ export class PreGame extends Scene
             })
             .on('pointerover', () => {
                 this.tweens.killTweensOf([noText, yesText]);
+                this.input.setDefaultCursor('pointer');
                 noText.setScale(1.0); 
                 yesNoTween = this.tweens.add({
                     targets: noText,
@@ -452,6 +475,7 @@ export class PreGame extends Scene
                 if (yesNoTween && yesNoTween.isPlaying()) {
                     yesNoTween.stop();
                 }
+                this.input.setDefaultCursor('default');
                 noText.setScale(1.0);
                 this.readyCheck?.changeTint(-1);
             });
@@ -464,6 +488,7 @@ export class PreGame extends Scene
             })
             .on('pointerover', () => {
                 this.tweens.killTweensOf([noText, yesText]);
+                this.input.setDefaultCursor('pointer');
                 yesText.setScale(1.0); 
                 yesNoTween = this.tweens.add({
                     targets: yesText,
@@ -479,6 +504,7 @@ export class PreGame extends Scene
                 if (yesNoTween && yesNoTween.isPlaying()) {
                     yesNoTween.stop();
                 }
+                this.input.setDefaultCursor('default');
                 yesText.setScale(1.0);
                 this.readyCheck?.changeTint(-1);
             });
@@ -551,7 +577,13 @@ export class PreGame extends Scene
                 this.redoPregameConstruction();
                 this.showConstructionMenu();
             }
-        });
+        })
+            .on('pointerover', () => {
+                this.input.setDefaultCursor('pointer');
+            })
+            .on('pointerout', () => {
+                this.input.setDefaultCursor('default');
+            });
         this.constructionMenu.insertElement(title, true);
         this.constructionMenu.insertElement([conName, coinImage, conCost], true);
         this.constructionMenu.insertElement(conText, true);
@@ -643,7 +675,13 @@ export class PreGame extends Scene
                     conCost.setText(` ${con.cost})`);
                     conSlot.changeBorder(8);
                     this.constructionMenu!.positionElements(['left', 'top'], 0, 8, padding);
-                });
+                })
+                    .on('pointerover', () => {
+                        this.input.setDefaultCursor('pointer');
+                    })
+                    .on('pointerout', () => {
+                        this.input.setDefaultCursor('default');
+                    });
                 tempArray.push(line, conSlot);
             });
             tempArray.splice(0,1);
@@ -705,9 +743,11 @@ export class PreGame extends Scene
 
         this.alchemist.on('pointerover', () => {
             this.alchemist?.postFX.clear();
+            this.input.setDefaultCursor('pointer');
             this.alchemist?.postFX.addGlow(0x00FFFF, 10, 0, false, 1, 1);
         }).on('pointerout', () => {
             this.alchemist?.postFX.clear();
+            this.input.setDefaultCursor('default');
             this.alchemist?.postFX.addGlow(0x000000, 2, 0, false, 1, 2);
         });
 

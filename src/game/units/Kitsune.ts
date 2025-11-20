@@ -44,7 +44,7 @@ export class Kitsune extends RangedUnit {
         super.fireProjectile(target);
         // Increase stack count every projectile until 9
         if(this.stacks < 9){
-            this.stacks += 1;
+            this.stacks += this.unitProps.specialValue;
             this.stacksSprite?.setFrame(40+this.stacks);
             if(this.stacks >= 9){
                 this.specialReady = true;

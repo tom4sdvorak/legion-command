@@ -6,7 +6,7 @@
         "tags": [
             "archer",
             "dps",
-            "armor_pen"
+            "armorIgnore"
         ],
         "iconFrameKey": [
             "DMG_UP"
@@ -27,7 +27,7 @@
         "tags": [
             "archer",
             "dps",
-            "armor_pen"
+            "armorIgnore"
         ],
         "iconFrameKey": [
             "DMG_UP"
@@ -48,7 +48,7 @@
         "tags": [
             "archer",
             "dps",
-            "armor_pen"
+            "armorIgnore"
         ],
         "iconFrameKey": [
             "DMG_UP"
@@ -188,17 +188,23 @@
         "rarity": "legendary",
         "tags": [
             "archer",
-            "specialEnabled"
+            "specialEnabled",
+            "projectilePenetration"
         ],
         "iconFrameKey": [
             "SPECIAL_POWER"
         ],
-        "description": "Arrows pierce first enemy, hitting also target behind, for half the damage.",
+        "description": "Arrows pierce +1 target.",
         "effects": [
             {
                 "stat": "specialEnabled",
                 "type": "true",
                 "value": -1
+            },
+            {
+                "stat": "specialValue",
+                "type": "flat",
+                "value": 1
             }
         ]
     },
@@ -360,12 +366,17 @@
         "iconFrameKey": [
             "SPECIAL_POWER"
         ],
-        "description": "Explodes on melee contact, damaging and applying burn to enemy.",
+        "description": "Enables special and increases explosion damage by 500%. SPECIAL: Explodes on melee contact, applying burn to enemy.",
         "effects": [
             {
                 "stat": "specialEnabled",
                 "type": "true",
                 "value": -1
+            },
+            {
+                "stat": "specialValue",
+                "type": "flat",
+                "value": 1
             }
         ]
     },
@@ -1046,12 +1057,17 @@
         "iconFrameKey": [
             "SPECIAL_POWER"
         ],
-        "description": "On melee contact, turns enemy temporary to sandstone, stopping them from action and increasing damage taken.",
+        "description": "Enable special and reduce cooldown by 2s. SPECIAL: On melee contact, turns enemy temporary to sandstone, stopping them from action and increasing damage taken.",
         "effects": [
             {
                 "stat": "specialEnabled",
                 "type": "true",
                 "value": -1
+            },
+            {
+                "stat": "specialCooldown",
+                "type": "flat",
+                "value": -2000
             }
         ]
     },
@@ -1306,12 +1322,17 @@
         "iconFrameKey": [
             "SPECIAL_POWER"
         ],
-        "description": "Kitsune prepares curse every attack, unleashing damage debuff on first target when ready.",
+        "description": "Enables special and +1 to stack speed. SPECIAL: Prepares curse every attack, unleashing damage debuff on first target when ready.",
         "effects": [
             {
                 "stat": "specialEnabled",
                 "type": "true",
                 "value": -1
+            },
+            {
+                "stat": "specialValue",
+                "type": "flat",
+                "value": 1
             }
         ]
     },
@@ -1519,18 +1540,18 @@
         "rarity": "legendary",
         "tags": [
             "minotaur",
-            "armor_pen",
+            "armorIgnore",
             "specialEnabled"
         ],
         "iconFrameKey": [
             "SPECIAL_POWER"
         ],
-        "description": "Minotaur's attacks now ignore 50 armor.",
+        "description": "Minotaur's attacks ignore +30 armor.",
         "effects": [
             {
                 "stat": "armorIgnore",
                 "type": "flat",
-                "value": 10
+                "value": 30
             },
             {
                 "stat": "specialEnabled",
@@ -2391,12 +2412,17 @@
         "iconFrameKey": [
             "EFFECT_UP"
         ],
-        "description": "Wizard's support ability buffs are doubled.",
+        "description": "Wizard's support ability buffs are improved by 100%",
         "effects": [
             {
                 "stat": "specialEnabled",
                 "type": "true",
                 "value": -1
+            },
+            {
+                "stat": "specialValue",
+                "type": "flat",
+                "value": 1
             }
         ]
     }

@@ -32,7 +32,7 @@ export class Wizard extends SupportUnit {
     
     
     support(target: Unit) {
-        target.applyBuff('speed', this.unitProps.unitID, this.unitProps.specialEnabled ? 2 : 1);
+        target.applyBuff('speed', this.unitProps.unitID, this.unitProps.specialValue);
         if (!this.buffedAllies.includes(target)) {
             this.buffedAllies.push(target);
         }

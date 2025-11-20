@@ -147,7 +147,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         }
         
         // Reward player
-        this.scene.rewardPlayer(this.unitProps.faction, this.unitProps.cost, this.unitProps.cost);
+        this.scene.rewardPlayer(this.unitProps.faction, this.unitProps.cost);
         eventsCenter.emit('unit-died', this.unitProps.faction);
         this.die();
     }

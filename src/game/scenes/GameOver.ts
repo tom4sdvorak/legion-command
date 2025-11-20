@@ -67,6 +67,7 @@ export class GameOver extends Scene
             })
             .on('pointerover', () => {
                 this.tweens.killTweensOf(continueText);
+                this.input.setDefaultCursor('pointer');
                 continueText.setScale(1.0);
                 this.tweens.add({
                     targets: continueText,
@@ -79,6 +80,7 @@ export class GameOver extends Scene
                 });})
             .on('pointerout', () => {
                 this.tweens.killTweensOf(continueText);
+                this.input.setDefaultCursor('default');
                 continueText.setScale(1.0);
             });
         continueText.setDropShadow(2, 2, devConfig.positiveColor, 1);
