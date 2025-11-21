@@ -5,6 +5,7 @@ import { UIComponent } from '../components/UIComponent';
 import { AIPlayer } from '../AIPlayer';
 import { devConfig } from '../helpers/DevConfig';
 import { UnitProps } from '../helpers/UnitProps';
+import { FramedImage } from '../components/FramedImage';
 
 export class UI extends Scene
 {
@@ -132,6 +133,7 @@ export class UI extends Scene
             const unitStats : UnitProps = this.player!.getUnitStats(unitType);
             this.playerUnits.set(unitType, unitStats);
         });
+        this.updateButtonStates();
     }
 
     create ()
@@ -203,10 +205,10 @@ export class UI extends Scene
             spawnButtonUI.setData('unitType', unitType);
             const innerButtonHeight = 96 - spawnButtonUI.getBorderThickness()[2]*2;
             const innerButtonWidth = 96 - spawnButtonUI.getBorderThickness()[0]*2;
-            const unitSprite = this.add.image(0, 0, unitType + '_static');
+            //const unitSprite = this.add.image(0, 0, unitType + '_static');
             
             // Determine how to resize the unit sprite so it fits UI element
-            const maxRatio = innerButtonWidth / innerButtonHeight;
+            /*const maxRatio = innerButtonWidth / innerButtonHeight;
             const originalRatio = unitSprite.texture.get().width / unitSprite.texture.get().height;
             let newWidth, newHeight;
             if (originalRatio > maxRatio) {
@@ -220,29 +222,36 @@ export class UI extends Scene
                 newHeight = innerButtonHeight-8;
                 newWidth = newHeight * originalRatio;
             }
-            unitSprite.setDisplaySize(newWidth,newHeight);
-            let currentGlow : any;
-            unitSprite.postFX.addGlow(0x000000, 2, 0, false, 1, 5);
+            unitSprite.setDisplaySize(newWidth,newHeight);*/
+            let currentGlow : any; 
+            //unitSprite.postFX.addGlow(0x000000, 2, 0, false, 1, 5);
             const unitLoadingBar = this.add.rectangle(0, innerButtonHeight/2, innerButtonWidth, innerButtonHeight, 0xffffff).setAlpha(0.5).setOrigin(0.5,1);
             unitLoadingBar.scaleY = 0;
             //const spawnButtonContainer = this.add.container(x, y);
             //spawnButtonContainer.setSize(96, 96);
             spawnButtonUI.add(unitLoadingBar);
-            spawnButtonUI.insertElement(unitSprite);
+            //spawnButtonUI.insertElement(unitSprite);
             //spawnButtonContainer.add(spawnButtonUI);
             //spawnButtonContainer.add(unitLoadingBar);
             //spawnButtonContainer.add(unitSprite);
+            const unit = new FramedImage(this, 0, 0, innerButtonWidth, innerButtonHeight, "square");
+            unit.changeBackground(0xffffff, 0);
+            unit.putInside(this.add.image(0, 0, unitType + '_static'));
+            unit.putInside(this.add.bitmapText(0, 0, 'pixelFont', `${stats.cost}`, 32).setOrigin(0.5, 0.5).setTintFill(0x000000));
+            spawnButtonUI.insertElement(unit);
             spawnButtonUI.setInteractive()
                 .on('pointerover', () => {
                     let buttonBorder : Phaser.GameObjects.NineSlice = spawnButtonUI.getBorder();
                     if(currentGlow) buttonBorder.postFX.remove(currentGlow);
                     currentGlow = buttonBorder.postFX.addGlow(0xffff00, 10, 0, false, 1, 1);
                     this.input.setDefaultCursor('pointer');
+                    unit.showAlt();
                 })
                 .on('pointerout', () => {
                     let buttonBorder : Phaser.GameObjects.NineSlice = spawnButtonUI.getBorder();
                     if(currentGlow) buttonBorder.postFX.remove(currentGlow);
                     this.input.setDefaultCursor('default');
+                    unit.hideAlt();
                 })
                 .on('pointerup', () => {
                     if(this.isSpawning || this.player!.getUnitQueue().length >= this.unitLimit || !spawnButtonUI.getData('canAfford')) return;
@@ -327,6 +336,21 @@ export class UI extends Scene
 
             const canAfford = this.player!.canAfford(stats.cost);
             button.setData('canAfford', canAfford);
+
+            /* Update displayed cost of the unit by getting the bitmap text inside FramedImage which is inside our UIComponent button*/
+            const insideElement = button.getChildrenByType('FramedImage')[0] as FramedImage;
+            if(insideElement){
+                const insideElementCostText = insideElement.getInsideAlt();
+                if (insideElementCostText && insideElementCostText instanceof Phaser.GameObjects.BitmapText) {
+                    insideElementCostText.setText(`${stats.cost}`);
+                }
+                else{
+                    console.error('Could not find bitmap text inside Framed Image');
+                }
+            }
+            else{
+                console.error('Could not find FramedImage inside UIComp');
+            }
 
             if (!canAfford) {
                 button.changeTint(devConfig.negativeColor, devConfig.negativeColorLight);

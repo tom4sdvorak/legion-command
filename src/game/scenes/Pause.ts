@@ -5,6 +5,7 @@ import eventsCenter from '../EventsCenter';
 import { UnitUpgrade, UpgradeManager } from '../helpers/UpgradeManager';
 import { devConfig } from '../helpers/DevConfig';
 import { FramedImage } from '../components/FramedImage';
+import { ICON_FRAMES } from '../helpers/IconKeys';
 
 export class Pause extends Scene {
     player: Player;
@@ -58,15 +59,15 @@ export class Pause extends Scene {
             if(upgrade === undefined) return;
             const upgradeUIElement = new UIComponent(this, currentPosX+UIElementWidth/2, 0, UIElementWidth, UIElementHeight, 1);
             upgradeUIElement.setSize(UIElementWidth, UIElementHeight);
-            const upgradeName = this.add.bitmapText(0, (32-UIElementHeight/2), 'pixelFont', upgrade.name, 32).setOrigin(0.5, 0).setMaxWidth(UIElementWidth-32);
-            const upgradeDescription = this.add.bitmapText(0, (-UIElementHeight/4), 'pixelFont', upgrade.description, 16).setOrigin(0.5, 0).setMaxWidth(UIElementWidth-32);
+            const upgradeName = this.add.bitmapText(0, (32-UIElementHeight/2), 'pixelFont', upgrade.name, 32).setOrigin(0.5, 0).setMaxWidth(UIElementWidth-64);
+            const upgradeDescription = this.add.bitmapText(0, (-UIElementHeight/4), 'pixelFont', upgrade.description, 24).setOrigin(0.5, 0).setMaxWidth(UIElementWidth-64);
             const tempArray : FramedImage[] = [];
-            const unit = new FramedImage(this, 0, 0, 48, 48, `square`);
+            const unit = new FramedImage(this, 0, 0, 64, 64, `square`);
             unit.putInside(this.add.image(0, 0, `${unitType}_static`));
             tempArray.push(unit);
             upgrade.iconFrameKey.forEach((frameKey, index) => {
-                const upgradeIcon = new FramedImage(this, 0, 0, 48, 48, "square");
-                upgradeIcon.putInside(this.add.image(0, 0, frameKey));
+                const upgradeIcon = new FramedImage(this, 0, 0, 64, 64, "square");
+                upgradeIcon.putInside(this.add.image(0, 0, 'icons', ICON_FRAMES[frameKey]));
                 tempArray.push(upgradeIcon);
             });
 
@@ -74,9 +75,9 @@ export class Pause extends Scene {
             const scaleY = 48 / unitSprite.height;
             unitSprite.setScale(scaleY, scaleY);*/
 
+            upgradeUIElement.insertElement(tempArray);
             upgradeUIElement.insertElement(upgradeName);
             upgradeUIElement.insertElement(upgradeDescription);
-            upgradeUIElement.insertElement(tempArray);
             upgradeUIElement.positionElements(['center', 'top'], 8, 32, 16);
 
             container.add(upgradeUIElement);

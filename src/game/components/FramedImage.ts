@@ -2,6 +2,7 @@ export class FramedImage extends Phaser.GameObjects.Container {
     //private border: Phaser.GameObjects.Graphics;
     private shape: Phaser.GameObjects.Graphics | Phaser.GameObjects.Ellipse | Phaser.GameObjects.Rectangle;
     private inside: Phaser.GameObjects.Image | Phaser.GameObjects.BitmapText | Phaser.GameObjects.Text;
+    private insideAlt: Phaser.GameObjects.Image | Phaser.GameObjects.BitmapText | Phaser.GameObjects.Text;
     private borderWidth: number = 2;
     public originX: number = 0.5;
     public originY: number = 0.5;
@@ -52,6 +53,14 @@ export class FramedImage extends Phaser.GameObjects.Container {
         this.add(this.shape);
         this.setDisplaySize(width, height);
     }
+    hideAlt() {
+        this.insideAlt?.setVisible(false);
+        this.inside?.setVisible(true);
+    }
+    showAlt() {
+        this.insideAlt?.setVisible(true);
+        this.inside?.setVisible(false);
+    }
 
     public drawSquircle(){
         if(this.shape instanceof Phaser.GameObjects.Graphics){
@@ -67,27 +76,42 @@ export class FramedImage extends Phaser.GameObjects.Container {
      * @param obj Image, BitmapText or Text to insert inside the frame
      */
     public putInside(obj : Phaser.GameObjects.Image | Phaser.GameObjects.BitmapText | Phaser.GameObjects.Text) : void {
-        this.inside = obj;
-        this.inside.setOrigin(0.5, 0.5);
-        this.inside.setScale(1.0);
-        const scaleX = this.width / this.inside.width;
-        const scaleY = this.height / this.inside.height;
+        obj.setOrigin(0.5, 0.5);
+        obj.setScale(1.0);
+        const scaleX = this.width / obj.width;
+        const scaleY = this.height / obj.height;
         
         let scaleFactor = Math.min(scaleX, scaleY);
         if(this.shapeType === 'round'){
             scaleFactor = scaleFactor * 0.75;
-            if(this.inside instanceof Phaser.GameObjects.BitmapText || this.inside instanceof Phaser.GameObjects.Text){
-                this.inside.x += scaleFactor*2;
+            if(obj instanceof Phaser.GameObjects.BitmapText || obj instanceof Phaser.GameObjects.Text){
+                obj.x += scaleFactor*2;
             }
         }
         else{
             scaleFactor = scaleFactor * 0.8;
-            if(this.inside instanceof Phaser.GameObjects.BitmapText || this.inside instanceof Phaser.GameObjects.Text){
-                this.inside.x += scaleFactor;
+            if(obj instanceof Phaser.GameObjects.BitmapText || obj instanceof Phaser.GameObjects.Text){
+                obj.x += scaleFactor;
             }
         }
-        this.inside.setScale(scaleFactor);
-        this.add(this.inside);
+        obj.setScale(scaleFactor);
+        if(this.inside) {// Add alternate image
+            this.insideAlt = obj;
+            this.add(this.insideAlt);
+            this.hideAlt();
+        }
+        else{
+            this.inside = obj;
+            this.add(this.inside);
+        }
+    }
+
+    public getInside() : Phaser.GameObjects.Image | Phaser.GameObjects.BitmapText | Phaser.GameObjects.Text | undefined {
+        return this.inside;
+    }
+
+    public getInsideAlt() : Phaser.GameObjects.Image | Phaser.GameObjects.BitmapText | Phaser.GameObjects.Text | undefined {
+        return this.insideAlt;
     }
 
     /**
@@ -116,7 +140,7 @@ export class FramedImage extends Phaser.GameObjects.Container {
             this.drawSquircle();
         }
         else{
-            this.shape.setFillStyle(color);
+            this.shape.setFillStyle(color, alpha);
         }
     }
 }

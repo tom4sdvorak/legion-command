@@ -454,7 +454,7 @@
     "prerequisites": ["campfire_basic_2"],
     "level": 4,
     "target": "unit",
-    "iconFrameKey": "MOVE_SPEED_UP",
+    "iconFrameKey": "SPEED_UP",
     "tier": "minor"
   },
   {
@@ -516,7 +516,7 @@
     "prerequisites": ["campfire_cauldron_0"],
     "level": 8,
     "target": "unit",
-    "iconFrameKey": "MOVE_SPEED_UP",
+    "iconFrameKey": "SPEED_UP",
     "tier": "minor"
   },
   {
@@ -531,7 +531,7 @@
     "prerequisites": ["campfire_cauldron_1"],
     "level": 9,
     "target": "unit",
-    "iconFrameKey": "MOVE_SPEED_UP",
+    "iconFrameKey": "SPEED_UP",
     "tier": "minor"
   },
   {

@@ -9,7 +9,7 @@
     "speed": 100,
     "cost": 10,
     "spawnTime": 2000,
-    "attackRange": 128,
+    "attackRange": 112,
     "specialRange": 128,
     "specialCooldown": -1,
     "specialEnabled": false,
@@ -56,7 +56,7 @@
       "actionSpeed": "1.3x",
       "cost": "2x",
       "spawnTime": 3000,
-      "attackRange": 160,
+      "attackRange": 176,
       "projectileOffsetY": -60,
       "tags": ["archer", "dps"]
     },
@@ -69,7 +69,7 @@
       "speed": "0.8x",
       "cost": "2x",
       "spawnTime": 3000,
-      "attackRange": 224,
+      "attackRange": 240,
       "specialRange": 128,
       "specialValue": 1,
       "specialCooldown": 5000,
@@ -119,7 +119,7 @@
       "speed": "0.8x",
       "cost": "3x",
       "spawnTime": 4000,
-      "attackRange": 288,
+      "attackRange": 304,
       "projectileOffsetY": -45,
       "tags": ["kitsune", "debuffer"]
     }

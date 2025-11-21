@@ -13,7 +13,17 @@ export const ICON_FRAMES = {
     DMG_UP: 49,
     RANGE_UP: 50,
     ACTION_SPEED_UP: 51,
-    MOVE_SPEED_UP: 52,
+    PROJECTILE_SPEED_UP: 51,
+    SPEED_UP: 52,
+    DMG_DOWN: 53,
+    COST_DOWN: 54,
+    COST_UP: 55,
+    HP_DOWN: 56,
+    SPAWN_DOWN: 57,
+    SPAWN_UP: 58,
+    ARMOR_DOWN: 59,
+    ARMOR_UP: 60,
+    SPECIAL_POWER: 61,
     // 53-63
     // 64+
 } as const;

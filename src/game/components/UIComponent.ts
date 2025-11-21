@@ -108,6 +108,18 @@ export class UIComponent extends Phaser.GameObjects.Container {
         super.destroy(fromScene);
     }
 
+    public getChildrenByType(type: string) : Phaser.GameObjects.GameObject[] {
+        const returnArray : Phaser.GameObjects.GameObject[] = [];
+        console.log("CHECKING CHILDREN", [...this.content, ...this.fixedContent]);
+        for (const child of [...this.content, ...this.fixedContent]) {
+            console.log(child, child.constructor.name, type);
+            if (child instanceof Phaser.GameObjects.GameObject && child.constructor.name === type) {
+                returnArray.push(child);
+            }
+        }
+        return returnArray;
+    }
+
     private createMask(){
         if(this.contentMaskGraphics) this.contentMaskGraphics.clear();
         this.contentMaskGraphics.fillStyle(0x000000, 0);

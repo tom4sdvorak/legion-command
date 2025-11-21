@@ -1,17 +1,15 @@
 [
     {
-        "id": "archer_ap_com",
+        "id": "dps_ap_com",
         "name": "Sharpened Tips",
         "rarity": "common",
         "tags": [
-            "archer",
-            "dps",
-            "armorIgnore"
+            "dps"
         ],
         "iconFrameKey": [
             "DMG_UP"
         ],
-        "description": "Archer's attacks ignore 3 armor.",
+        "description": "Attacks ignore 3 armor.",
         "effects": [
             {
                 "stat": "armorIgnore",
@@ -21,18 +19,16 @@
         ]
     },
     {
-        "id": "archer_ap_epc",
+        "id": "dps_ap_epc",
         "name": "Hunter's Fury",
         "rarity": "epic",
         "tags": [
-            "archer",
-            "dps",
-            "armorIgnore"
+            "dps"
         ],
         "iconFrameKey": [
             "DMG_UP"
         ],
-        "description": "Archer's attacks ignore 10 armor.",
+        "description": "Attacks ignore 10 armor.",
         "effects": [
             {
                 "stat": "armorIgnore",
@@ -42,18 +38,16 @@
         ]
     },
     {
-        "id": "archer_ap_rar",
+        "id": "dps_ap_rar",
         "name": "Armor Piercers",
         "rarity": "rare",
         "tags": [
-            "archer",
-            "dps",
-            "armorIgnore"
+            "dps"
         ],
         "iconFrameKey": [
             "DMG_UP"
         ],
-        "description": "Archer's attacks ignore 6 armor.",
+        "description": "Attacks ignore 6 armor.",
         "effects": [
             {
                 "stat": "armorIgnore",
@@ -63,17 +57,16 @@
         ]
     },
     {
-        "id": "archer_as_percent_common",
+        "id": "dps_as_percent_common",
         "name": "Bowstring Speed I",
         "rarity": "common",
         "tags": [
-            "archer",
-            "actionSpeed"
+            "dps"
         ],
         "iconFrameKey": [
             "ACTION_SPEED_UP"
         ],
-        "description": "Archer attack speed +7%.",
+        "description": "Attack speed +7%.",
         "effects": [
             {
                 "stat": "actionSpeed",
@@ -83,17 +76,16 @@
         ]
     },
     {
-        "id": "archer_as_percent_epic",
+        "id": "dps_as_percent_epic",
         "name": "Bowstring Speed III",
         "rarity": "epic",
         "tags": [
-            "archer",
-            "actionSpeed"
+            "dps"
         ],
         "iconFrameKey": [
             "ACTION_SPEED_UP"
         ],
-        "description": "Archer attack speed +21%.",
+        "description": "Attack speed +21%.",
         "effects": [
             {
                 "stat": "actionSpeed",
@@ -103,17 +95,16 @@
         ]
     },
     {
-        "id": "archer_as_percent_rare",
+        "id": "dps_as_percent_rare",
         "name": "Bowstring Speed II",
         "rarity": "rare",
         "tags": [
-            "archer",
-            "actionSpeed"
+            "dps"
         ],
         "iconFrameKey": [
             "ACTION_SPEED_UP"
         ],
-        "description": "Archer attack speed +14%.",
+        "description": "Attack speed +14%.",
         "effects": [
             {
                 "stat": "actionSpeed",
@@ -127,8 +118,7 @@
         "name": "Common Quiver",
         "rarity": "common",
         "tags": [
-            "archer",
-            "range"
+            "archer"
         ],
         "iconFrameKey": [
             "RANGE_UP"
@@ -147,8 +137,7 @@
         "name": "Reinforced Quiver",
         "rarity": "rare",
         "tags": [
-            "archer",
-            "range"
+            "archer"
         ],
         "iconFrameKey": [
             "RANGE_UP"
@@ -167,8 +156,7 @@
         "name": "Eagle-Eye Quiver",
         "rarity": "epic",
         "tags": [
-            "archer",
-            "range"
+            "archer"
         ],
         "iconFrameKey": [
             "RANGE_UP"
@@ -188,8 +176,7 @@
         "rarity": "legendary",
         "tags": [
             "archer",
-            "specialEnabled",
-            "projectilePenetration"
+            "special"
         ],
         "iconFrameKey": [
             "SPECIAL_POWER"
@@ -213,9 +200,7 @@
         "name": "Lightened Draw",
         "rarity": "rare",
         "tags": [
-            "archer",
-            "actionSpeed",
-            "damage"
+            "archer"
         ],
         "iconFrameKey": [
             "ACTION_SPEED_UP",
@@ -240,8 +225,7 @@
         "name": "Mass Production I",
         "rarity": "common",
         "tags": [
-            "fireworm",
-            "cost"
+            "fireWorm"
         ],
         "iconFrameKey": [
             "COST_DOWN"
@@ -260,8 +244,7 @@
         "name": "Mass Production III",
         "rarity": "epic",
         "tags": [
-            "fireworm",
-            "cost"
+            "fireWorm"
         ],
         "iconFrameKey": [
             "COST_DOWN"
@@ -280,8 +263,7 @@
         "name": "Mass Production II",
         "rarity": "rare",
         "tags": [
-            "fireworm",
-            "cost"
+            "fireWorm"
         ],
         "iconFrameKey": [
             "COST_DOWN"
@@ -300,8 +282,7 @@
         "name": "Hotter Flame I",
         "rarity": "common",
         "tags": [
-            "fireworm",
-            "dps"
+            "fireWorm"
         ],
         "iconFrameKey": [
             "DMG_UP"
@@ -320,8 +301,7 @@
         "name": "Hotter Flame III",
         "rarity": "epic",
         "tags": [
-            "fireworm",
-            "dps"
+            "fireWorm"
         ],
         "iconFrameKey": [
             "DMG_UP"
@@ -340,8 +320,7 @@
         "name": "Hotter Flame II",
         "rarity": "rare",
         "tags": [
-            "fireworm",
-            "dps"
+            "fireWorm"
         ],
         "iconFrameKey": [
             "DMG_UP"
@@ -361,7 +340,7 @@
         "rarity": "legendary",
         "tags": [
             "fireWorm",
-            "specialEnabled"
+            "special"
         ],
         "iconFrameKey": [
             "SPECIAL_POWER"
@@ -381,17 +360,17 @@
         ]
     },
     {
-        "id": "fireworm_speed_percent_common",
+        "id": "speed_percent_common",
         "name": "Burrow Speed I",
         "rarity": "common",
         "tags": [
             "fireWorm",
-            "speed"
+            "gorgon"
         ],
         "iconFrameKey": [
             "SPEED_UP"
         ],
-        "description": "FireWorm movement speed +10%.",
+        "description": "Move speed +10%.",
         "effects": [
             {
                 "stat": "speed",
@@ -401,17 +380,17 @@
         ]
     },
     {
-        "id": "fireworm_speed_percent_epic",
+        "id": "speed_percent_epic",
         "name": "Burrow Speed III",
         "rarity": "epic",
         "tags": [
             "fireWorm",
-            "speed"
+            "gorgon"
         ],
         "iconFrameKey": [
             "SPEED_UP"
         ],
-        "description": "FireWorm movement speed +30%.",
+        "description": "Move speed +30%.",
         "effects": [
             {
                 "stat": "speed",
@@ -421,17 +400,17 @@
         ]
     },
     {
-        "id": "fireworm_speed_percent_rare",
+        "id": "speed_percent_rare",
         "name": "Burrow Speed II",
         "rarity": "rare",
         "tags": [
             "fireWorm",
-            "speed"
+            "gorgon"
         ],
         "iconFrameKey": [
             "SPEED_UP"
         ],
-        "description": "FireWorm movement speed +20%.",
+        "description": "Move speed +20%.",
         "effects": [
             {
                 "stat": "speed",
@@ -445,7 +424,6 @@
         "name": "Haste I",
         "rarity": "common",
         "tags": [
-            "actionSpeed",
             "generic"
         ],
         "iconFrameKey": [
@@ -465,7 +443,6 @@
         "name": "Haste III",
         "rarity": "epic",
         "tags": [
-            "actionSpeed",
             "generic"
         ],
         "iconFrameKey": [
@@ -485,7 +462,6 @@
         "name": "Haste II",
         "rarity": "rare",
         "tags": [
-            "actionSpeed",
             "generic"
         ],
         "iconFrameKey": [
@@ -505,9 +481,8 @@
         "name": "Unstable Fury II",
         "rarity": "epic",
         "tags": [
-            "damage",
-            "health",
-            "generic"
+            "melee",
+            "dps"
         ],
         "iconFrameKey": [
             "DMG_UP",
@@ -532,9 +507,8 @@
         "name": "Unstable Fury I",
         "rarity": "rare",
         "tags": [
-            "damage",
-            "health",
-            "generic"
+            "melee",
+            "dps"
         ],
         "iconFrameKey": [
             "DMG_UP",
@@ -559,18 +533,17 @@
         "name": "Mass Production I",
         "rarity": "common",
         "tags": [
-            "cost",
             "generic"
         ],
         "iconFrameKey": [
             "COST_DOWN"
         ],
-        "description": "Cost -5%.",
+        "description": "Cost -1.",
         "effects": [
             {
                 "stat": "cost",
-                "type": "percent",
-                "value": -0.05
+                "type": "flat",
+                "value": -1
             }
         ]
     },
@@ -579,18 +552,17 @@
         "name": "Mass Production III",
         "rarity": "epic",
         "tags": [
-            "cost",
             "generic"
         ],
         "iconFrameKey": [
             "COST_DOWN"
         ],
-        "description": "Cost -15%.",
+        "description": "Cost -3.",
         "effects": [
             {
                 "stat": "cost",
-                "type": "percent",
-                "value": -0.15
+                "type": "flat",
+                "value": -3
             }
         ]
     },
@@ -599,18 +571,17 @@
         "name": "Mass Production II",
         "rarity": "rare",
         "tags": [
-            "cost",
             "generic"
         ],
         "iconFrameKey": [
             "COST_DOWN"
         ],
-        "description": "Cost -10%.",
+        "description": "Cost -2.",
         "effects": [
             {
                 "stat": "cost",
-                "type": "percent",
-                "value": -0.1
+                "type": "flat",
+                "value": -2
             }
         ]
     },
@@ -619,7 +590,6 @@
         "name": "Focused Strike I",
         "rarity": "common",
         "tags": [
-            "damage",
             "generic"
         ],
         "iconFrameKey": [
@@ -639,7 +609,6 @@
         "name": "Focused Strike III",
         "rarity": "epic",
         "tags": [
-            "damage",
             "generic"
         ],
         "iconFrameKey": [
@@ -659,7 +628,6 @@
         "name": "Focused Strike II",
         "rarity": "rare",
         "tags": [
-            "damage",
             "generic"
         ],
         "iconFrameKey": [
@@ -679,7 +647,6 @@
         "name": "Vitality Boost I",
         "rarity": "common",
         "tags": [
-            "health",
             "generic"
         ],
         "iconFrameKey": [
@@ -699,7 +666,6 @@
         "name": "Vitality Boost III",
         "rarity": "epic",
         "tags": [
-            "health",
             "generic"
         ],
         "iconFrameKey": [
@@ -719,7 +685,6 @@
         "name": "Vitality Boost II",
         "rarity": "rare",
         "tags": [
-            "health",
             "generic"
         ],
         "iconFrameKey": [
@@ -739,8 +704,6 @@
         "name": "Overburdened Foundry",
         "rarity": "rare",
         "tags": [
-            "cost",
-            "spawnTime",
             "generic"
         ],
         "iconFrameKey": [
@@ -766,8 +729,6 @@
         "name": "Rapid Mobilization Tax",
         "rarity": "rare",
         "tags": [
-            "cost",
-            "spawnTime",
             "generic"
         ],
         "iconFrameKey": [
@@ -793,7 +754,6 @@
         "name": "Efficient Release I",
         "rarity": "common",
         "tags": [
-            "spawn",
             "generic"
         ],
         "iconFrameKey": [
@@ -813,7 +773,6 @@
         "name": "Efficient Release III",
         "rarity": "epic",
         "tags": [
-            "spawn",
             "generic"
         ],
         "iconFrameKey": [
@@ -833,7 +792,6 @@
         "name": "Efficient Release II",
         "rarity": "rare",
         "tags": [
-            "spawn",
             "generic"
         ],
         "iconFrameKey": [
@@ -853,7 +811,6 @@
         "name": "Marching Orders I",
         "rarity": "common",
         "tags": [
-            "speed",
             "generic"
         ],
         "iconFrameKey": [
@@ -873,7 +830,6 @@
         "name": "Marching Orders III",
         "rarity": "epic",
         "tags": [
-            "speed",
             "generic"
         ],
         "iconFrameKey": [
@@ -893,7 +849,6 @@
         "name": "Marching Orders II",
         "rarity": "rare",
         "tags": [
-            "speed",
             "generic"
         ],
         "iconFrameKey": [
@@ -913,9 +868,7 @@
         "name": "Shrieking Rage I",
         "rarity": "common",
         "tags": [
-            "gorgon",
-            "damage",
-            "health"
+            "gorgon"
         ],
         "iconFrameKey": [
             "DMG_HP_UP"
@@ -939,9 +892,7 @@
         "name": "Shrieking Rage III",
         "rarity": "epic",
         "tags": [
-            "gorgon",
-            "damage",
-            "health"
+            "gorgon"
         ],
         "iconFrameKey": [
             "DMG_HP_UP"
@@ -965,9 +916,7 @@
         "name": "Shrieking Rage II",
         "rarity": "rare",
         "tags": [
-            "gorgon",
-            "damage",
-            "health"
+            "gorgon"
         ],
         "iconFrameKey": [
             "DMG_HP_UP"
@@ -991,8 +940,7 @@
         "name": "Accelerated Birth",
         "rarity": "common",
         "tags": [
-            "gorgon",
-            "production"
+            "gorgon"
         ],
         "iconFrameKey": [
             "SPAWN_DOWN"
@@ -1011,8 +959,7 @@
         "name": "Instant Manifest",
         "rarity": "epic",
         "tags": [
-            "gorgon",
-            "production"
+            "gorgon"
         ],
         "iconFrameKey": [
             "SPAWN_DOWN"
@@ -1031,8 +978,7 @@
         "name": "Rapid Incubation",
         "rarity": "rare",
         "tags": [
-            "gorgon",
-            "production"
+            "gorgon"
         ],
         "iconFrameKey": [
             "SPAWN_DOWN"
@@ -1052,7 +998,7 @@
         "rarity": "legendary",
         "tags": [
             "gorgon",
-            "specialEnabled"
+            "special"
         ],
         "iconFrameKey": [
             "SPECIAL_POWER"
@@ -1072,77 +1018,16 @@
         ]
     },
     {
-        "id": "gorgon_speed_c1",
-        "name": "Quickened Pace",
-        "rarity": "common",
-        "tags": [
-            "gorgon",
-            "speed"
-        ],
-        "iconFrameKey": [
-            "SPEED_UP"
-        ],
-        "description": "Gorgon moves 10% faster.",
-        "effects": [
-            {
-                "stat": "speed",
-                "type": "percent",
-                "value": 0.1
-            }
-        ]
-    },
-    {
-        "id": "gorgon_speed_e1",
-        "name": "Blinding Rush",
-        "rarity": "epic",
-        "tags": [
-            "gorgon",
-            "speed"
-        ],
-        "iconFrameKey": [
-            "SPEED_UP"
-        ],
-        "description": "Gorgon moves 35% faster.",
-        "effects": [
-            {
-                "stat": "speed",
-                "type": "percent",
-                "value": 0.35
-            }
-        ]
-    },
-    {
-        "id": "gorgon_speed_r1",
-        "name": "Swift Stride",
-        "rarity": "rare",
-        "tags": [
-            "gorgon",
-            "speed"
-        ],
-        "iconFrameKey": [
-            "SPEED_UP"
-        ],
-        "description": "Gorgon moves 20% faster.",
-        "effects": [
-            {
-                "stat": "speed",
-                "type": "percent",
-                "value": 0.2
-            }
-        ]
-    },
-    {
-        "id": "kitsune_cost_c1",
+        "id": "cost_c1",
         "name": "Frugal Spirit I",
         "rarity": "common",
         "tags": [
-            "kitsune",
-            "economy"
+            "kitsune"
         ],
         "iconFrameKey": [
             "COST_DOWN"
         ],
-        "description": "Kitsune now costs $5\\%$ less.",
+        "description": "Cost -5%.",
         "effects": [
             {
                 "stat": "cost",
@@ -1152,17 +1037,16 @@
         ]
     },
     {
-        "id": "kitsune_cost_e1",
+        "id": "cost_e1",
         "name": "Frugal Spirit III",
         "rarity": "epic",
         "tags": [
-            "kitsune",
-            "economy"
+            "kitsune"
         ],
         "iconFrameKey": [
             "COST_DOWN"
         ],
-        "description": "Kitsune now costs $15\\%$ less.",
+        "description": "Cost -15%.",
         "effects": [
             {
                 "stat": "cost",
@@ -1172,17 +1056,16 @@
         ]
     },
     {
-        "id": "kitsune_cost_r1",
+        "id": "cost_r1",
         "name": "Frugal Spirit II",
         "rarity": "rare",
         "tags": [
-            "kitsune",
-            "economy"
+            "kitsune"
         ],
         "iconFrameKey": [
             "COST_DOWN"
         ],
-        "description": "Kitsune now costs $10\\%$ less.",
+        "description": "Cost -10%.",
         "effects": [
             {
                 "stat": "cost",
@@ -1192,17 +1075,17 @@
         ]
     },
     {
-        "id": "kitsune_hp_c1",
+        "id": "hp_c1",
         "name": "Spirit Fortitude I",
         "rarity": "common",
         "tags": [
             "kitsune",
-            "health"
+            "support"
         ],
         "iconFrameKey": [
             "HP_UP"
         ],
-        "description": "Kitsune gains $20\\%$ maximum health.",
+        "description": "20% more maximum health.",
         "effects": [
             {
                 "stat": "maxHealth",
@@ -1212,17 +1095,17 @@
         ]
     },
     {
-        "id": "kitsune_hp_e1",
+        "id": "hp_e1",
         "name": "Spirit Fortitude III",
         "rarity": "epic",
         "tags": [
             "kitsune",
-            "health"
+            "support"
         ],
         "iconFrameKey": [
             "HP_UP"
         ],
-        "description": "Kitsune gains $75\\%$ maximum health.",
+        "description": "75% more maximum health.",
         "effects": [
             {
                 "stat": "maxHealth",
@@ -1232,17 +1115,17 @@
         ]
     },
     {
-        "id": "kitsune_hp_r1",
+        "id": "hp_r1",
         "name": "Spirit Fortitude II",
         "rarity": "rare",
         "tags": [
             "kitsune",
-            "health"
+            "support"
         ],
         "iconFrameKey": [
             "HP_UP"
         ],
-        "description": "Kitsune gains $40\\%$ maximum health.",
+        "description": "40% more maximum health.",
         "effects": [
             {
                 "stat": "maxHealth",
@@ -1256,8 +1139,7 @@
         "name": "Rapid Appearance I",
         "rarity": "common",
         "tags": [
-            "kitsune",
-            "spawnTime"
+            "kitsune"
         ],
         "iconFrameKey": [
             "SPAWN_DOWN"
@@ -1276,8 +1158,7 @@
         "name": "Rapid Appearance III",
         "rarity": "epic",
         "tags": [
-            "kitsune",
-            "spawnTime"
+            "kitsune"
         ],
         "iconFrameKey": [
             "SPAWN_DOWN"
@@ -1296,8 +1177,7 @@
         "name": "Rapid Appearance II",
         "rarity": "rare",
         "tags": [
-            "kitsune",
-            "spawnTime"
+            "kitsune"
         ],
         "iconFrameKey": [
             "SPAWN_DOWN"
@@ -1317,7 +1197,7 @@
         "rarity": "legendary",
         "tags": [
             "kitsune",
-            "specialEnabled"
+            "special"
         ],
         "iconFrameKey": [
             "SPECIAL_POWER"
@@ -1337,78 +1217,16 @@
         ]
     },
     {
-        "id": "melee_as_percent_common",
-        "name": "Furious Tempo I",
-        "rarity": "common",
-        "tags": [
-            "melee",
-            "actionSpeed"
-        ],
-        "iconFrameKey": [
-            "ACTION_SPEED_UP"
-        ],
-        "description": "Increases attack speed by 5%.",
-        "effects": [
-            {
-                "stat": "actionSpeed",
-                "type": "percent",
-                "value": -0.05
-            }
-        ]
-    },
-    {
-        "id": "melee_as_percent_epic",
-        "name": "Furious Tempo III",
-        "rarity": "epic",
-        "tags": [
-            "melee",
-            "actionSpeed"
-        ],
-        "iconFrameKey": [
-            "ACTION_SPEED_UP"
-        ],
-        "description": "Increases attack speed by 15%.",
-        "effects": [
-            {
-                "stat": "actionSpeed",
-                "type": "percent",
-                "value": -0.15
-            }
-        ]
-    },
-    {
-        "id": "melee_as_percent_rare",
-        "name": "Furious Tempo II",
-        "rarity": "rare",
-        "tags": [
-            "melee",
-            "actionSpeed"
-        ],
-        "iconFrameKey": [
-            "ACTION_SPEED_UP"
-        ],
-        "description": "Increases attack speed by 10%.",
-        "effects": [
-            {
-                "stat": "actionSpeed",
-                "type": "percent",
-                "value": -0.1
-            }
-        ]
-    },
-    {
         "id": "melee_speed_armor_common",
         "name": "Trench Boots I",
         "rarity": "common",
         "tags": [
-            "melee",
-            "speed",
-            "armor"
+            "melee"
         ],
         "iconFrameKey": [
             "ARMOR_SPEED_UP"
         ],
-        "description": "Melee speed +5%, Armor +0.5.",
+        "description": "Walking speed +5%, Armor +0.5.",
         "effects": [
             {
                 "stat": "speed",
@@ -1427,14 +1245,12 @@
         "name": "Trench Boots III",
         "rarity": "epic",
         "tags": [
-            "melee",
-            "speed",
-            "armor"
+            "melee"
         ],
         "iconFrameKey": [
             "ARMOR_SPEED_UP"
         ],
-        "description": "Melee speed +15%, Armor +1.5.",
+        "description": "Walking speed +15%, Armor +1.5.",
         "effects": [
             {
                 "stat": "speed",
@@ -1453,14 +1269,12 @@
         "name": "Trench Boots II",
         "rarity": "rare",
         "tags": [
-            "melee",
-            "speed",
-            "armor"
+            "melee"
         ],
         "iconFrameKey": [
             "ARMOR_SPEED_UP"
         ],
-        "description": "Melee speed +10%, Armor +1.",
+        "description": "Walking speed +10%, Armor +1.",
         "effects": [
             {
                 "stat": "speed",
@@ -1475,73 +1289,12 @@
         ]
     },
     {
-        "id": "minotaur_arm_c1",
-        "name": "Plated Hide I",
-        "rarity": "common",
-        "tags": [
-            "minotaur",
-            "tank"
-        ],
-        "iconFrameKey": [
-            "ARMOR_UP"
-        ],
-        "description": "Minotaur gains 3 armor.",
-        "effects": [
-            {
-                "stat": "armor",
-                "type": "flat",
-                "value": 3
-            }
-        ]
-    },
-    {
-        "id": "minotaur_arm_e1",
-        "name": "Plated Hide III",
-        "rarity": "epic",
-        "tags": [
-            "minotaur",
-            "tank"
-        ],
-        "iconFrameKey": [
-            "ARMOR_UP"
-        ],
-        "description": "Minotaur gains 10 armor.",
-        "effects": [
-            {
-                "stat": "armor",
-                "type": "flat",
-                "value": 10
-            }
-        ]
-    },
-    {
-        "id": "minotaur_arm_r1",
-        "name": "Plated Hide II",
-        "rarity": "rare",
-        "tags": [
-            "minotaur",
-            "tank"
-        ],
-        "iconFrameKey": [
-            "ARMOR_UP"
-        ],
-        "description": "Minotaur gains 7 armor.",
-        "effects": [
-            {
-                "stat": "armor",
-                "type": "flat",
-                "value": 7
-            }
-        ]
-    },
-    {
         "id": "minotaur_special",
         "name": "Piercing Horns",
         "rarity": "legendary",
         "tags": [
             "minotaur",
-            "armorIgnore",
-            "specialEnabled"
+            "special"
         ],
         "iconFrameKey": [
             "SPECIAL_POWER"
@@ -1565,8 +1318,7 @@
         "name": "Charge I",
         "rarity": "common",
         "tags": [
-            "minotaur",
-            "speed"
+            "minotaur"
         ],
         "iconFrameKey": [
             "SPEED_UP"
@@ -1585,8 +1337,7 @@
         "name": "Charge III",
         "rarity": "epic",
         "tags": [
-            "minotaur",
-            "speed"
+            "minotaur"
         ],
         "iconFrameKey": [
             "SPEED_UP"
@@ -1605,8 +1356,7 @@
         "name": "Charge II",
         "rarity": "rare",
         "tags": [
-            "minotaur",
-            "speed"
+            "minotaur"
         ],
         "iconFrameKey": [
             "SPEED_UP"
@@ -1625,9 +1375,7 @@
         "name": "Snipers' Focus I",
         "rarity": "common",
         "tags": [
-            "ranged",
-            "actionSpeed",
-            "range"
+            "ranged"
         ],
         "iconFrameKey": [
             "ACTION_SPEED_UP",
@@ -1652,9 +1400,7 @@
         "name": "Snipers' Focus III",
         "rarity": "epic",
         "tags": [
-            "ranged",
-            "actionSpeed",
-            "range"
+            "ranged"
         ],
         "iconFrameKey": [
             "ACTION_SPEED_UP",
@@ -1679,9 +1425,7 @@
         "name": "Snipers' Focus II",
         "rarity": "rare",
         "tags": [
-            "ranged",
-            "actionSpeed",
-            "range"
+            "ranged"
         ],
         "iconFrameKey": [
             "ACTION_SPEED_UP",
@@ -1702,12 +1446,11 @@
         ]
     },
     {
-        "id": "ranged_dmg_percent_common",
+        "id": "dps_dmg_percent_common",
         "name": "Precise Hit I",
         "rarity": "common",
         "tags": [
-            "range",
-            "damage"
+            "dps"
         ],
         "iconFrameKey": [
             "DMG_UP"
@@ -1722,12 +1465,11 @@
         ]
     },
     {
-        "id": "ranged_dmg_percent_epic",
+        "id": "dps_dmg_percent_epic",
         "name": "Precise Hit III",
         "rarity": "epic",
         "tags": [
-            "range",
-            "damage"
+            "dps"
         ],
         "iconFrameKey": [
             "DMG_UP"
@@ -1742,12 +1484,11 @@
         ]
     },
     {
-        "id": "ranged_dmg_percent_rare",
+        "id": "dps_dmg_percent_rare",
         "name": "Precise Hit II",
         "rarity": "rare",
         "tags": [
-            "range",
-            "damage"
+            "dps"
         ],
         "iconFrameKey": [
             "DMG_UP"
@@ -1766,8 +1507,7 @@
         "name": "Quick Release I",
         "rarity": "common",
         "tags": [
-            "ranged",
-            "projectileVelocity"
+            "ranged"
         ],
         "iconFrameKey": [
             "PROJECTILE_SPEED_UP"
@@ -1786,8 +1526,7 @@
         "name": "Quick Release III",
         "rarity": "epic",
         "tags": [
-            "ranged",
-            "projectileVelocity"
+            "ranged"
         ],
         "iconFrameKey": [
             "PROJECTILE_SPEED_UP"
@@ -1806,8 +1545,7 @@
         "name": "Quick Release II",
         "rarity": "rare",
         "tags": [
-            "ranged",
-            "projectileVelocity"
+            "ranged"
         ],
         "iconFrameKey": [
             "PROJECTILE_SPEED_UP"
@@ -1826,8 +1564,7 @@
         "name": "Range Extender I",
         "rarity": "common",
         "tags": [
-            "ranged",
-            "range"
+            "ranged"
         ],
         "iconFrameKey": [
             "RANGE_UP"
@@ -1846,8 +1583,7 @@
         "name": "Range Extender III",
         "rarity": "epic",
         "tags": [
-            "ranged",
-            "range"
+            "ranged"
         ],
         "iconFrameKey": [
             "RANGE_UP"
@@ -1866,8 +1602,7 @@
         "name": "Range Extender II",
         "rarity": "rare",
         "tags": [
-            "ranged",
-            "range"
+            "ranged"
         ],
         "iconFrameKey": [
             "RANGE_UP"
@@ -1882,132 +1617,11 @@
         ]
     },
     {
-        "id": "support_as_common",
-        "name": "Support Efficiency I",
-        "rarity": "common",
-        "tags": [
-            "support",
-            "actionSpeed"
-        ],
-        "iconFrameKey": [
-            "ACTION_SPEED_UP"
-        ],
-        "description": "Attack speed +5%.",
-        "effects": [
-            {
-                "stat": "actionSpeed",
-                "type": "percent",
-                "value": -0.05
-            }
-        ]
-    },
-    {
-        "id": "support_as_epic",
-        "name": "Support Efficiency III",
-        "rarity": "epic",
-        "tags": [
-            "support",
-            "actionSpeed"
-        ],
-        "iconFrameKey": [
-            "ACTION_SPEED_UP"
-        ],
-        "description": "Attack speed +15%.",
-        "effects": [
-            {
-                "stat": "actionSpeed",
-                "type": "percent",
-                "value": -0.15
-            }
-        ]
-    },
-    {
-        "id": "support_as_rare",
-        "name": "Support Efficiency II",
-        "rarity": "rare",
-        "tags": [
-            "support",
-            "actionSpeed"
-        ],
-        "iconFrameKey": [
-            "ACTION_SPEED_UP"
-        ],
-        "description": "Attack speed +10%.",
-        "effects": [
-            {
-                "stat": "actionSpeed",
-                "type": "percent",
-                "value": -0.1
-            }
-        ]
-    },
-    {
-        "id": "support_cost_common",
-        "name": "Streamlined Training I",
-        "rarity": "common",
-        "tags": [
-            "support",
-            "cost"
-        ],
-        "iconFrameKey": [
-            "COST_DOWN"
-        ],
-        "description": "Support unit cost -1.",
-        "effects": [
-            {
-                "stat": "cost",
-                "type": "flat",
-                "value": -1
-            }
-        ]
-    },
-    {
-        "id": "support_cost_epic",
-        "name": "Streamlined Training III",
-        "rarity": "epic",
-        "tags": [
-            "support",
-            "cost"
-        ],
-        "iconFrameKey": [
-            "COST_DOWN"
-        ],
-        "description": "Support unit cost -3.",
-        "effects": [
-            {
-                "stat": "cost",
-                "type": "flat",
-                "value": -3
-            }
-        ]
-    },
-    {
-        "id": "support_cost_rare",
-        "name": "Streamlined Training II",
-        "rarity": "rare",
-        "tags": [
-            "support",
-            "cost"
-        ],
-        "iconFrameKey": [
-            "COST_DOWN"
-        ],
-        "description": "Support unit cost -2.",
-        "effects": [
-            {
-                "stat": "cost",
-                "type": "flat",
-                "value": -2
-            }
-        ]
-    },
-    {
         "id": "support_range_s1",
         "name": "Extended Aura",
         "rarity": "common",
         "tags": [
-            "support",
-            "range"
+            "support"
         ],
         "iconFrameKey": [
             "RANGE_UP"
@@ -2026,8 +1640,7 @@
         "name": "Broadened Focus",
         "rarity": "rare",
         "tags": [
-            "support",
-            "range"
+            "support"
         ],
         "iconFrameKey": [
             "RANGE_UP"
@@ -2046,8 +1659,7 @@
         "name": "Global Influence",
         "rarity": "epic",
         "tags": [
-            "support",
-            "range"
+            "support"
         ],
         "iconFrameKey": [
             "RANGE_UP"
@@ -2066,9 +1678,7 @@
         "name": "Field Medic Gear I",
         "rarity": "common",
         "tags": [
-            "support",
-            "speed",
-            "health"
+            "support"
         ],
         "iconFrameKey": [
             "SPEED_UP",
@@ -2093,9 +1703,7 @@
         "name": "Field Medic Gear III",
         "rarity": "epic",
         "tags": [
-            "support",
-            "speed",
-            "health"
+            "support"
         ],
         "iconFrameKey": [
             "SPEED_UP",
@@ -2120,9 +1728,7 @@
         "name": "Field Medic Gear II",
         "rarity": "rare",
         "tags": [
-            "support",
-            "speed",
-            "health"
+            "support"
         ],
         "iconFrameKey": [
             "SPEED_UP",
@@ -2147,13 +1753,12 @@
         "name": "Plating Reinforcement I",
         "rarity": "common",
         "tags": [
-            "warrior",
-            "armor"
+            "tank"
         ],
         "iconFrameKey": [
             "ARMOR_UP"
         ],
-        "description": "Warrior armor +5.",
+        "description": "Armor +5.",
         "effects": [
             {
                 "stat": "armor",
@@ -2167,13 +1772,12 @@
         "name": "Plating Reinforcement III",
         "rarity": "epic",
         "tags": [
-            "warrior",
-            "armor"
+            "tank"
         ],
         "iconFrameKey": [
             "ARMOR_UP"
         ],
-        "description": "Warrior armor +15.",
+        "description": "Armor +15.",
         "effects": [
             {
                 "stat": "armor",
@@ -2187,13 +1791,12 @@
         "name": "Plating Reinforcement II",
         "rarity": "rare",
         "tags": [
-            "warrior",
-            "armor"
+            "tank"
         ],
         "iconFrameKey": [
             "ARMOR_UP"
         ],
-        "description": "Warrior armor +10.",
+        "description": "Armor +10",
         "effects": [
             {
                 "stat": "armor",
@@ -2207,9 +1810,7 @@
         "name": "Reorientation",
         "rarity": "epic",
         "tags": [
-            "warrior",
-            "damage",
-            "armor"
+            "warrior"
         ],
         "iconFrameKey": [
             "DMG_UP",
@@ -2234,13 +1835,12 @@
         "name": "Shield Training I",
         "rarity": "common",
         "tags": [
-            "warrior",
-            "health"
+            "tank"
         ],
         "iconFrameKey": [
             "HP_UP"
         ],
-        "description": "Warrior max health +7%.",
+        "description": "Max health +7%.",
         "effects": [
             {
                 "stat": "maxHealth",
@@ -2254,13 +1854,12 @@
         "name": "Shield Training III",
         "rarity": "epic",
         "tags": [
-            "warrior",
-            "health"
+            "tank"
         ],
         "iconFrameKey": [
             "HP_UP"
         ],
-        "description": "Warrior max health +21%.",
+        "description": "Max health +21%.",
         "effects": [
             {
                 "stat": "maxHealth",
@@ -2274,13 +1873,12 @@
         "name": "Shield Training II",
         "rarity": "rare",
         "tags": [
-            "warrior",
-            "health"
+            "tank"
         ],
         "iconFrameKey": [
             "HP_UP"
         ],
-        "description": "Warrior max health +14%.",
+        "description": "Max health +14%.",
         "effects": [
             {
                 "stat": "maxHealth",
@@ -2294,8 +1892,7 @@
         "name": "Rapid Deployment I",
         "rarity": "common",
         "tags": [
-            "warrior",
-            "spawnTime"
+            "warrior"
         ],
         "iconFrameKey": [
             "SPAWN_DOWN"
@@ -2314,8 +1911,7 @@
         "name": "Rapid Deployment III",
         "rarity": "epic",
         "tags": [
-            "warrior",
-            "spawnTime"
+            "warrior"
         ],
         "iconFrameKey": [
             "SPAWN_DOWN"
@@ -2334,8 +1930,7 @@
         "name": "Rapid Deployment II",
         "rarity": "rare",
         "tags": [
-            "warrior",
-            "spawnTime"
+            "warrior"
         ],
         "iconFrameKey": [
             "SPAWN_DOWN"
@@ -2355,7 +1950,7 @@
         "rarity": "legendary",
         "tags": [
             "warrior",
-            "tank"
+            "special"
         ],
         "iconFrameKey": [
             "ARMOR_UP"
@@ -2379,9 +1974,7 @@
         "name": "Arcane Resonance",
         "rarity": "epic",
         "tags": [
-            "wizard",
-            "range",
-            "actionSpeed"
+            "wizard"
         ],
         "iconFrameKey": [
             "RANGE_UP",
@@ -2407,10 +2000,10 @@
         "rarity": "legendary",
         "tags": [
             "wizard",
-            "support"
+            "special"
         ],
         "iconFrameKey": [
-            "EFFECT_UP"
+            "SPECIAL_POWER"
         ],
         "description": "Wizard's support ability buffs are improved by 100%",
         "effects": [
