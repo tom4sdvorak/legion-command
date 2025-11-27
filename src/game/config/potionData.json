@@ -1,7 +1,7 @@
 [
   {
     "id": "potion_might",
-    "name": "Might",
+    "name": "Potion of Might",
     "description": "Units damage +20%",
     "cost": 1,
     "effects": [
@@ -10,7 +10,7 @@
   },
   {
     "id": "potion_health",
-    "name": "Health",
+    "name": "Potion of Health",
     "description": "Units health +20%",
     "cost": 1,
     "effects": [
@@ -19,7 +19,7 @@
   },
   {
     "id": "potion_speed",
-    "name": "Swiftness",
+    "name": "Potion of Swiftness",
     "description": "Units move speed +30%",
     "cost": 1,
     "effects": [

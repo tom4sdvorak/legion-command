@@ -190,10 +190,10 @@ export class PlayerController {
     }
 
     public update(time: any, delta: number): void {
-
+        
         // If we are spawning, reduce spawn timer by delta and increase counter of frames since last spawn
         if(this.isSpawning){
-            this.spawnTime -= delta;
+            this.spawnTime -= delta*this.scene.time.timeScale;
             if(this.spawnTime < 0) this.spawnTime = 0;
             if(this.framesSinceSpawn < 3) this.framesSinceSpawn++;
         }

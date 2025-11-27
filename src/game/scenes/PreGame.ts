@@ -371,9 +371,11 @@ export class PreGame extends Scene
         })
         .on('pointerover', () => {
             this.input.setDefaultCursor('pointer');
+            this.stageSelectButton.changeBackground(undefined, 1);
         })
         .on('pointerout', () => {
             this.input.setDefaultCursor('default');
+            this.stageSelectButton.changeBackground(undefined, 0.5);
         });
 
         let tempArray : any[] = [];
@@ -428,9 +430,11 @@ export class PreGame extends Scene
             })
             .on('pointerover', () => {
                 this.input.setDefaultCursor('pointer');
+                levelIcon.changeBackground(undefined, 1);
             })
             .on('pointerout', () => {
                 this.input.setDefaultCursor('default');
+                levelIcon.changeBackground(undefined, 0.5);
             });
             tempArray.push(line, levelIcon);
         });
@@ -547,7 +551,7 @@ export class PreGame extends Scene
         //let preConID : string | undefined;
         let selectedCon : ConstructionUpgrade | undefined;
         let lastClicked : FramedImage | undefined;
-        const padding = 16;
+        const padding = 32;
         const title = this.add.bitmapText(0, 0, 'pixelFont', 'WORKSHOP', 64).setMaxWidth(this.constructionMenu.width-padding*2);
         const conName = this.add.bitmapText(0, 0, 'pixelFont', '', 48).setMaxWidth(this.constructionMenu.width-padding*2);
         const conText = this.add.bitmapText(0, 0, 'pixelFont', '', 32).setMaxWidth(this.constructionMenu.width-padding*2);
@@ -580,9 +584,11 @@ export class PreGame extends Scene
         })
             .on('pointerover', () => {
                 this.input.setDefaultCursor('pointer');
+                this.conBuyButton.changeBackground(undefined, 1);
             })
             .on('pointerout', () => {
                 this.input.setDefaultCursor('default');
+                this.conBuyButton.changeBackground(undefined, 0.5);
             });
         this.constructionMenu.insertElement(title, true);
         this.constructionMenu.insertElement([conName, coinImage, conCost], true);
@@ -618,15 +624,18 @@ export class PreGame extends Scene
                 }
                 conSlot.putInside(this.add.image(0, 0, 'icons', ICON_FRAMES[con.iconFrameKey]));
                 conSlot.changeBorder(4, devConfig.negativeColor); // Set all upgrades to not possible color
+                conSlot.changeBackground(devConfig.negativeColorLight, 0.5);
                 conSlot.setData('canBuild', false);
                 if(this.builtConstructions.includes(con.id)){ // Change those already built to neutral color
                     conSlot.changeBorder(4, 0x000000);
+                    conSlot.changeBackground(0xCCCCCC, 0.5);
                     conSlot.setData('built', true);
                     line.strokeColor = 0x000000;
                 }
                 else if(firstNotBuilt){ // On finding first upgrade not built, give it special color
                     firstNotBuilt = false;
                     conSlot.changeBorder(4, devConfig.positiveColor);
+                    conSlot.changeBackground(devConfig.positiveColorLight, 0.5);
                     line.strokeColor = devConfig.positiveColor;
                     conSlot.setData('built', false);
                     if(this.playerMoney >= con.cost){
@@ -678,9 +687,11 @@ export class PreGame extends Scene
                 })
                     .on('pointerover', () => {
                         this.input.setDefaultCursor('pointer');
+                        conSlot.changeBackground(undefined, 1);
                     })
                     .on('pointerout', () => {
                         this.input.setDefaultCursor('default');
+                        conSlot.changeBackground(undefined, 0.5);
                     });
                 tempArray.push(line, conSlot);
             });
@@ -696,16 +707,60 @@ export class PreGame extends Scene
 
     /* Handles this.alchemist sprite and potion selection */
     alchemistLogic(){
-        this.potionsMenu = new UIComponent(this, (this.gameWidth-this.largeWindowSize.w/2-64), this.gameHeight/2, this.largeWindowSize.w, this.largeWindowSize.h, 0).setDepth(1001).setVisible(false);
+        this.potionsMenu = new UIComponent(this, (this.gameWidth-this.largeWindowSize.w/2-64), this.gameHeight/2, this.largeWindowSize.w, this.largeWindowSize.h/2, 0).setDepth(1001).setVisible(false);
         this.add.existing(this.potionsMenu);
         /*this.potionsMenu.on('uicomponent-visibility-changed', (visible : boolean) => {
             if(!visible) this.alchemist.playAfterRepeat('alchemist_dialogToIdle');
         });*/
         this.potionsMenu.setInteractive();
+        const title = this.add.bitmapText(0, 0, 'pixelFont', 'The Alchemist', 64);
+        const text = this.add.bitmapText(0, 0, 'pixelFont', 'Enhance units with random potion for next game?', 32).setMaxWidth(this.potionsMenu!.width-64);
+        const costText = this.add.bitmapText(0, 0, 'pixelFont', 'Costs 10', 32).setMaxWidth(this.potionsMenu!.width-64);
+        const coinImage = this.add.image(0, 0, 'coin_gold').setDisplaySize(32, 32).setOrigin(0,0.5);
+        const empty = this.add.rectangle(0, 0, 16, 16, 0x000000).setVisible(false);
+        const potionBuy = new FramedImage(this, 0, 0, 64, 40, 'square').setInteractive();
+        if(this.registry.get('coins') < 10){
+            potionBuy.changeBorder(4, devConfig.negativeColor);
+            potionBuy.changeBackground(devConfig.negativeColorLight, 0.5);
+        }
+        potionBuy.putInside(this.add.bitmapText(0, 0, 'pixelFont', 'BUY', 32));
+        potionBuy.changeBorder(4, devConfig.positiveColor);
+        potionBuy.changeBackground(devConfig.positiveColorLight, 0.5);
+        this.potionsMenu.insertElement(title, true);
+        this.potionsMenu.insertElement(text);
+        this.potionsMenu.insertElement([costText, coinImage, empty, potionBuy]);
+        this.potionsMenu.positionElements(['left', 'top'], 0, 8);
+
+        potionBuy.on('pointerup', () => {
+            if(this.registry.get('coins') < 10) return; // Skip if not enough coins
+            this.registry.set('coins', this.registry.get('coins') - 10);
+            this.updateMoney();
+            const potions : Potion[] = this.upgradeManager.getAllPotions();
+            const randomPotionIndex = Math.floor(Math.random() * potions.length);
+            const randomPotion : Potion = potions[randomPotionIndex];
+            this.registry.set('playerPotion', randomPotion.id);
+            this.potionSelected = true;
+            this.alchemist?.playAfterRepeat('alchemist_idleToDialog');
+            this.potionsMenu?.destroyContent(false);
+            const potionName = this.add.bitmapText(0, 0, 'pixelFont', randomPotion.name, 48).setMaxWidth(this.potionsMenu!.width-64);
+            const potionText = this.add.bitmapText(0, 0, 'pixelFont', randomPotion.description, 32).setMaxWidth(this.potionsMenu!.width-64);
+            this.potionsMenu?.insertElement(potionName);
+            this.potionsMenu?.insertElement(potionText);
+            this.potionsMenu?.positionElements(['left', 'top'], 0, 8);
+        })
+        .on('pointerover', () => {
+            this.input.setDefaultCursor('pointer');
+            potionBuy.changeBackground(devConfig.positiveColorLight, 1);
+        })
+        .on('pointerout', () => {
+            this.input.setDefaultCursor('default');
+            potionBuy.changeBackground(devConfig.positiveColorLight, 0.5);
+        });
         
         // Load and show potions
-        const potions : Potion[] = this.upgradeManager.getAllPotions();
-        potions.forEach((potion : Potion) => {
+        
+        
+        /*potions.forEach((potion : Potion) => {
 
             // Potion info
             const potionName = this.add.bitmapText(0, 0, 'pixelFont', potion.name, 64).setMaxWidth(this.potionsMenu!.width-64);
@@ -730,12 +785,11 @@ export class PreGame extends Scene
             this.potionsMenu?.insertElement(potionText);
             this.potionsMenu?.insertElement([potionCostText, coinImage, potionButton]);
         });
-        this.potionsMenu.positionElements(['left', 'top'], 0, 8);
+        this.potionsMenu.positionElements(['left', 'top'], 0, 8);*/
 
         this.alchemist = this.add.sprite(100, this.botY, 'alchemist').play('alchemist_idle').setScale(2).setOrigin(0.5, 1);
         this.alchemist.postFX.addGlow(0x000000, 2, 0, false, 1, 2);
         this.alchemist.setInteractive({ pixelPerfect: true }).on('pointerup', () => {
-            if(this.potionSelected) return;
             this.alchemist?.playAfterRepeat('alchemist_idleToDialog');
             this.potionsMenu?.setVisible(true);
             this.overlay?.setVisible(true);

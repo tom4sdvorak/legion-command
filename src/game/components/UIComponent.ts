@@ -108,11 +108,22 @@ export class UIComponent extends Phaser.GameObjects.Container {
         super.destroy(fromScene);
     }
 
+    /**
+     * Remove content from UI component
+     * @param fixedToo Also removes fixed content (added with insertElement(true))
+     */
+    public destroyContent(fixedToo?: boolean): void {
+        this.contentContainer.removeAll(true);
+        this.content = [];
+        if (fixedToo) {
+            this.removeAll(true);
+            this.fixedContent = [];
+        }
+    }
+
     public getChildrenByType(type: string) : Phaser.GameObjects.GameObject[] {
         const returnArray : Phaser.GameObjects.GameObject[] = [];
-        console.log("CHECKING CHILDREN", [...this.content, ...this.fixedContent]);
         for (const child of [...this.content, ...this.fixedContent]) {
-            console.log(child, child.constructor.name, type);
             if (child instanceof Phaser.GameObjects.GameObject && child.constructor.name === type) {
                 returnArray.push(child);
             }

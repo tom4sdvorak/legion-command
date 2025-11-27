@@ -205,7 +205,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         }
 
         if(this.state === UnitStates.ATTACKING || this.state === UnitStates.SHOOTING){
-            this.actionCooldown += delta;
+            this.actionCooldown += delta*this.scene.time.timeScale;
         }
 
         if(this.state === UnitStates.ATTACKING && this.meleeTarget.target){
@@ -228,7 +228,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         * Count cooldown time if special is both enabled and units' set cooldown is above 0 (-1 means special is not using cooldown) up to 100s
         * Once accumulating enough for cooldown, set specialReady to true (unless units base cooldown is -1) so unit can trigger special when situation allows
         */
-        if(this.unitProps.specialEnabled && this.unitProps.specialCooldown > 0 && this.specialCooldown <= 100000) this.specialCooldown += delta;
+        if(this.unitProps.specialEnabled && this.unitProps.specialCooldown > 0 && this.specialCooldown <= 100000) this.specialCooldown += delta*this.scene.time.timeScale;
         if(this.unitProps.specialCooldown > 0 && this.specialCooldown >= this.unitProps.specialCooldown) this.specialReady = true;
 
         this.healthComponent.update();
