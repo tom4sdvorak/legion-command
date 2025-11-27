@@ -27,6 +27,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
     buffList: {buff: string, source: number}[] = [];
     private outlineSprite: Phaser.GameObjects.Sprite | null = null;
     specialReady: boolean = false;
+    rewardText: Phaser.GameObjects.BitmapText | null = null;
 
     constructor(scene: Game, unitType: string) {
         super(scene, -500, -500, unitType);
@@ -147,6 +148,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         }
         
         // Reward player
+        if(this.unitProps.faction === 'blue') this.rewardText = this.scene.add.bitmapText(this.x, this.y-96, 'pixelFont', `+${this.unitProps.cost}`, 16).setOrigin(0.5, 0.5).setTintFill(0xffff00);
         this.scene.rewardPlayer(this.unitProps.faction, this.unitProps.cost);
         eventsCenter.emit('unit-died', this.unitProps.faction);
         this.die();
@@ -189,6 +191,8 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
             this.unitPool = null;
             this.removeInteractive();
             this.postFX.clear();
+            this.rewardText?.destroy();
+            this.rewardText = null;
         }, undefined, this);
         
     }
