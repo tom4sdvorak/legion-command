@@ -5,8 +5,8 @@ export class OverlayComponent extends Phaser.Events.EventEmitter {
     private tintRect: Phaser.GameObjects.Rectangle;
     private blurEffect: Phaser.FX.Blur | null = null;
     private overlayDepth: number = 999;
-    sharpCamera: Phaser.Cameras.Scene2D.Camera | null = null;
-    sharpObject: Phaser.GameObjects.GameObject | null = null;
+    private sharpCamera: Phaser.Cameras.Scene2D.Camera | null = null;
+    private sharpObject: Phaser.GameObjects.GameObject | null = null;
 
     constructor(scene: Phaser.Scene, tintColor: number = 0x000000, tintAlpha: number = 0.5) {
         super();

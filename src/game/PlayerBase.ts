@@ -5,27 +5,25 @@ import { Game } from "./scenes/Game";
 import { HealthComponent } from "./components/HealthComponent";
 
 export class PlayerBase extends Phaser.Physics.Arcade.Sprite{
-    faction: 'red' | 'blue';
-    yOffset: number; // How high from groundLevel to spawn
-    proximityZone: Phaser.GameObjects.Zone;
-    enemiesInRange: Unit[] = [];
-    damage: number = 0;
-    isShooting: boolean = false;
-    attackSpeed: number = 1000;
-    shootingTimer: Phaser.Time.TimerEvent | null = null;
-    projectiles: Phaser.Physics.Arcade.Group;
-    enemyUnitsPhysics: Phaser.Physics.Arcade.Group;
-    range: number = 400;
-    projectilePool: Phaser.Physics.Arcade.Group | null = null;
+    private faction: 'red' | 'blue';
+    private proximityZone: Phaser.GameObjects.Zone;
+    private enemiesInRange: Unit[] = [];
+    private damage: number = 0;
+    private isShooting: boolean = false;
+    private attackSpeed: number = 1000;
+    private shootingTimer: Phaser.Time.TimerEvent | null = null;
+    private projectiles: Phaser.Physics.Arcade.Group;
+    private enemyUnitsPhysics: Phaser.Physics.Arcade.Group;
+    private range: number = 400;
+    private projectilePool: Phaser.Physics.Arcade.Group | null = null;
     scene: Game;
-    physicsBody: Phaser.Physics.Arcade.Body;
-    sizeW: number = 150;
-    sizeH: number = 300;
-    healthComponent : HealthComponent;
-    shootingSprite: Phaser.GameObjects.Sprite;
-    watchtowerEnabled: boolean = false;
-    spawnPosition: Phaser.Math.Vector2;
-    watchTowerProjectileSpawnPoint: Phaser.Math.Vector2;
+    private sizeW: number = 150;
+    private sizeH: number = 300;
+    private healthComponent : HealthComponent;
+    private shootingSprite: Phaser.GameObjects.Sprite;
+    private watchtowerEnabled: boolean = false;
+    private spawnPosition: Phaser.Math.Vector2;
+    private watchTowerProjectileSpawnPoint: Phaser.Math.Vector2;
 
     constructor(scene: Game, faction: 'red' | 'blue', maxHealth: number, spawnPosition: Phaser.Math.Vector2, enemyUnitsPhysics: Phaser.Physics.Arcade.Group, projectiles: Phaser.Physics.Arcade.Group) {
         super(scene, spawnPosition.x, spawnPosition.y, 'single_pixel');
@@ -100,7 +98,7 @@ export class PlayerBase extends Phaser.Physics.Arcade.Sprite{
     public checkForEnemies(): void {
         if(!this.enemyUnitsPhysics) return;
         this.enemiesInRange = [];
-        this.scene.physics.overlap(this.proximityZone, this.enemyUnitsPhysics, (object1, object2) => {
+        this.scene.physics.overlap(this.proximityZone, this.enemyUnitsPhysics, (_object1, object2) => {
             if (object2 instanceof Unit && !this.enemiesInRange.includes(object2)) {
                 this.enemiesInRange.push(object2);
             }
@@ -191,7 +189,7 @@ export class PlayerBase extends Phaser.Physics.Arcade.Sprite{
         const projectile = this.projectilePool.get(this.watchTowerProjectileSpawnPoint.x, this.watchTowerProjectileSpawnPoint.y);
         if (!projectile) return;
         if(projectile instanceof Projectile){
-            projectile.damage = this.damage;
+            projectile.setDamage(this.damage);
             projectile.spawn(this.projectiles, this.projectilePool);
         }
         // Calculate projectile angle and launch it
@@ -227,5 +225,9 @@ export class PlayerBase extends Phaser.Physics.Arcade.Sprite{
             this.isShooting = false;
             this.shootingSprite.play(`${this.shootingSprite.texture.key}_idle`, true);
             this.shootingSprite.anims.timeScale = 1;
+    }
+
+    public getFaction(): string {
+        return this.faction;
     }
 }

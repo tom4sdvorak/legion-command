@@ -1,16 +1,15 @@
 import { Scene, GameObjects } from 'phaser';
 import { UIComponent } from '../components/UIComponent';
-import SaveManager, { SaveData } from '../helpers/SaveManager';
+import SaveManager from '../helpers/SaveManager';
 import { OverlayComponent } from '../components/OverlayComponent';
 import { devConfig } from '../helpers/DevConfig';
-import { FramedImage } from '../components/FramedImage';
 
 export class MainMenu extends Scene
 {
-    mainMenu: UIComponent;
-    creditsUI: UIComponent | undefined;
-    overlay: OverlayComponent;
-    saveSlotsContainer: GameObjects.Container;
+    private mainMenu: UIComponent;
+    private creditsUI: UIComponent | undefined;
+    private overlay: OverlayComponent;
+    private saveSlotsContainer: GameObjects.Container;
 
     constructor ()
     {

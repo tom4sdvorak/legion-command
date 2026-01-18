@@ -5,40 +5,38 @@ import { devConfig } from '../helpers/DevConfig';
 import { ConstructionUpgrade, Potion, UpgradeManager } from '../helpers/UpgradeManager';
 import { FramedImage } from '../components/FramedImage';
 import { ICON_FRAMES } from '../helpers/IconKeys';
-import { GameLevel, GameManager } from '../helpers/GameManager';
+import { GameManager } from '../helpers/GameManager';
 
 export class PreGame extends Scene
 {
-    unitsToTake : string[] = [];
-    readyCheck: UIComponent | undefined;
-    gameWidth : number;
-    gameHeight : number;
-    levelButton: Phaser.GameObjects.BitmapText| undefined;
-    selectedLevel: number;
-    overlay: GameObjects.Rectangle| undefined;
-    potionsMenu: UIComponent| undefined;
-    constructionMenu: UIComponent| undefined;
-    potionSelected: boolean = false;
-    largeWindowSize: {w: number, h: number} = {w: 0, h: 0};
-    upgradeManager: UpgradeManager;
-    gameManager: GameManager;
-    builtConstructions: string[] = [];
-    campfire: Phaser.GameObjects.Sprite| undefined;
-    alchemist: Phaser.GameObjects.Sprite| undefined;
-    sawmill: Phaser.GameObjects.Sprite| undefined;
-    settingsImage: GameObjects.Image;
-    playerMoney: number = 0;
-    playerMoneyText: GameObjects.BitmapText;
-    moneyImage: GameObjects.Sprite;
-    exitButton: GameObjects.BitmapText;
-    levelButtonTween: Phaser.Tweens.Tween;
-    topY: number = 0;
-    botY: number = 0;
-    conBuyButton: FramedImage;
-    levelMenu: UIComponent | undefined;
-    readyButton: GameObjects.BitmapText;
-    readyButtonTween: Phaser.Tweens.Tween;
-    stageSelectButton: FramedImage;
+    private unitsToTake : string[] = [];
+    private readyCheck: UIComponent | undefined;
+    private gameWidth : number;
+    private gameHeight : number;
+    private levelButton: Phaser.GameObjects.BitmapText| undefined;
+    private selectedLevel: number;
+    private overlay: GameObjects.Rectangle| undefined;
+    private potionsMenu: UIComponent| undefined;
+    private constructionMenu: UIComponent| undefined;
+    private potionSelected: boolean = false;
+    private largeWindowSize: {w: number, h: number} = {w: 0, h: 0};
+    private upgradeManager: UpgradeManager;
+    private gameManager: GameManager;
+    private builtConstructions: string[] = [];
+    private campfire: Phaser.GameObjects.Sprite| undefined;
+    private alchemist: Phaser.GameObjects.Sprite| undefined;
+    private sawmill: Phaser.GameObjects.Sprite| undefined;
+    private playerMoney: number = 0;
+    private playerMoneyText: GameObjects.BitmapText;
+    private moneyImage: GameObjects.Sprite;
+    private exitButton: GameObjects.BitmapText;
+    private topY: number = 0;
+    private botY: number = 0;
+    private conBuyButton: FramedImage;
+    private levelMenu: UIComponent | undefined;
+    private readyButton: GameObjects.BitmapText;
+    private readyButtonTween: Phaser.Tweens.Tween;
+    private stageSelectButton: FramedImage;
 
     constructor ()
     {
@@ -96,7 +94,7 @@ export class PreGame extends Scene
                 this.overlay?.setVisible(true);
                 this.levelMenu?.setVisible(true);
         });
-        this.levelButtonTween = this.tweens.add({
+        this.tweens.add({
             targets: this.levelButton,
             ease: 'power2.inOut',
             duration: 200,
@@ -253,25 +251,8 @@ export class PreGame extends Scene
             this.sawmill?.postFX.clear();
             this.input.setDefaultCursor('default');
             this.sawmill?.postFX.addGlow(0x000000, 2, 0, false, 1, 2);
-        });
-
+        });    
         
-
-        /*this.settingsImage = this.add.image(this.cameras.main.width/4*3+50, this.cameras.main.height - 96, 'cog').setOrigin(0, 0.5).setDisplaySize(80, 80).setInteractive();
-        this.settingsImage.postFX.addGlow(0xA8A9AD, 10, 1, false, 1, 1);
-        this.settingsImage.setTint(0xA9A9A9);
-        this.settingsImage.on('pointerup', () => {
-            this.scene.start('MainMenu');
-        }).on('pointerover', () => {
-            this.settingsImage?.postFX.clear();
-            this.settingsImage?.postFX.addGlow(0xffffff, 10, 0, false, 1, 1);
-        }).on('pointerout', () => {
-            this.settingsImage?.postFX.clear();
-            this.settingsImage.postFX.addGlow(0xA8A9AD, 10, 1, false, 1, 1);
-        })*/
-        
-        
-
         this.overlay = this.add.rectangle(0, 0, this.cameras.main.width, this.cameras.main.height, 0x000000).setOrigin(0, 0).setAlpha(0.5).setInteractive().setDepth(1000).setVisible(false);
         this.overlay.on('pointerdown', () => {
             this.overlay?.setVisible(false);
@@ -754,7 +735,7 @@ export class PreGame extends Scene
             this.alchemist?.postFX.addGlow(0x000000, 2, 0, false, 1, 2);
         });
 
-        this.alchemist.on('animationcomplete', (anim : Phaser.Animations.Animation, frame : Phaser.Animations.AnimationFrame) => {
+        this.alchemist.on('animationcomplete', (anim : Phaser.Animations.Animation, _frame : Phaser.Animations.AnimationFrame) => {
             switch (anim.key) {
                 case 'alchemist_idle':
                     if (Math.random() <= 0.1) {

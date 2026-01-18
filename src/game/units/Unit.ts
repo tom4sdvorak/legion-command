@@ -4,30 +4,29 @@ import { PlayerBase } from "../PlayerBase";
 import { HealthComponent } from "../components/HealthComponent";
 import { Game } from "../scenes/Game";
 import eventsCenter from "../EventsCenter";
-import { devConfig } from "../helpers/DevConfig";
 
 
 export class Unit extends Phaser.Physics.Arcade.Sprite {
-    unitProps: UnitProps;
+    protected unitProps: UnitProps;
     state: string = UnitStates.WAITING;
-    actionCooldown: number = 0;
-    specialCooldown: number = 0;
-    direction: number = 1;
-    unitType: string;
-    unitGroup: Phaser.Physics.Arcade.Group | null = null;
-    unitPool: Phaser.Physics.Arcade.Group | null = null;
-    healthComponent: HealthComponent;
+    protected actionCooldown: number = 0;
+    protected specialCooldown: number = 0;
+    protected direction: number = 1;
+    protected unitType: string;
+    protected unitGroup: Phaser.Physics.Arcade.Group | null = null;
+    protected unitPool: Phaser.Physics.Arcade.Group | null = null;
+    protected healthComponent: HealthComponent;
     declare scene: Game;
-    meleeTarget: { target: Unit | PlayerBase | null, id: number} = {target: null, id: -1};
-    colorMatrix: Phaser.FX.ColorMatrix;
-    actionDisabled: boolean = false;
-    burningDebuff : {timer: Phaser.Time.TimerEvent | null, ticks: number, damage: number} | null = null;
-    petrifyDebuff : {timer: Phaser.Time.TimerEvent | null, duration: number} | null = null;
-    buffDebuffGlow: {buffDebuff: string, glow: Phaser.FX.Glow | null} = {buffDebuff: '', glow: null};
-    buffList: {buff: string, source: number}[] = [];
-    private outlineSprite: Phaser.GameObjects.Sprite | null = null;
-    specialReady: boolean = false;
-    rewardText: Phaser.GameObjects.BitmapText | null = null;
+    protected meleeTarget: { target: Unit | PlayerBase | null, id: number} = {target: null, id: -1};
+    protected colorMatrix: Phaser.FX.ColorMatrix;
+    protected actionDisabled: boolean = false;
+    protected burningDebuff : {timer: Phaser.Time.TimerEvent | null, ticks: number, damage: number} | null = null;
+    protected petrifyDebuff : {timer: Phaser.Time.TimerEvent | null, duration: number} | null = null;
+    protected buffDebuffGlow: {buffDebuff: string, glow: Phaser.FX.Glow | null} = {buffDebuff: '', glow: null};
+    protected buffList: {buff: string, source: number}[] = [];
+    protected outlineSprite: Phaser.GameObjects.Sprite | null = null;
+    protected specialReady: boolean = false;
+    protected rewardText: Phaser.GameObjects.BitmapText | null = null;
 
     constructor(scene: Game, unitType: string) {
         super(scene, -500, -500, unitType);
@@ -43,7 +42,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
     }
 
     // Reinitializes the unit like a constructor would
-    spawn(unitProps: UnitProps, unitGroup: Phaser.Physics.Arcade.Group, unitPool: Phaser.Physics.Arcade.Group, enemyGroup: Phaser.Physics.Arcade.Group, baseGroup: Phaser.GameObjects.Group, projectiles: Phaser.Physics.Arcade.Group, projectilePool: Phaser.Physics.Arcade.Group | null): void{
+    spawn(unitProps: UnitProps, unitGroup: Phaser.Physics.Arcade.Group, unitPool: Phaser.Physics.Arcade.Group, _enemyGroup: Phaser.Physics.Arcade.Group, _baseGroup: Phaser.GameObjects.Group, _projectiles: Phaser.Physics.Arcade.Group, _projectilePool: Phaser.Physics.Arcade.Group | null): void{
         this.direction = (unitProps.faction === 'blue') ? -1 : 1;
         this.setFlipX(this.direction === -1);
         this.unitProps = unitProps;
@@ -192,7 +191,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         
     }
 
-    update(time: any, delta: number): void {
+    update(_time: any, delta: number): void {
         if (!this.active) {
             return;
         }
@@ -400,7 +399,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
             this.meleeTarget.id = target.unitProps.unitID;
             this.changeState(UnitStates.ATTACKING);            
         }
-        else if(target instanceof PlayerBase && target.faction !== this.unitProps.faction){
+        else if(target instanceof PlayerBase && target.getFaction() !== this.unitProps.faction){
             this.meleeTarget.target = target;
             this.meleeTarget.id = -1;
             if(this.unitProps.tags.includes('melee')){
@@ -459,7 +458,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
                     if(blockingSituation[1] instanceof Unit && blockingSituation[1].unitProps.faction !== this.unitProps.faction){
                         this.handleCollision(blockingSituation[1]);
                     }
-                    else if(blockingSituation[1] instanceof PlayerBase && blockingSituation[1].faction !== this.unitProps.faction){
+                    else if(blockingSituation[1] instanceof PlayerBase && blockingSituation[1].getFaction() !== this.unitProps.faction){
                         this.handleCollision(blockingSituation[1]);
                     }
                 }
@@ -568,7 +567,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
                 if (gameObject instanceof Unit && gameObject !== this && gameObject.isAlive()) {
                     return [true, gameObject];
                 }
-                else if (gameObject instanceof PlayerBase && gameObject.faction !== this.unitProps.faction) {
+                else if (gameObject instanceof PlayerBase && gameObject.getFaction() !== this.unitProps.faction) {
                     return [true, gameObject];
                 }
             }
@@ -596,5 +595,9 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
 
     public isAlive(): boolean {
         return this.healthComponent.isAlive();
+    }
+
+    public getUnitProps(): UnitProps {
+        return this.unitProps;
     }
 }

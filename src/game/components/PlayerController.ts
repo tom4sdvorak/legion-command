@@ -1,7 +1,6 @@
 import { PlayerBase } from "../PlayerBase";
 import { Unit } from "../units/Unit";
 import { ObjectPool } from "../helpers/ObjectPool";
-import { devConfig } from "../helpers/DevConfig";
 import { UnitConfigLoader } from "../helpers/UnitConfigLoader";
 import { ResourceComponent } from "./ResourceComponent";
 import eventsCenter from '../EventsCenter';
@@ -9,27 +8,27 @@ import { UnitProps } from "../helpers/UnitProps";
 import { TotalEffect, UpgradeManager } from "../helpers/UpgradeManager";
 
 export class PlayerController {   
-    public playerBase: PlayerBase;
-    public spawnPosition: Phaser.Math.Vector2;
+    protected playerBase: PlayerBase;
+    protected spawnPosition: Phaser.Math.Vector2;
     protected resourceComponent: ResourceComponent;
     protected unitQueueMaxSize: number = 10;
-    public faction : 'red' | 'blue';
-    scene: Phaser.Scene;
-    ownUnitsPhysics: Phaser.Physics.Arcade.Group;
-    enemyUnitsPhysics: Phaser.Physics.Arcade.Group;
-    projectiles: Phaser.Physics.Arcade.Group;
-    unitCounter: number = 0;
-    unitQueue: string[] = [];
-    objectPool: ObjectPool;
-    baseGroup: Phaser.GameObjects.Group;
-    spawnTime: number = 0;
-    spawnBarSize: number = 0;
-    framesSinceSpawn: number = 0;
-    configLoader: UnitConfigLoader;
-    isSpawning: boolean = false;
+    protected faction: 'red' | 'blue';
+    public scene: Phaser.Scene;
+    public ownUnitsPhysics: Phaser.Physics.Arcade.Group;
+    public enemyUnitsPhysics: Phaser.Physics.Arcade.Group;
+    protected projectiles: Phaser.Physics.Arcade.Group;
+    public unitCounter: number = 0;
+    protected unitQueue: string[] = [];
+    protected objectPool: ObjectPool;
+    protected baseGroup: Phaser.GameObjects.Group;
+    protected spawnTime: number = 0;
+    protected spawnBarSize: number = 0;
+    protected framesSinceSpawn: number = 0;
+    protected configLoader: UnitConfigLoader;
+    public isSpawning: boolean = false;
     public selectedUnits: Map<string, {unitConfig: UnitProps, upgrades: string[]}> = new Map();
-    upgradeManager: UpgradeManager;
-    potionID: string | undefined = undefined;
+    protected upgradeManager: UpgradeManager;
+    protected potionID: string | undefined = undefined;
 
     constructor(scene: Phaser.Scene, playerBase: PlayerBase, spawnPosition: Phaser.Math.Vector2, ownUnitsPhysics: Phaser.Physics.Arcade.Group,
         enemyUnitsPhysics: Phaser.Physics.Arcade.Group, projectiles: Phaser.Physics.Arcade.Group,
@@ -67,7 +66,7 @@ export class PlayerController {
         if(unitType === null || unitType === undefined) return;
         const upgradeIDs = Array.isArray(upgrade) ? upgrade : [upgrade]; // If just one upgradeID, turn it to array of single string
         if(unitType === 'ALL'){
-            this.selectedUnits.forEach((value, key) => {
+            this.selectedUnits.forEach((value, _key) => {
                 value.upgrades.push(...upgradeIDs); 
             });
         }
@@ -117,7 +116,7 @@ export class PlayerController {
         this.potionID = potionID;
     }
 
-    public update(time: any, delta: number): void {
+    public update(_time: any, delta: number): void {
         
         // If we are spawning, reduce spawn timer by delta and increase counter of frames since last spawn
         if(this.isSpawning){
@@ -238,5 +237,9 @@ export class PlayerController {
 
     public getMoney() : number {
         return this.resourceComponent.getMoney();
+    }
+
+    public getFaction() : string {
+        return this.faction;
     }
 }

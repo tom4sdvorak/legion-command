@@ -15,7 +15,7 @@ export class AIController {
     private lastDecision: number = 0;
     private difficulty: 'EASY' | 'MEDIUM' | 'HARD';
     private decisionTime: number = 0;
-    enemy: Player | undefined;
+    private enemy: Player | undefined;
 
     constructor(parent: AIPlayer, enemy: Player, difficulty: 'EASY' | 'MEDIUM' | 'HARD' = 'EASY') {
         this.player = parent;
@@ -150,7 +150,7 @@ export class AIController {
      */
     private getUnitsByTag(requiredTag: string) : Array<{unitType: string, unitConfig: UnitProps}> {
         return Array.from(this.player!.selectedUnits.entries())
-        .filter(([unitType, unitData]) => {
+        .filter(([_, unitData]) => {
             return unitData.unitConfig.tags.includes(requiredTag);
         })
         .map(([unitType, unitData]) => ({

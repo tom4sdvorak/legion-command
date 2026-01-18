@@ -1,5 +1,3 @@
-import { UnitStates } from "../helpers/UnitStates";
-import { PlayerBase } from "../PlayerBase";
 import { Game } from "../scenes/Game";
 import { Unit } from "./Unit";
 

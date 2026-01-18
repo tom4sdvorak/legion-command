@@ -9,31 +9,30 @@ import { FramedImage } from '../components/FramedImage';
 
 export class UI extends Scene
 {
-    button: Phaser.GameObjects.Shape | undefined;
-    unitSpawnButtons: UIComponent[] = [];
-    player: Player | undefined;
-    enemyPlayer: AIPlayer | undefined;
-    unitLimit: number = 1;
-    moneyText: Phaser.GameObjects.BitmapText | undefined;
-    moneyImage: Phaser.GameObjects.Sprite | undefined;
-    hpBarUI: UIComponent | undefined;
-    hpBar: Phaser.GameObjects.Graphics | undefined;
-    enemyHPBarUI: UIComponent | undefined;
-    enemyHPBar: Phaser.GameObjects.Graphics | undefined;
-    hpBarWidth: number = 0;
-    hpBarHeight: number = 0;
-    isSpawning: boolean = false;
-    enemyHPBarWidth: number = 0;
-    enemyHPBarHeight: number = 0;
-    timeText: Phaser.GameObjects.BitmapText | undefined;
-    XPBarUI: Phaser.GameObjects.Rectangle | undefined;
-    levelText: Phaser.GameObjects.BitmapText | undefined;
-    levelPopUp: UIComponent | undefined;
-    overlay: Phaser.GameObjects.Rectangle | undefined;
-    settingsImage: Phaser.GameObjects.Image | undefined;
-    elapsedTime: number = 0;
-    timerEvent: Phaser.Time.TimerEvent | null = null;
-    playerUnits: Map<string, UnitProps> = new Map<string, UnitProps>();
+    private unitSpawnButtons: UIComponent[] = [];
+    private player: Player | undefined;
+    private enemyPlayer: AIPlayer | undefined;
+    private unitLimit: number = 1;
+    private moneyText: Phaser.GameObjects.BitmapText | undefined;
+    private moneyImage: Phaser.GameObjects.Sprite | undefined;
+    private hpBarUI: UIComponent | undefined;
+    private hpBar: Phaser.GameObjects.Graphics | undefined;
+    private enemyHPBarUI: UIComponent | undefined;
+    private enemyHPBar: Phaser.GameObjects.Graphics | undefined;
+    private hpBarWidth: number = 0;
+    private hpBarHeight: number = 0;
+    private isSpawning: boolean = false;
+    private enemyHPBarWidth: number = 0;
+    private enemyHPBarHeight: number = 0;
+    private timeText: Phaser.GameObjects.BitmapText | undefined;
+    private XPBarUI: Phaser.GameObjects.Rectangle | undefined;
+    private levelText: Phaser.GameObjects.BitmapText | undefined;
+    private levelPopUp: UIComponent | undefined;
+    private overlay: Phaser.GameObjects.Rectangle | undefined;
+    private settingsImage: Phaser.GameObjects.Image | undefined;
+    private elapsedTime: number = 0;
+    private timerEvent: Phaser.Time.TimerEvent | null = null;
+    private playerUnits: Map<string, UnitProps> = new Map<string, UnitProps>();
     
 
     constructor ()
@@ -95,7 +94,7 @@ export class UI extends Scene
 
     public updateUnitStats(){
         if(!this.player) return;
-        this.player.selectedUnits.forEach((unit, unitType: string) => {
+        this.player.selectedUnits.forEach((_unit, unitType: string) => {
             const unitStats : UnitProps = this.player!.getUnitStats(unitType);
             this.playerUnits.set(unitType, unitStats);
         });
@@ -195,7 +194,7 @@ export class UI extends Scene
                     if(this.isSpawning || this.player!.getUnitQueue().length >= this.unitLimit || !spawnButtonUI.getData('canAfford')) return;
                     eventsCenter.emit('spawn-red-unit', unitType);
                     this.isSpawning = true;
-                    this.unitSpawnButtons.forEach((button : UIComponent) => {
+                    this.unitSpawnButtons.forEach((_button : UIComponent) => {
                         this.updateButtonStates();
                     });
                     unitLoadingBar.scaleY = 1;
@@ -269,40 +268,40 @@ export class UI extends Scene
          * updates money value in UI, renders UI buttons red if player cannot afford unit
          */
         eventsCenter.on('money-changed', (faction: string, amount: number) => {
-            if(faction != this.player?.faction) return;
+            if(faction != this.player?.getFaction()) return;
             this.moneyText?.setText(`${amount}`);
             this.updateButtonStates();
         });
 
         // Listens for player's unit spawn event in order to remove the grey tint
         eventsCenter.on('unit-spawned', (faction: string) => {
-            if(faction != this.player?.faction) return;
+            if(faction != this.player?.getFaction()) return;
             this.isSpawning = false;
             this.updateButtonStates();
         });
 
         // Listeners for basese damage to update each health bars
         eventsCenter.on('base-take-damage', (faction: string) => {
-            if(faction != this.player!.faction) this.updateEnemyHPBar()
+            if(faction != this.player!.getFaction()) this.updateEnemyHPBar()
             else this.updateHPBar();
         });
 
         // Listener for XP accumulation events to update xp bar
         eventsCenter.on('xp-changed', (faction: string, amount: number) => {
-            if(faction != this.player!.faction) return;
+            if(faction != this.player!.getFaction()) return;
             this.updateXPBar(amount);
             this.levelText?.setText(`Level ${this.player!.getLevel()}`);
         });
 
         // Listener for player getting unit upgrade to update our cached unit stats
         eventsCenter.on('upgrade-added', (faction: string) => {
-            if(faction != this.player!.faction) return;
+            if(faction != this.player!.getFaction()) return;
             this.updateUnitStats();
         });
 
         // Listener for level up events to trigger level up screen
         eventsCenter.on('level-up', (faction: string) => {
-            if(faction != this.player!.faction) return;
+            if(faction != this.player!.getFaction()) return;
             this.onLevelUp();
         });
 
@@ -314,7 +313,7 @@ export class UI extends Scene
 
         // Listens to base destroyed event that is fired with losing faction
         eventsCenter.on('base-destroyed', (faction : string) => {
-            const winner : string = (faction === this.player!.faction) ? this.enemyPlayer!.faction : this.player!.faction;
+            const winner : string = (faction === this.player!.getFaction()) ? this.enemyPlayer!.getFaction() : this.player!.getFaction();
             this.gameOver(winner);
         });
     }
@@ -329,7 +328,7 @@ export class UI extends Scene
         // Save data about the game and player to register
         this.registry.set('playTime', this.registry.get('playTime') + this.elapsedTime);
         let rewardMoney = 0;
-        if(faction === this.player!.faction) { // On player's victory
+        if(faction === this.player!.getFaction()) { // On player's victory
             this.registry.set('gamesWon', this.registry.get('gamesWon') + 1);
             this.registry.set('lastStageWon', this.registry.get('stage'));
             rewardMoney = 100 + this.player.getMoney() * 0.1; // Victory reward is always 100 + 10% of owned coins
@@ -341,12 +340,12 @@ export class UI extends Scene
             let totalMoney = this.registry.get('coins') + Math.floor(rewardMoney);
             this.registry.set('coins', totalMoney);
         }
-        this.scene.launch('GameOver', { winner: (faction === this.player.faction), playTime: this.elapsedTime, level: this.player.getLevel(), money: this.player.getMoney(), reward: Math.floor(rewardMoney), unitsKilled: this.player.unitsKilled, unitsSpawned: this.player.unitCounter });
+        this.scene.launch('GameOver', { winner: (faction === this.player.getFaction()), playTime: this.elapsedTime, level: this.player.getLevel(), money: this.player.getMoney(), reward: Math.floor(rewardMoney), unitsKilled: this.player.unitsKilled, unitsSpawned: this.player.unitCounter });
         this.scene.stop('Game');
         this.scene.stop('UI');
     }
 
-    update(time: number, delta: number) {
+    update(_time: number, _delta: number) {
    
     }
 

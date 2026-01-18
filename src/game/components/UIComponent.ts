@@ -1,4 +1,3 @@
-import { UI } from "../scenes/UI";
 
     /**
      * Constructor for the UIComponent.
@@ -39,8 +38,8 @@ export class UIComponent extends Phaser.GameObjects.Container {
     private scrollbarThumbH: Phaser.GameObjects.Graphics | null = null;
     private scrollbarWidth: number = 8;
     private scrollbarPadding: number = 4;
-    public trackColor = 0x2d3436;
-    public thumbColor = 0xFFFF00;
+    private trackColor = 0x2d3436;
+    private thumbColor = 0xFFFF00;
 
     private order: ['left' | 'center' | 'right', 'top' | 'center' | 'bottom'] = ['center', 'center'];
     private marginBottom: number = 16;
@@ -512,7 +511,6 @@ export class UIComponent extends Phaser.GameObjects.Container {
         // Figure out starting horizontal position
         let startX, originX;
         let scrollableX = (-this.sizeW / 2) + this.padding; // Scrollable content always starts left
-        let scrollableOriginX = 0;
         switch (position[0]) {
             case 'left':
                 startX = (-this.sizeW / 2) + this.padding;
@@ -531,7 +529,7 @@ export class UIComponent extends Phaser.GameObjects.Container {
         let posY = startY;
         const allContent = [...this.fixedContent, ...this.content];
         // Loop thrugh all elements positioning them correctly
-        allContent.forEach((element, index) => {
+        allContent.forEach((element, _index) => {
             // Check if element is the scrollbar and skip position for it as it's handled separately
             if(element === this.scrollbarTrackV || element === this.scrollbarThumbV || element === this.scrollbarTrackH || element === this.scrollbarThumbH) return;
 

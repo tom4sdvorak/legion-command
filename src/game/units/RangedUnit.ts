@@ -7,11 +7,11 @@ import { Game } from "../scenes/Game";
 
 export class RangedUnit extends Unit {
 
-    proximityZone: Phaser.GameObjects.Zone;
-    public enemiesInRange: Unit[] = [];
-    baseInRange: PlayerBase | null = null;
-    projectiles: Phaser.Physics.Arcade.Group | null = null;
-    projectilePool: Phaser.Physics.Arcade.Group | null = null;
+    protected proximityZone: Phaser.GameObjects.Zone;
+    protected enemiesInRange: Unit[] = [];
+    protected baseInRange: PlayerBase | null = null;
+    protected projectiles: Phaser.Physics.Arcade.Group | null = null;
+    protected projectilePool: Phaser.Physics.Arcade.Group | null = null;
     protected enemyGroup: Phaser.Physics.Arcade.Group | null = null;
     protected baseGroup: Phaser.GameObjects.Group | null = null;
 
@@ -119,15 +119,15 @@ export class RangedUnit extends Unit {
         this.enemiesInRange = [];
         this.baseInRange = null;
 
-        this.scene.physics.overlap(this.proximityZone, this.enemyGroup, (object1, object2) => {
+        this.scene.physics.overlap(this.proximityZone, this.enemyGroup, (_object1, object2) => {
             if (object2 instanceof Unit && object2.active && !this.enemiesInRange.includes(object2)) {
                 this.enemiesInRange.push(object2);
             }
         }, undefined, this);
         if (!this.baseGroup) return;
         
-        this.scene.physics.overlap(this.proximityZone, this.baseGroup, (object1, object2) => {
-            if (object2 instanceof PlayerBase && object2.active && object2.faction !== this.unitProps.faction) {
+        this.scene.physics.overlap(this.proximityZone, this.baseGroup, (_object1, object2) => {
+            if (object2 instanceof PlayerBase && object2.active && object2.getFaction() !== this.unitProps.faction) {
                 this.baseInRange = object2;
             }
         }, undefined, this);
@@ -152,7 +152,7 @@ export class RangedUnit extends Unit {
         
     }
 
-    fireProjectile(target: Unit | PlayerBase): void {
+    fireProjectile(_target: Unit | PlayerBase): void {
         // Calculate Y position of sprite from which projectile should originate
         let yPos = this.y+this.unitProps.projectileOffsetY*this.unitProps.scale;
         let xPos = this.x+this.unitProps.bodyWidth/2;
@@ -161,7 +161,7 @@ export class RangedUnit extends Unit {
         if (!projectile) return;
         projectile.setFlipX(this.direction === -1); 
         if(projectile instanceof Projectile){
-            projectile.damage = this.unitProps.damage;
+            projectile.setDamage(this.unitProps.damage);
             projectile.spawn(this.projectiles, this.projectilePool);
         }        
 

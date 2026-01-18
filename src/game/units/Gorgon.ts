@@ -1,4 +1,3 @@
-import { UnitStates } from "../helpers/UnitStates";
 import { Game } from "../scenes/Game";
 import { MeleeUnit } from "./MeleeUnit";
 import { Unit } from "./Unit";
@@ -16,7 +15,7 @@ export class Gorgon extends MeleeUnit {
     }
 
     public doSpecial(): void {
-        if(this.meleeTarget.target instanceof Unit && this.meleeTarget.target.isAlive() && this.meleeTarget.id === this.meleeTarget.target.unitProps.unitID){
+        if(this.meleeTarget.target instanceof Unit && this.meleeTarget.target.isAlive() && this.meleeTarget.id === this.meleeTarget.target.getUnitProps().unitID){
             this.meleeTarget.target.applyDebuff('petrify');
             this.specialCooldown = 0;
             this.specialReady = false;                

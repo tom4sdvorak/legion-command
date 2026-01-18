@@ -22,37 +22,32 @@ import { TotalEffect, UpgradeManager } from '../helpers/UpgradeManager';
 import { Minotaur } from '../units/Minotaur';
 import { Kitsune } from '../units/Kitsune';
 import { GameLevel, GameManager } from '../helpers/GameManager';
+import { UnitProps } from '../helpers/UnitProps';
 
 export class Game extends Scene
 {
-    camera: Phaser.Cameras.Scene2D.Camera;
-    worldWidth: number = 2200;
-    worldHeight: number = 800;
-    ground: Phaser.GameObjects.Image;
-    playerRed: Player | undefined
-    playerBlue: AIPlayer | undefined
-    baseRed: PlayerBase | undefined
-    baseBlue: PlayerBase | undefined
-    redUnitsPhysics: Phaser.Physics.Arcade.Group;
-    blueUnitsPhysics: Phaser.Physics.Arcade.Group;
-    redProjectiles: Phaser.Physics.Arcade.Group;
-    blueProjectiles: Phaser.Physics.Arcade.Group;
-    objectPool: ObjectPool;
-    blueCollider: Phaser.Physics.Arcade.Collider;
-    redCollider: Phaser.Physics.Arcade.Collider;
-    hostileCollider: Phaser.Physics.Arcade.Collider;
-    baseGroup: Phaser.GameObjects.Group;
-    redConfigLoader: UnitConfigLoader;
-    blueConfigLoader: UnitConfigLoader;
-    AIController: AIController | undefined
-    controls: Phaser.Cameras.Controls.SmoothedKeyControl;
-    isDragging: boolean = false;
-    lastPointerPosition : Phaser.Math.Vector2;
-    globalOffsetY: number = -200;
-    nextUnitContainer: Phaser.GameObjects.Container;
-    nextUnit: Phaser.GameObjects.Image;
-    gameManager: GameManager;
-    levelInfo: GameLevel | undefined;
+    public camera: Phaser.Cameras.Scene2D.Camera;
+    private readonly worldWidth: number = 2200;
+    private readonly worldHeight: number = 800;
+    private playerRed: Player | undefined;
+    private playerBlue: AIPlayer | undefined;
+    private baseRed: PlayerBase | undefined;
+    private baseBlue: PlayerBase | undefined;
+    private redUnitsPhysics: Phaser.Physics.Arcade.Group;
+    private blueUnitsPhysics: Phaser.Physics.Arcade.Group;
+    private redProjectiles: Phaser.Physics.Arcade.Group;
+    private blueProjectiles: Phaser.Physics.Arcade.Group;
+    private objectPool: ObjectPool;
+    private baseGroup: Phaser.GameObjects.Group;
+    private redConfigLoader: UnitConfigLoader;
+    private blueConfigLoader: UnitConfigLoader;
+    private AIController: AIController | undefined;
+    private controls: Phaser.Cameras.Controls.SmoothedKeyControl;
+    private isDragging: boolean = false;
+    private lastPointerPosition: Phaser.Math.Vector2;
+    private readonly globalOffsetY: number = -200;
+    private gameManager: GameManager;
+    private levelInfo: GameLevel | undefined;
 
     constructor ()
     {
@@ -120,12 +115,12 @@ export class Game extends Scene
 
         // Create and setup AI player
         const bluePos = new Phaser.Math.Vector2(this.worldWidth, this.worldHeight+this.globalOffsetY);
-        const blueSprites = [
-            this.add.sprite(this.worldWidth-10, this.worldHeight+this.globalOffsetY+35, 'mineBase', 'hill').setOrigin(1,1).setScale(1.1),
-            this.add.sprite(this.worldWidth-10, this.worldHeight+this.globalOffsetY+35, 'mineBase', 'dark_hill').setOrigin(1,1).setScale(1.1),
-            this.add.sprite(this.worldWidth-10, this.worldHeight+this.globalOffsetY+35, 'mineBase', 'mine_bg').setOrigin(1,1).setScale(1.1),
-            this.add.sprite(this.worldWidth-10, this.worldHeight+this.globalOffsetY+35, 'mineBase', 'mine_fg').setOrigin(1,1).setDepth(10).setScale(1.1),
-        ];
+        // Sprites for AI base
+        this.add.sprite(this.worldWidth-10, this.worldHeight+this.globalOffsetY+35, 'mineBase', 'hill').setOrigin(1,1).setScale(1.1);
+        this.add.sprite(this.worldWidth-10, this.worldHeight+this.globalOffsetY+35, 'mineBase', 'dark_hill').setOrigin(1,1).setScale(1.1);
+        this.add.sprite(this.worldWidth-10, this.worldHeight+this.globalOffsetY+35, 'mineBase', 'mine_bg').setOrigin(1,1).setScale(1.1);
+        this.add.sprite(this.worldWidth-10, this.worldHeight+this.globalOffsetY+35, 'mineBase', 'mine_fg').setOrigin(1,1).setDepth(10).setScale(1.1);
+        
         this.baseBlue = new PlayerBase(this, 'blue', 500*levelMultiplier, bluePos, this.redUnitsPhysics, this.blueProjectiles);
         this.playerBlue = new AIPlayer(this, this.baseBlue, bluePos, this.blueUnitsPhysics, this.redUnitsPhysics, 
             this.blueProjectiles, this.objectPool, this.baseGroup, this.blueConfigLoader, this.levelInfo.units);
@@ -194,7 +189,8 @@ export class Game extends Scene
     }
 
     handleBaseCollision(base: PlayerBase, unit: Unit){
-        if(base.faction !== unit.unitProps.faction){
+        let unitProps : UnitProps = unit.getUnitProps();
+        if(base.getFaction() !== unitProps.faction){
             unit.handleCollision(base);
         }
         
@@ -293,11 +289,11 @@ export class Game extends Scene
         this.physics.add.overlap(this.baseRed!,this.blueProjectiles, this.onProjectileHit as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, this.beforeBlueProjectileHit as unknown as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, this);
         
         // Add collision between friendly units
-        this.redCollider = this.physics.add.collider(this.redUnitsPhysics, this.redUnitsPhysics, this.handleUnitCollision as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, undefined, this);
-        this.blueCollider = this.physics.add.collider(this.blueUnitsPhysics, this.blueUnitsPhysics, this.handleUnitCollision as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, undefined, this);
+        this.physics.add.collider(this.redUnitsPhysics, this.redUnitsPhysics, this.handleUnitCollision as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, undefined, this);
+        this.physics.add.collider(this.blueUnitsPhysics, this.blueUnitsPhysics, this.handleUnitCollision as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, undefined, this);
         
         // Add collision when hostile
-        this.hostileCollider = this.physics.add.collider(this.redUnitsPhysics, this.blueUnitsPhysics, this.handleUnitCollision as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, undefined, this);
+        this.physics.add.collider(this.redUnitsPhysics, this.blueUnitsPhysics, this.handleUnitCollision as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, undefined, this);
 
         // Add collision with hostile base
         this.physics.add.collider(this.redUnitsPhysics, this.baseBlue!, this.handleBaseCollision as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, undefined, this);

@@ -6,8 +6,8 @@ import { devConfig } from '../helpers/DevConfig';
 
 export class GameOver extends Scene
 {
-    gameOverUI: UIComponent | undefined;
-    postGameData: { winner: boolean, playTime: number, level: number, money: number, reward : number, unitsKilled: number, unitsSpawned: number } | undefined;
+    private gameOverUI: UIComponent | undefined;
+    private postGameData: { winner: boolean, playTime: number, level: number, money: number, reward : number, unitsKilled: number, unitsSpawned: number } | undefined;
 
     constructor ()
     {
@@ -117,7 +117,7 @@ export class GameOver extends Scene
             value: endValue,
             duration: duration,
             ease: 'Cubic.easeOut',
-            onUpdate: (tween) => {
+            onUpdate: (_tween) => {
                 const currentValue = counter.value;
                 bitmapTextObject.setText(Math.floor(currentValue).toLocaleString());
             },

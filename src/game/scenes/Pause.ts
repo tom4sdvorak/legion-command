@@ -8,13 +8,12 @@ import { FramedImage } from '../components/FramedImage';
 import { ICON_FRAMES } from '../helpers/IconKeys';
 
 export class Pause extends Scene {
-    player: Player;
-    situation: string;
-    overlay: Phaser.GameObjects.Rectangle;
-    levelPopUp: UIComponent;
-    menu: UIComponent;
-    gameSpeed: number = 1;
-    upgradeManager: UpgradeManager;
+    private player: Player;
+    private situation: string;
+    private menu: UIComponent;
+    private gameSpeed: number = 1;
+    private upgradeManager: UpgradeManager;
+
     constructor() {
         super('Pause');
 
@@ -65,7 +64,7 @@ export class Pause extends Scene {
             const unit = new FramedImage(this, 0, 0, 64, 64, `square`);
             unit.putInside(this.add.image(0, 0, `${unitType}_static`));
             tempArray.push(unit);
-            upgrade.iconFrameKey.forEach((frameKey, index) => {
+            upgrade.iconFrameKey.forEach((frameKey, _index) => {
                 const upgradeIcon = new FramedImage(this, 0, 0, 64, 64, "square");
                 upgradeIcon.putInside(this.add.image(0, 0, 'icons', ICON_FRAMES[frameKey]));
                 tempArray.push(upgradeIcon);
@@ -185,7 +184,7 @@ export class Pause extends Scene {
         this.scene.resume('Game');
         this.scene.resume('UI');
         // Mimic event of player's base destruction
-        eventsCenter.emit('base-destroyed', this.player.faction);
+        eventsCenter.emit('base-destroyed', this.player.getFaction());
         this.scene.stop('Pause');
     }
 
@@ -223,7 +222,7 @@ export class Pause extends Scene {
     create() {
         this.scene.pause('Game');
         this.scene.pause('UI');
-        this.overlay = this.add.rectangle(0, 0, this.cameras.main.width, this.cameras.main.height, 0x000000).setOrigin(0, 0).setAlpha(0.5).setInteractive().setDepth(1000);
+        this.add.rectangle(0, 0, this.cameras.main.width, this.cameras.main.height, 0x000000).setOrigin(0, 0).setAlpha(0.5).setInteractive().setDepth(1000);
         if (this.situation === 'LevelUp') {
             this.showLevelUp();
         }

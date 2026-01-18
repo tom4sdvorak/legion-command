@@ -10,11 +10,11 @@ export class FramedImage extends Phaser.GameObjects.Container {
     public y: number = 0;
     public displayHeight: number = 0;
     public displayWidth: number = 0;
-    public shapeType: string;
-    public borderColor : number = 0x000000;
-    public bgColor : number = 0x000000;
-    public bgAlpha : number = 0.5;
-    public cornerRadius : number = 10;
+    private shapeType: string;
+    private borderColor : number = 0x000000;
+    private bgColor : number = 0x000000;
+    private bgAlpha : number = 0.5;
+    private cornerRadius : number = 10;
 
     /**
      * 

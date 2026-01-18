@@ -1,5 +1,4 @@
 import eventsCenter from "../EventsCenter";
-import { Player } from "../Player";
 import { PlayerController } from "./PlayerController";
 
 export class ResourceComponent {
@@ -31,20 +30,20 @@ export class ResourceComponent {
 
     public setMoney(amount: number): void {
         this.money = amount;
-        eventsCenter.emit('money-changed', this.parent.faction, this.money);
+        eventsCenter.emit('money-changed', this.parent.getFaction(), this.money);
     }
 
     public addMoney(amount: number): void {
         this.money += amount;
-        eventsCenter.emit('money-changed', this.parent.faction, this.money);
+        eventsCenter.emit('money-changed', this.parent.getFaction(), this.money);
     }
 
     public addXP(amount: number): void {
         this.xp += amount;
-        eventsCenter.emit('xp-changed', this.parent.faction, this.xp);
+        eventsCenter.emit('xp-changed', this.parent.getFaction(), this.xp);
         // On overflow, signal level up and reset to 0, preserving the overflow amount
         if (this.xp >= this.maxXP) {
-            eventsCenter.emit('level-up', this.parent.faction);
+            eventsCenter.emit('level-up', this.parent.getFaction());
             this.xp = this.xp - this.maxXP;
         }
     }
@@ -59,7 +58,7 @@ export class ResourceComponent {
 
     public removeMoney(amount: number): void {
         this.money -= amount;
-        eventsCenter.emit('money-changed', this.parent.faction, this.money);
+        eventsCenter.emit('money-changed', this.parent.getFaction(), this.money);
     }
 
     public hasEnoughMoney(amount: number): boolean {

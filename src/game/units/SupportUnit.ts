@@ -6,9 +6,9 @@ import { Unit } from "./Unit";
 
 export class SupportUnit extends RangedUnit {
 
-    supportZone: Phaser.GameObjects.Zone;
-    public alliesInRange: Unit[] = [];
-    buffedAllies: Unit[] = []; 
+    protected supportZone: Phaser.GameObjects.Zone;
+    protected alliesInRange: Unit[] = [];
+    protected buffedAllies: Unit[] = []; 
 
     constructor(scene: Game, texture: string) {
         super(scene, texture);
@@ -90,7 +90,7 @@ export class SupportUnit extends RangedUnit {
         });
     }
 
-    support(target: Unit) {
+    support(_target: Unit) {
         // Do nothing here
     }
 
@@ -105,7 +105,7 @@ export class SupportUnit extends RangedUnit {
         this.buffedAllies = [];
     }
 
-    unsupport(ally: Unit) {
+    unsupport(_ally: Unit) {
         // Do nothing here
     }
 
@@ -113,7 +113,7 @@ export class SupportUnit extends RangedUnit {
         
         if (!this.unitGroup) return;
         this.alliesInRange = [];
-        this.scene.physics.overlap(this.supportZone, this.unitGroup, (object1, object2) => {
+        this.scene.physics.overlap(this.supportZone, this.unitGroup, (_object1, object2) => {
             if (object2 instanceof Unit && object2.active && !this.alliesInRange.includes(object2)) {
                 this.alliesInRange.push(object2);
             }
