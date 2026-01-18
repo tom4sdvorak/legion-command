@@ -183,7 +183,7 @@ export class MainMenu extends Scene
             });
             this.saveSlotsContainer.destroy();
         }
-        if(this.overlay) this.overlay.destroy();
+        if(this.overlay) this.overlay.hide();
     }
     deleteSave(saveSlot: string, saveName: string) {
         const overlay = new OverlayComponent(this, 0x000000, 0.9);
@@ -288,7 +288,7 @@ export class MainMenu extends Scene
 
     showCredits() {
         // Create credits menu if its not already existing
-        const overlay = new OverlayComponent(this, 0x000000, 0.9);
+        const overlay = new OverlayComponent(this, 0x000000, 0.5);
         overlay.show(false);
         overlay.changeDepth(900);
         overlay.on('overlay-clicked', () => {

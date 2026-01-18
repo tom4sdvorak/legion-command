@@ -11,8 +11,6 @@ export class Preloader extends Scene
 
     init ()
     {
-        //  We loaded this image in our Boot Scene, so we can display it here
-        this.add.image(512, 384, 'background');
 
         //  A simple progress bar. This is the outline of the bar.
         this.add.rectangle(512, 384, 468, 32).setStrokeStyle(1, 0xffffff);
@@ -31,26 +29,25 @@ export class Preloader extends Scene
 
     preload ()
     {
+        this.load.setPath('assets');
+        this.load.bitmapFont('pixelFont', 'fonts/BoldPixels.png', 'fonts/BoldPixels.xml');
+        this.load.image('single_pixel', 'images/single_pixel.png');
+        this.load.image('background', 'images/bg.png');
+        this.load.atlas('mineBase', 'images/buildings/mine/texture.png', 'images/buildings/mine/texture.json');
+
         // Load data jsons
-        this.load.setPath('src/game/config');
+        this.load.setPath('assets/data');
+        this.load.json('animationData', 'animations.json');
         this.load.json('unitData', 'unitData.json');
         this.load.json('unitUpgrades', 'unitUpgrades.json');
         this.load.json('potionData', 'potionData.json');
         this.load.json('constructionData', 'constructionData.json');
         this.load.json('gameLevels', 'gameLevels.json');
         this.load.json('credits', 'credits.json');
-
-        this.load.setPath('assets');
-        this.load.bitmapFont('pixelFont', 'fonts/BoldPixels.png', 'fonts/BoldPixels.xml');
-        this.load.json('animationData', 'data/animations.json');
-        this.load.image('single_pixel', 'images/single_pixel.png');
-        this.load.image('background', 'images/bg.png');
-        this.load.atlas('mineBase', 'images/buildings/mine/texture.png', 'images/buildings/mine/texture.json');
         
 
         // Objects
         this.load.setPath('assets/images/items');
-        this.load.image('signpost', 'signpost.png');
         this.load.image('cog', 'cog.png');
         this.load.image('tent', 'tent.png');
         this.load.image('tent_large', 'tent_large.png');
