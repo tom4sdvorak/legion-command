@@ -96,8 +96,7 @@ export class RangedUnit extends Unit {
                 this.actionCooldown -= this.unitProps.actionSpeed;
             }
         }
-
-        //this.handleState();      
+   
     }
 
     handleState(): void {
@@ -153,39 +152,6 @@ export class RangedUnit extends Unit {
         
     }
 
-    /*public startShooting(): void {
-        if (this.shootingTimer) return;
-        this.shootingTimer = this.scene.time.addEvent({
-                delay: this.unitProps.actionSpeed,
-                callback: () => {
-                    if (!this.active) {
-                        this.stopShooting();
-                        return;
-                    }
-                    this.anims.timeScale = (this.anims?.currentAnim?.duration ?? 1) / (this.unitProps.actionSpeed + 100);
-                    let target: Unit | PlayerBase | null = null;
-                    if (this.baseInRange) { // Attack base in range ignoring any targets
-                        target = this.baseInRange;
-                    }
-                    else if (this.enemiesInRange.length > 0) { // otherwise attack first target
-                        target = this.enemiesInRange[0];
-                    }
-
-                    if (target) {
-                        this.fireProjectile(target);
-                    }
-                    else{
-                        this.stopShooting();
-                    }
-                },
-                callbackScope: this,
-                loop: true
-        });
-        
-    }*/
-    
-
-
     fireProjectile(target: Unit | PlayerBase): void {
         // Calculate Y position of sprite from which projectile should originate
         let yPos = this.y+this.unitProps.projectileOffsetY*this.unitProps.scale;
@@ -198,13 +164,10 @@ export class RangedUnit extends Unit {
             projectile.damage = this.unitProps.damage;
             projectile.spawn(this.projectiles, this.projectilePool);
         }        
-        // Calculate projectile angle and launch it
-        //const projectileAngle = Phaser.Math.Angle.Between(this.x, yPos, target.x, yPos);
-        //projectile.rotation = projectileAngle;
+
         projectile.enableBody(true, xPos, yPos, true, true);
         projectile.setVelocityX(this.unitProps.projectileVelocity * this.direction);
         projectile.setVelocityY(20);
-        //this.scene.physics.moveTo(projectile, target.x, yPos, 300);
     }
     getProjectile(xPos: number, yPos: number) : Projectile{
         return this.projectilePool?.get(xPos, yPos) as Projectile;

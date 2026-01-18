@@ -5,8 +5,6 @@ import { Game } from "./scenes/Game";
 import { HealthComponent } from "./components/HealthComponent";
 
 export class PlayerBase extends Phaser.Physics.Arcade.Sprite{
-    //health: number = 5000;
-    //maxHealth: number = 5000;
     faction: 'red' | 'blue';
     yOffset: number; // How high from groundLevel to spawn
     proximityZone: Phaser.GameObjects.Zone;
@@ -47,8 +45,7 @@ export class PlayerBase extends Phaser.Physics.Arcade.Sprite{
 
         // Add healthbar
         this.healthComponent = new HealthComponent(this, maxHealth, false, this.sizeW, 20, spawnPosition.y-this.sizeH/2);
-        this.on('death', this.die, this);
-        //this.healthBar = this.scene.add.rectangle(this.x, this.y-this.height/2, this.width, 20, 0x00ff00).setDepth(1).setAlpha(1);       
+        this.on('death', this.die, this);       
     }
 
     update(time: any, delta: number): void {
@@ -106,7 +103,6 @@ export class PlayerBase extends Phaser.Physics.Arcade.Sprite{
         this.scene.physics.overlap(this.proximityZone, this.enemyUnitsPhysics, (object1, object2) => {
             if (object2 instanceof Unit && !this.enemiesInRange.includes(object2)) {
                 this.enemiesInRange.push(object2);
-                //console.log("Enemy in range: " + object2.unitProps.unitID);
             }
         }, undefined, this);
     }
@@ -215,13 +211,10 @@ export class PlayerBase extends Phaser.Physics.Arcade.Sprite{
             overlap = this.scene.physics.overlapRect(this.scene.getWorldSize().x, 0, 100, this.scene.getWorldSize().y, true, false);
         }
         
-        //if (overlap.length > 0) console.log(overlap);
         return overlap.some(object => {
             if (object.gameObject instanceof Unit && object.gameObject.active) {
-                //console.log(`Blocked by ${object.gameObject.unitProps.unitID}`);
                 return true;
             }
-            //console.log("Not blocked by", object);
             return false;
         });
     }

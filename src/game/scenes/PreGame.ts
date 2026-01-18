@@ -295,7 +295,6 @@ export class PreGame extends Scene
     async handleQuit() {
         try {
             await SaveManager.saveGame(this); 
-            console.log('Save successful');
             this.scene.start('MainMenu');
 
         } catch (error) {
@@ -337,7 +336,6 @@ export class PreGame extends Scene
             }
         }
         if(this.builtConstructions.includes('campfire_cauldron_0')){
-            console.log("Found pot")
             if(this.campfire) this.campfire.setTexture('campfire_pot');
             else this.campfire = this.add.sprite(this.gameWidth/2, this.gameHeight/2, 'campfire_pot').setDisplaySize(64,64);
             this.campfire.play('campfire_pot_burning');
@@ -405,7 +403,6 @@ export class PreGame extends Scene
             levelIcon.setInteractive();
             levelIcon.on('pointerup', () => {
                 if (this.constructionMenu?.getWasDragged()) {
-                    console.log("Click stopped because Was Dragged");
                     return;
                 }
                 if(lastClicked && lastClicked !== levelIcon){
@@ -644,10 +641,8 @@ export class PreGame extends Scene
                 }
                 conSlot.on('pointerup', () => {
                     if (this.constructionMenu?.getWasDragged()) {
-                        console.log("Click stopped because Was Dragged");
                         return;
                     }
-                    //conCostText.setVisible(true);
                     coinImage.setVisible(true);
                     if(lastClicked && lastClicked !== conSlot){
                         lastClicked.changeBorder(4);
@@ -665,22 +660,9 @@ export class PreGame extends Scene
                         this.conBuyButton.changeBackground(devConfig.positiveColorLight, 0.5);
                     }
                     selectedCon = con; 
-                    //conID = con.id;
-                    /*if(con.prerequisites.length > 0){
-                        preConID = con.prerequisites[0];
-                    }
-                    else{
-                        preConID = 'none';
-                    }*/
                     lastClicked = conSlot;
                     conName.setText(`${con.name} (`);
                     conText.setText(`${con.description}`);
-
-                    /*// Turn cost number to 4 lenght string
-                    let costString = con.cost.toString();
-                    while(costString.length < 3){
-                        costString = ' ' + costString;
-                    }*/
                     conCost.setText(` ${con.cost})`);
                     conSlot.changeBorder(8);
                     this.constructionMenu!.positionElements(['left', 'top'], 0, 8, padding);
@@ -709,9 +691,6 @@ export class PreGame extends Scene
     alchemistLogic(){
         this.potionsMenu = new UIComponent(this, (this.gameWidth-this.largeWindowSize.w/2-64), this.gameHeight/2, this.largeWindowSize.w, this.largeWindowSize.h/2, 0).setDepth(1001).setVisible(false);
         this.add.existing(this.potionsMenu);
-        /*this.potionsMenu.on('uicomponent-visibility-changed', (visible : boolean) => {
-            if(!visible) this.alchemist.playAfterRepeat('alchemist_dialogToIdle');
-        });*/
         this.potionsMenu.setInteractive();
         const title = this.add.bitmapText(0, 0, 'pixelFont', 'The Alchemist', 64);
         const text = this.add.bitmapText(0, 0, 'pixelFont', 'Enhance units with random potion for next game?', 32).setMaxWidth(this.potionsMenu!.width-64);
@@ -756,36 +735,6 @@ export class PreGame extends Scene
             this.input.setDefaultCursor('default');
             potionBuy.changeBackground(devConfig.positiveColorLight, 0.5);
         });
-        
-        // Load and show potions
-        
-        
-        /*potions.forEach((potion : Potion) => {
-
-            // Potion info
-            const potionName = this.add.bitmapText(0, 0, 'pixelFont', potion.name, 64).setMaxWidth(this.potionsMenu!.width-64);
-            const potionText = this.add.bitmapText(0, 0, 'pixelFont', potion.description, 32).setMaxWidth(this.potionsMenu!.width-64);
-            const potionCostText = this.add.bitmapText(0, 0, 'pixelFont', `Cost: ${potion.cost}`, 32).setOrigin(0,0.5);
-            const coinImage = this.add.image(0, 0, 'coin').setDisplaySize(32, 32).setOrigin(0,0.5);
-            
-            // Buying button
-            const potionButtonBorder = this.add.rectangle(0, 0, 64, 34, 0xffffff, 0).setStrokeStyle(1, 0x000000);
-            const potionBuyText = this.add.bitmapText(0, 0, 'pixelFont', `BUY`, 32).setOrigin(0.5,0.5);
-            const potionButton = this.add.container(0, 0, [potionButtonBorder, potionBuyText]);
-            potionButton.setSize(32, 34);
-            potionButton.setInteractive().on('pointerup', () => {
-                this.potionsMenu?.setVisible(false);
-                this.overlay?.setVisible(false);
-                this.registry.set('playerPotion', potion.id);
-                this.potionSelected = true;
-                this.alchemist?.playAfterRepeat('alchemist_idleToDialog');
-            });
-
-            this.potionsMenu?.insertElement(potionName);
-            this.potionsMenu?.insertElement(potionText);
-            this.potionsMenu?.insertElement([potionCostText, coinImage, potionButton]);
-        });
-        this.potionsMenu.positionElements(['left', 'top'], 0, 8);*/
 
         this.alchemist = this.add.sprite(100, this.botY, 'alchemist').play('alchemist_idle').setScale(2).setOrigin(0.5, 1);
         this.alchemist.postFX.addGlow(0x000000, 2, 0, false, 1, 2);

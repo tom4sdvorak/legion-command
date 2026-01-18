@@ -51,7 +51,6 @@ export class UI extends Scene
         if(!this.player) throw new Error('Player is undefined');
         if(!this.enemyPlayer) throw new Error('Enemy player is undefined');
 
-        // --- Recommended additions for a clean state ---
         this.unitSpawnButtons = [];
         this.unitLimit = 1;
         this.isSpawning = false;
@@ -59,39 +58,6 @@ export class UI extends Scene
         this.playerUnits = new Map<string, UnitProps>();
 
     }
-
-    /*private renderUnitQueue():void{       
-        this.unitQueueGraphics.clear(true, true);
-        const spriteMaxWidth = this.unitQueueUI.getWidth()/2;
-        const spriteMaxHeight = (this.unitQueueUI.getHeight()-12)/10
-        const maxRatio = spriteMaxWidth / spriteMaxHeight;
-        let yPos = (this.unitQueueUI.getHeight()/2) - spriteMaxHeight/2 - 6;
-        for (const unit of this.unitQueue) {
-            const sprite = this.unitQueueGraphics.get(0, 0, `${unit}_static`);
-            const originalRatio = sprite.texture.get().width / sprite.texture.get().height;
-            let newWidth, newHeight;
-            // Update the sprite properties
-            this.unitQueueUI.add(sprite);
-            sprite.setOrigin(0.5, 0.5);
-
-            if (originalRatio > maxRatio) {
-                // The original image is wider than the max container
-                // Use the max width as the limiting factor
-                newWidth = spriteMaxWidth;
-                newHeight = newWidth / originalRatio;
-            } else {
-                // The original image is taller than the max container
-                // Use the max height as the limiting factor
-                newHeight = spriteMaxHeight;
-                newWidth = newHeight * originalRatio;
-            }
-            sprite.setDisplaySize(newWidth,newHeight);
-            sprite.y = yPos;
-            sprite.setVisible(true);
-            sprite.setActive(true);
-            yPos -= spriteMaxHeight;
-        }
-    }*/
 
     public updateHPBar(){
         if(!this.hpBar || !this.player) return;
@@ -166,9 +132,6 @@ export class UI extends Scene
         this.moneyText = this.add.bitmapText(this.cameras.main.width/4-(32+50+24), this.cameras.main.height - (96), 'pixelFont', `${this.player!.getMoney()}`, 48).setOrigin(1, 0.5).setTintFill(0xffffff);
         this.moneyImage = this.add.sprite(this.cameras.main.width/4-50, this.cameras.main.height - (96), 'coin_silver').setOrigin(1, 0.5).setDisplaySize(40, 40);
         this.moneyImage.play('coin_silver_rotate');
-        /*let moneyImageBorder = this.add.graphics();
-        moneyImageBorder.lineStyle(1, 0xffffff, 1);
-        moneyImageBorder.strokeCircle(this.cameras.main.width/4-(50+20), this.cameras.main.height - (96), 20);*/
 
         // Display settings/pause menu
         this.settingsImage = this.add.image(this.cameras.main.width/4*3+50, this.cameras.main.height - 96, 'cog').setOrigin(0, 0.5).setDisplaySize(64, 64).setInteractive();
@@ -205,35 +168,10 @@ export class UI extends Scene
             spawnButtonUI.setData('unitType', unitType);
             const innerButtonHeight = 96 - spawnButtonUI.getBorderThickness()[2]*2;
             const innerButtonWidth = 96 - spawnButtonUI.getBorderThickness()[0]*2;
-            //const unitSprite = this.add.image(0, 0, unitType + '_static');
-            
-            // Determine how to resize the unit sprite so it fits UI element
-            /*const maxRatio = innerButtonWidth / innerButtonHeight;
-            const originalRatio = unitSprite.texture.get().width / unitSprite.texture.get().height;
-            let newWidth, newHeight;
-            if (originalRatio > maxRatio) {
-                // The original image is wider than the max container
-                // Use the max width as the limiting factor
-                newWidth = innerButtonWidth-8;
-                newHeight = newWidth / originalRatio;
-            } else {
-                // The original image is taller than the max container
-                // Use the max height as the limiting factor
-                newHeight = innerButtonHeight-8;
-                newWidth = newHeight * originalRatio;
-            }
-            unitSprite.setDisplaySize(newWidth,newHeight);*/
             let currentGlow : any; 
-            //unitSprite.postFX.addGlow(0x000000, 2, 0, false, 1, 5);
             const unitLoadingBar = this.add.rectangle(0, innerButtonHeight/2, innerButtonWidth, innerButtonHeight, 0xffffff).setAlpha(0.5).setOrigin(0.5,1);
             unitLoadingBar.scaleY = 0;
-            //const spawnButtonContainer = this.add.container(x, y);
-            //spawnButtonContainer.setSize(96, 96);
             spawnButtonUI.add(unitLoadingBar);
-            //spawnButtonUI.insertElement(unitSprite);
-            //spawnButtonContainer.add(spawnButtonUI);
-            //spawnButtonContainer.add(unitLoadingBar);
-            //spawnButtonContainer.add(unitSprite);
             const unit = new FramedImage(this, 0, 0, innerButtonWidth, innerButtonHeight, "square");
             unit.changeBackground(0xffffff, 0);
             unit.putInside(this.add.image(0, 0, unitType + '_static'));
@@ -270,11 +208,8 @@ export class UI extends Scene
                         duration: unitSpawnTime
                     });
                 });
-
-            //this.unitSpawnButtons.push(spawnButtonContainer);
             this.unitSpawnButtons.push(spawnButtonUI);
             this.add.existing(spawnButtonUI);
-            //Phaser.Display.Align.In.Center(unitSprite, spawnButtonUI);
             count++;
         });
 
@@ -292,40 +227,7 @@ export class UI extends Scene
         
         // Bind event listeners with delay
         this.time.delayedCall(10, this.bindListeners, [], this);
-        
-        /*
-        this.button = this.add.circle(500, 500, 40, 0x000000)
-            .setStrokeStyle(2, 0xffffff)
-            .setInteractive()
-            .on('pointerup', () => {
-                eventsCenter.emit('spawn-blue-unit', 'warrior');
-            });
-        const image2 = this.add.image(500, 500, 'warrior');
-        Phaser.Display.Align.In.Center(image2, this.button); // Center the image within the button.
-        this.button.setData('parent', image2);
-        image2.setData('parent', this.button);
 
-        this.button = this.add.circle(500, 400, 40, 0x000000)
-            .setStrokeStyle(2, 0xffffff)
-            .setInteractive()
-            .on('pointerup', () => {
-                eventsCenter.emit('spawn-blue-unit', 'archer');
-            });
-        const image2b = this.add.image(500, 400, 'archer');
-        Phaser.Display.Align.In.Center(image2b, this.button); // Center the image within the button.
-        this.button.setData('parent', image2b);
-        image2b.setData('parent', this.button);
-
-        this.button = this.add.circle(500, 300, 40, 0x000000)
-            .setStrokeStyle(2, 0xffffff)
-            .setInteractive()
-            .on('pointerup', () => {
-                eventsCenter.emit('spawn-blue-unit', 'wizard');
-            });
-        const image2c = this.add.image(500, 300, 'wizard');
-        Phaser.Display.Align.In.Center(image2c, this.button); // Center the image within the button.
-        this.button.setData('parent', image2c);
-        image2c.setData('parent', this.button);*/
     }
 
     private updateButtonStates(): void {

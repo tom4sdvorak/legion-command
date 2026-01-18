@@ -73,12 +73,10 @@ export class AIController {
             default:
                 throw new Error('Invalid state');
         }
-        //console.log("I have this many units: " + this.player!.ownUnitsPhysics.getChildren().length);
     }
 
     changeState(state: string) { 
         if(this.state === state) return;
-        console.log("AI has decided to " + state);
         this.state = state;
     }
 

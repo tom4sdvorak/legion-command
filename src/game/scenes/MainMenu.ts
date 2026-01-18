@@ -30,15 +30,12 @@ export class MainMenu extends Scene
         // Menu buttons
         const buttonSize = 64;
         let menuTween : Phaser.Tweens.Tween | undefined;
-        //const playButton = this.add.bitmapText(0, 0, 'pixelFont', 'Play', buttonSize).setOrigin(0.5, 0.5).setInteractive().on('pointerup', () => this.showSaveSlots());
         const playButton = this.add.bitmapText(0, 0, 'pixelFont', 'Play', buttonSize).setOrigin(0.5, 0.5).setInteractive()
             .on('pointerup', () => {
                 this.showSaveSlots();
                 this.tweens.killTweensOf(interactableGroup.getChildren());
             });
-        //cancelText.setDropShadow(2, 2, devConfig.positiveColor, 1);
         interactableGroup.add(playButton);
-        //const creditsButton = this.add.bitmapText(0, 0, 'pixelFont', 'Credits', buttonSize).setOrigin(0.5, 0.5).setInteractive().on('pointerup', () => this.showCredits());
         const creditsButton = this.add.bitmapText(0, 0, 'pixelFont', 'Credits', buttonSize).setOrigin(0.5, 0.5).setInteractive()
             .on('pointerup', () => {
                 this.showCredits();
@@ -46,7 +43,6 @@ export class MainMenu extends Scene
             });
         interactableGroup.add(creditsButton);
 
-        //this.mainMenu.add([continueButton, newGameButton, creditsButton]);
         this.mainMenu.insertElement(playButton);
         this.mainMenu.insertElement(creditsButton);
         this.mainMenu.positionElements(['center', 'center']);

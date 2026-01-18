@@ -189,7 +189,6 @@ export class Game extends Scene
     }
 
     handleUnitCollision(unit1: Unit, unit2: Unit){
-        // console.log("Collision between " + unit1.unitProps.unitID + " and " + unit2.unitProps.unitID);
         unit1.handleCollision(unit2);
         unit2.handleCollision(unit1);            
     }
@@ -327,12 +326,10 @@ export class Game extends Scene
 
     bindListeners(){
         eventsCenter.on('spawn-red-unit', (unitType : string) => {
-            console.log(`%cTrying to spawn red ${unitType}`, "color: red");
             this.playerRed!.addUnitToQueue(unitType);
             
         });
         eventsCenter.on('spawn-blue-unit', (unitType : string) => {
-            console.log(`%cTrying to spawn blue ${unitType}`, "color: blue");
             this.playerBlue!.addUnitToQueue(unitType);
         });
 
@@ -340,7 +337,6 @@ export class Game extends Scene
             this.tweens.timeScale = gameSpeed;
             this.physics.world.timeScale = 1 / gameSpeed;
             this.time.timeScale = gameSpeed;
-            console.log(this.tweens.timeScale, this.physics.world.timeScale, this.time.timeScale);
         });
     }
 

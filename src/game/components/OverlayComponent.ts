@@ -24,7 +24,6 @@ export class OverlayComponent extends Phaser.Events.EventEmitter {
 
         this.tintRect.on('pointerup', () => {
             this.emit('overlay-clicked');
-            console.log('Overlay clicked');
         });
     }
 

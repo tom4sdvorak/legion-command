@@ -125,12 +125,7 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         }).on('pointerout', () => {
             this.postFX.clear();
             if(savedGlowConfig.saved) this.postFX.addGlow(savedGlowConfig.color, savedGlowConfig.outerStrength, savedGlowConfig.innerStrength);            
-        }).on('pointerup', () => {
-            if(!devConfig.consoleLog) return;
-            console.log("%c ", "color:green", "Clicked unit:");
-            console.log(this.state);
-            console.log(this.unitProps);
-        })
+        });
         this.changeState(UnitStates.WALKING);
     }
     
@@ -201,11 +196,9 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
         if (!this.active) {
             return;
         }
-        //super.update(time, delta);
         // Keep unit moving when not blocked
         if (this.state !== UnitStates.DEAD && this.state !== UnitStates.WALKING && !this.isBlocked()[0]) {
             this.changeState(UnitStates.WALKING);
-            //this.moveForward();
         }
 
         if(this.state === UnitStates.ATTACKING || this.state === UnitStates.SHOOTING){
@@ -580,12 +573,6 @@ export class Unit extends Phaser.Physics.Arcade.Sprite {
                 }
             }
         }
-            /*return overlap.some(object => {
-                if (object.gameObject instanceof Unit && object.gameObject.isAlive()) {
-                    return [true, object.gameObject];
-                }
-                return [false, null];
-            });*/
         return [false, null];
         
     }

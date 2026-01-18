@@ -92,8 +92,6 @@ export default class SaveManager {
         return new Promise((resolve, reject) => {
             try {
                 localStorage.setItem(saveSlot, JSON.stringify(save));
-                console.log("Saved game to " + saveSlot);
-                console.log(save);
                 resolve();            
             }
             catch(e) {
@@ -143,7 +141,6 @@ export default class SaveManager {
             scene.registry.set('gamesPlayed', saveData.playerData.gamesPlayed);
             scene.registry.set('gamesWon', saveData.playerData.gamesWon);
             scene.registry.set('lastStageWon', saveData.playerData.lastStageWon);
-            console.log("Loaded game from " + saveSlot);
             return true;
         }
         return false;

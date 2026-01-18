@@ -30,7 +30,6 @@ export class PlayerController {
     public selectedUnits: Map<string, {unitConfig: UnitProps, upgrades: string[]}> = new Map();
     upgradeManager: UpgradeManager;
     potionID: string | undefined = undefined;
-    //public unitsUpgrades: Array<{unitType: string, upgrades: UnitUpgrade[]}> = [];
 
     constructor(scene: Phaser.Scene, playerBase: PlayerBase, spawnPosition: Phaser.Math.Vector2, ownUnitsPhysics: Phaser.Physics.Arcade.Group,
         enemyUnitsPhysics: Phaser.Physics.Arcade.Group, projectiles: Phaser.Physics.Arcade.Group,
@@ -106,77 +105,6 @@ export class PlayerController {
         }
 
         return newStats;
-
-        /*interface UnitModifier {
-            stat: keyof UnitProps; 
-            type: 'flat' | 'percent'; 
-            value: number;
-        }
-
-        // Get list of upgrades for specified unit then extract just the effect objects from it
-        const unitUpgrades = this.unitsUpgrades.find(unitUpgrades => unitUpgrades.unitType === unitType)?.upgrades || [];
-        const allUpgradeEffects = unitUpgrades.flatMap((upgrade: UnitUpgrade) => upgrade.effects);
-
-        // 💡 DEBUGGING CODE: Add this block temporarily
-        for (let i = 0; i < allUpgradeEffects.length; i++) {
-            const effect = allUpgradeEffects[i];
-            if (effect === null || effect === undefined) {
-                // This will print the exact location of the invalid data
-                console.error(`ERROR: Null/Undefined found at index ${i} in allUpgradeEffects!`);
-                console.log("Full array for context:", allUpgradeEffects);
-                console.log("Full map for the context:", unitUpgrades);
-                console.log("Current potion for the context:", typeof this.scene.registry.get('playerPotion'));
-                // You can also add a debugger breakpoint here:
-                // debugger; 
-            }
-        }
-        // 💡 END DEBUGGING CODE
-
-        //Split extracted effects to flat bonuses and percentage bonuses
-        const flatUpgrades : UnitModifier[]  = allUpgradeEffects.filter((effect: { stat: string; type: string; value: number; }) => effect && effect.type === 'flat') as UnitModifier[]; 
-        const percentUpgrades : UnitModifier[] = allUpgradeEffects.filter((effect: { stat: string; type: string; value: number; }) => effect && effect.type === 'percent') as UnitModifier[];
-
-        // Calculate new stats starting with base stats and increasing them directly by flat upgrades
-        const newStats = flatUpgrades.reduce((acc, modifier : UnitModifier) => {
-            const newAcc = {...acc};
-            const currentStat = modifier.stat;
-            const baseValue = (newAcc[currentStat] as number) ?? 0;
-
-            if (typeof baseValue === 'number' && modifier.type === 'flat') {
-                (newAcc[currentStat] as number) = baseValue + modifier.value;
-            }
-
-            return newAcc;
-        }, {...baseStats});
-
-        // Calculate percentage bonuses for each stat by adding them together
-        const percentageTotals: Partial<Record<keyof UnitProps, number>> = {};
-        percentUpgrades.forEach((modifier) => {
-            const stat = modifier.stat;
-            // Accumulate the percentage bonuses
-            percentageTotals[stat] = (percentageTotals[stat] || 0) + modifier.value;
-        });
-
-        let finalStats: UnitProps = { ...newStats }; // Start with the flat-modified stats
-
-        // Apply the percentage bonuses
-        for (const stat in percentageTotals) {
-            if (percentageTotals.hasOwnProperty(stat)) {
-                const currentStat = stat as keyof UnitProps;
-                const totalBonus = percentageTotals[currentStat]!;
-
-                // The multiplier is 1 + totalBonus
-                const multiplier = 1 + totalBonus; 
-                
-                const currentValue = (finalStats[currentStat] as number) ?? 0;
-
-                if (typeof currentValue === 'number') {
-                    // Apply the single multiplier and floor it down to next integer
-                    (finalStats[currentStat] as number) = Math.floor(currentValue * multiplier);
-                }
-            }
-        }
-        return finalStats;*/
     }
 
     // Sets passive (per second) income to amount (if override is true) or by default it increases income by the amount (if override is false)
@@ -207,7 +135,6 @@ export class PlayerController {
         
         // If spawntime has been reduced below zero and base is not blocked, release the unit
         if(!this.playerBase.isBlocked() && this.isSpawning && this.unitQueue.length > 0 && this.spawnTime <= 0 && this.framesSinceSpawn >= 3){
-            if(devConfig.consoleLog) console.log(`Spawning ${this.faction} ${this.unitQueue[0]} unit`);
             eventsCenter.emit('unit-spawned', this.faction, this.unitQueue[0]);
             this.spawnUnit(this.unitQueue[0]);
             this.unitQueue.shift();
@@ -270,7 +197,6 @@ export class PlayerController {
             // Spawn unit
             unit.spawn(newUnitProps, this.ownUnitsPhysics, pool, this.enemyUnitsPhysics, this.baseGroup, this.projectiles, projectilePool);
             this.ownUnitsPhysics.add(unit);
-            if(devConfig.consoleLog) console.log("%cSpawning unit with  id: " + this.unitCounter, `color: ${this.faction}`);
             this.unitCounter++;
             unit.moveForward();
             return unit;

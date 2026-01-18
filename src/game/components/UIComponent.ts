@@ -453,12 +453,6 @@ export class UIComponent extends Phaser.GameObjects.Container {
             return 'setPosition' in element && 'displayHeight' in element && 'displayWidth' in element && 'originY' in element;
         }
 
-        const itemCount = this.content.length;
-        /*if(itemCount <= 0 && this.fixedContent.length <= 0){ {
-            console.error('UIComponent: positionElements() called without any elements!');
-            return;
-        }*/
-
         // Calculate height of all (non-fixed) elements
         const totalContentHeight = this.calculateTotalContentHeight();
 
